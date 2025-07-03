@@ -83,11 +83,8 @@ const brandSchema = new mongoose.Schema({
 });
 
 //Password Hashing
-brandSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
-  next();
-});
+const passwordHashing = require('../middlewares/hashPassword');
+brandSchema.pre('save', passwordHashing);
 
 
 module.exports = mongoose.model('brand', brandSchema);

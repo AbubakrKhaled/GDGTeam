@@ -25,11 +25,8 @@ const adminSchema = new mongoose.Schema({
 });
 
 //Password Hashing
-adminSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
-  next();
-});
+const passwordHashing = require('../middlewares/hashPassword');
+brandSchema.pre('save', passwordHashing);
 
 
 module.exports = mongoose.model('admin', adminSchema);
