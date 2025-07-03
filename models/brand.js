@@ -73,7 +73,7 @@ const brandSchema = new mongoose.Schema({
     }],
     role:{
         type: String,
-        enum: ['admin', 'brand', 'customer'],
+        enum: ['brand'],
         default: 'brand'
     },
     createdAt:{
@@ -81,5 +81,13 @@ const brandSchema = new mongoose.Schema({
         default: Date.now
     }
 });
+
+//Password Hashing
+brandSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
 
 module.exports = mongoose.model('brand', brandSchema);
