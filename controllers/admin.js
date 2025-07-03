@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const Brand = require("../models/brand");
+const Customer = require("../models/customer");
 
 // for logging in **************************************************************************************
 exports.adminLogin = async (req, res) => {
@@ -91,6 +92,63 @@ exports.deleteBrand = async (req, res, next) => {
 		}
 
 		await Brand.findByIdAndDelete(id);
+
+        res.status(200).json({success: true, data: {}});
+    } catch(err){
+        next(err);
+    }
+}
+// ******************************************************************************************************
+//customer operations ***********************************************************************************
+exports.getAllCustomers = async (req, res, next) => {
+	try {
+		if (!req.admin) {
+		return next(new ErrorResponse('Not authorized as admin', 401));
+		}
+
+		const customer = await Customer.find();
+
+		res.status(200).json({success: true, data: customer});
+
+	} catch(err) {
+		next(err);
+	}
+}
+
+exports.getCustomerById = async (req, res, next) => {
+    const id = req.params.id;
+    try {
+		if (!req.admin) {
+		return next(new ErrorResponse('Not authorized as admin', 401));
+		}
+
+		const customer = await Customer.findById(id);
+
+		if (!Customer) {
+		return next(new ErrorResponse('Customer not found', 404));
+		}
+
+        res.status(200).json({success: true, data: customer});
+
+    } catch(err) {
+        next(err);
+    }
+}
+
+exports.deleteCustomer = async (req, res, next) => {
+    const id = req.params.id;
+    try {
+		if (!req.admin) {
+		return next(new ErrorResponse('Not authorized as admin', 401));
+		}
+		
+		const customer = await Customer.findById(id);
+
+		if (!customer) {
+		return next(new ErrorResponse('Customer not found', 404));
+		}
+
+		await Customer.findByIdAndDelete(id);
 
         res.status(200).json({success: true, data: {}});
     } catch(err){

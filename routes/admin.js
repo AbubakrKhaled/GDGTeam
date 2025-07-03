@@ -17,14 +17,17 @@ router.post('/login', adminLogin);
 
 router
     .route('/')
-    .get(getAllBrands);
+    .get(getAllBrands)
+    .get(getAllCustomers);
 
 router
     .route('/:id')
     .get(getBrandById)
+    .get(getCustomerById)
 
     .put(brandApproval)
 
-    .delete(deleteBrand);
+    .delete(deleteBrand)
+    .delete(deleteCustomer);
 
 module.exports = router;
