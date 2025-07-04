@@ -18,7 +18,7 @@ app.use(express.json());
 app.use('/api/admin', adminRoutes);
 app.use('/api/brand', brandRoutes); 
 app.use('/api/customer', customerRoutes);
-app.use('/api/products', productsRoutes);
+app.use('/api/product', productsRoutes);
 
 app.use(errorHandler);
 

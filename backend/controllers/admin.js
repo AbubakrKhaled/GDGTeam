@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const Brand = require("../models/brand");
-const Customer = require("../models/customer");
-const Order = require("../models/order");
+const Brand = require("../models/brand.js");
+const Customer = require("../models/customer.js");
+const Order = require("../models/order.js");
 
 // for logging in **************************************************************************************
 exports.adminLogin = async (req, res) => {

@@ -15,8 +15,8 @@ const {
     getAllOrders,
     getOrderById,
     updateOrderStatus,
-} = require('../controllers/admin');
-const adminAuth = require('../middlewares/adminauth');
+} = require('../controllers/admin.js');
+const adminAuth = require('../middlewares/adminauth.js');
 
 router.post('/login', adminLogin);
 
