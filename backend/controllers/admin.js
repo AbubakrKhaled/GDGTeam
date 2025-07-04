@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const Brand = require("../models/brand");
 const Customer = require("../models/customer");
+const Order = require("../models/order");
 
 // for logging in **************************************************************************************
 exports.adminLogin = async (req, res) => {
@@ -126,4 +127,50 @@ exports.deleteCustomer = async (req, res, next) => {
     } catch(err){
         next(err);
     }
+}
+// ******************************************************************************************************
+//order operations **************************************************************************************
+exports.getAllOrders = async (req, res, next) => {
+	try {
+		const order = await order.find();
+
+		res.status(200).json({success: true, data: order});
+
+	} catch(err) {
+		next(err);
+	}
+}
+
+exports.getOrderById = async (req, res, next) => {
+    const id = req.params.id;
+    try {
+		const order = await Order.findById(id);
+
+		if (!order) {
+		return next(new ErrorResponse('Order not found', 404));
+		}
+
+        res.status(200).json({success: true, data: order});
+
+    } catch(err) {
+        next(err);
+    }
+}
+
+exports.updateOrderStatus = async (req, res, next) => {
+	const id = req.params.id;
+	try {
+		const order = await Order.findById(id);
+
+		if (!order) {
+		return next(new ErrorResponse('Order not found', 404));
+		}
+
+		order.status = req.body.status;
+		await order.save();
+
+		res.status(200).json({success: true, data: order});
+	} catch(err){
+		next(err);
+	}
 }

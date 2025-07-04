@@ -18,6 +18,10 @@ const orderSchema = new mongoose.Schema({
             }
         }
     ],
+    brands: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'brand'
+    }],
     totalPrice: {
         type: Number,
         required: [true]

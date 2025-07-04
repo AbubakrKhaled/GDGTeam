@@ -14,7 +14,6 @@ const productsRoutes = require('./routes/product');
 const app = express();
 
 app.use(express.json());
-app.use(errorHandler);
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/brand', brandRoutes); 
