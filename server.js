@@ -10,7 +10,7 @@ connectDB();
 const adminRoutes = require('./routes/admin');
 const brandRoutes = require('./routes/brand'); 
 const customerRoutes = require('./routes/customer'); 
-const productsRoutes = require('./routes/products');
+const productsRoutes = require('./routes/product');
 const app = express();
 
 app.use(express.json());

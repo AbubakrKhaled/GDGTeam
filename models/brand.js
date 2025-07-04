@@ -50,7 +50,7 @@ const brandSchema = new mongoose.Schema({
     payment:{
         type: [String],
         required: [true, 'Please choose accepted payment methods'],
-        enum: ['Instapay', 'Vodafone Cash', 'Cash on delivery']
+        enum: ['Instapay', 'Vodafone Cash']
     },
     description:{
         type: String,
