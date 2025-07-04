@@ -7,6 +7,10 @@ const Order = require("../models/order");
 // for logging in **************************************************************************************
 exports.adminLogin = async (req, res) => {
 	const { username, password } = req.body;
+	/*
+	const username = req.body.username;
+	const password = req.body.password;
+	*/
 
   	if (username !== process.env.ADMIN_USERNAME)
     	return res.status(401).json({ message: 'Invalid credentials' });
