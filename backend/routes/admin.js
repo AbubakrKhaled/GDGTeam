@@ -11,6 +11,10 @@ const {
     getAllCustomers,
     getCustomerById,
     deleteCustomer,
+
+    getAllOrders,
+    getOrderById,
+    updateOrderStatus,
 } = require('../controllers/admin');
 const adminAuth = require('../middlewares/adminauth');
 
@@ -24,6 +28,10 @@ router.delete('/brands/:id', adminAuth, deleteBrand);
 router.get('/customers', adminAuth, getAllCustomers);
 router.get('/customers/:id', adminAuth, getCustomerById);
 router.delete('/customers/:id', adminAuth, deleteCustomer);
+
+router.get('/orders', adminAuth, getAllOrders);
+router.get('/orders/:id', adminAuth, getOrderById);
+router.put('/orders/:id/status', adminAuth, updateOrderStatus);
 
 
 module.exports = router;
