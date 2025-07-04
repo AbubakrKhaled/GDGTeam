@@ -26,7 +26,6 @@ exports.brandLogin = async (req, res, next) => {
     }
 };
 //************************************************************************************************
-
 exports.createBrand = async (req, res) => {
     try{
         const {
@@ -42,10 +41,7 @@ exports.createBrand = async (req, res) => {
             payment, description, isApproved, ratings, products, role
         });
 
-        res.status(201).json({
-            success: true,
-            data: brand
-        });
+        res.status(201).json({success: true, data: brand});
     }catch(err){
         errorHandler(err);
     }
@@ -64,10 +60,40 @@ exports.updateBrand = async (req, res) => {
             payment, description, isApproved, products, role
         }, {new: true});
 
-        res.status(201).json({
-            success: true,
-            data: brand
+        res.status(201).json({success: true, data: brand});
+    }catch(err){
+        errorHandler(err);
+    }
+}
+//************************************************************************************************
+exports.createProduct = async (req, res) => {
+    try{
+        const {
+            name, price, quantity, imageURL, description, category, color, size, discount
+        } = req.body;
+        const ratings = 0;
+
+        const product = await Product.create({
+            name, price, quantity, imageURL, description, category, color, size, discount, ratings
         });
+
+        res.status(201).json({success: true, data: product});
+    }catch(err){
+        errorHandler(err);
+    }
+}
+
+exports.updateBrand = async (req, res) => {
+    const {
+            name, price, quantity, imageURL, description, category, color, size, discount
+        } = req.body;
+    try{
+        const product = await Product.findByIdAndUpdate(id, {
+            name, price, quantity, imageURL, description, category, color, size, discount
+        }, {new: true});
+
+        res.status(201).json({success: true, data: product});
+
     }catch(err){
         errorHandler(err);
     }
