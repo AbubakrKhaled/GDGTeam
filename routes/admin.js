@@ -12,22 +12,18 @@ const {
     getCustomerById,
     deleteCustomer,
 } = require('../controllers/admin');
+const adminAuth = require('../middlewares/adminauth');
 
 router.post('/login', adminLogin);
 
-router
-    .route('/')
-    .get(getAllBrands)
-    .get(getAllCustomers);
+router.get('/brands', adminAuth, getAllBrands);
+router.get('/brands/:id', adminAuth, getBrandById);
+router.put('/brands/:id/approve', adminAuth, brandApproval);
+router.delete('/brands/:id', adminAuth, deleteBrand);
 
-router
-    .route('/:id')
-    .get(getBrandById)
-    .get(getCustomerById)
+router.get('/customers', adminAuth, getAllCustomers);
+router.get('/customers/:id', adminAuth, getCustomerById);
+router.delete('/customers/:id', adminAuth, deleteCustomer);
 
-    .put(brandApproval)
-
-    .delete(deleteBrand)
-    .delete(deleteCustomer);
 
 module.exports = router;

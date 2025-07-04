@@ -23,10 +23,6 @@ exports.adminLogin = async (req, res) => {
 //brand operations ***********************************************************************************
 exports.getAllBrands = async (req, res, next) => {
 	try {
-		if (!req.admin) {
-		return next(new ErrorResponse('Not authorized as admin', 401));
-		}
-
 		const brand = await Brand.find();
 
 		res.status(200).json({success: true, data: brand});
@@ -39,10 +35,6 @@ exports.getAllBrands = async (req, res, next) => {
 exports.getBrandById = async (req, res, next) => {
     const id = req.params.id;
     try {
-		if (!req.admin) {
-		return next(new ErrorResponse('Not authorized as admin', 401));
-		}
-
 		const brand = await Brand.findById(id);
 
 		if (!brand) {
@@ -59,10 +51,6 @@ exports.getBrandById = async (req, res, next) => {
 exports.brandApproval = async (req, res, next) => {
 	const id = req.params.id;
 	try {
-		if (!req.admin) {
-		return next(new ErrorResponse('Not authorized as admin', 401));
-		}
-
 		const brand = await Brand.findById(id);
 
 		if (!brand) {
@@ -81,10 +69,6 @@ exports.brandApproval = async (req, res, next) => {
 exports.deleteBrand = async (req, res, next) => {
     const id = req.params.id;
     try {
-		if (!req.admin) {
-		return next(new ErrorResponse('Not authorized as admin', 401));
-		}
-		
 		const brand = await Brand.findById(id);
 
 		if (!brand) {
@@ -102,10 +86,6 @@ exports.deleteBrand = async (req, res, next) => {
 //customer operations ***********************************************************************************
 exports.getAllCustomers = async (req, res, next) => {
 	try {
-		if (!req.admin) {
-		return next(new ErrorResponse('Not authorized as admin', 401));
-		}
-
 		const customer = await Customer.find();
 
 		res.status(200).json({success: true, data: customer});
@@ -118,13 +98,9 @@ exports.getAllCustomers = async (req, res, next) => {
 exports.getCustomerById = async (req, res, next) => {
     const id = req.params.id;
     try {
-		if (!req.admin) {
-		return next(new ErrorResponse('Not authorized as admin', 401));
-		}
-
 		const customer = await Customer.findById(id);
 
-		if (!Customer) {
+		if (!customer) {
 		return next(new ErrorResponse('Customer not found', 404));
 		}
 
@@ -138,10 +114,6 @@ exports.getCustomerById = async (req, res, next) => {
 exports.deleteCustomer = async (req, res, next) => {
     const id = req.params.id;
     try {
-		if (!req.admin) {
-		return next(new ErrorResponse('Not authorized as admin', 401));
-		}
-		
 		const customer = await Customer.findById(id);
 
 		if (!customer) {
