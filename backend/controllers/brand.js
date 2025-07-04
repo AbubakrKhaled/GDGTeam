@@ -48,6 +48,7 @@ exports.createBrand = async (req, res) => {
 }
 
 exports.updateBrand = async (req, res) => {
+    const id = req.params.id;
     const {
             brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
             payment, description, products
@@ -55,10 +56,15 @@ exports.updateBrand = async (req, res) => {
         const isApproved = false;
         const role = 'brand';
     try{
+        
         const brand = await Brand.findByIdAndUpdate(id, {
             brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
             payment, description, isApproved, products, role
         }, {new: true});
+        
+        if (!brand) {
+        return next(new ErrorResponse('Brand not found', 404));
+        }
 
         res.status(201).json({success: true, data: brand});
     }catch(err){
@@ -74,7 +80,11 @@ exports.createProduct = async (req, res) => {
         const ratings = 0;
 
         const product = await Product.create({
-            name, price, quantity, imageURL, description, category, color, size, discount, ratings
+            name, price, quantity, imageURL, description, ratings,
+            category: Types.ObjectId(category),
+            color: Types.ObjectId(color),
+            size: Types.ObjectId(size),
+            discount: Types.ObjectId(discount),
         });
 
         res.status(201).json({success: true, data: product});
@@ -83,14 +93,22 @@ exports.createProduct = async (req, res) => {
     }
 }
 
-exports.updateBrand = async (req, res) => {
+exports.updateProduct = async (req, res) => {
+    const id = req.params.id;
     const {
             name, price, quantity, imageURL, description, category, color, size, discount
         } = req.body;
     try{
         const product = await Product.findByIdAndUpdate(id, {
-            name, price, quantity, imageURL, description, category, color, size, discount
-        }, {new: true});
+            name, price, quantity, imageURL, description,
+            category: Types.ObjectId(category),
+            color: Types.ObjectId(color),
+            size: Types.ObjectId(size),
+            discount: Types.ObjectId(discount),        }, {new: true});
+
+        if (!product) {
+        return next(new ErrorResponse('Product not found', 404));
+        }
 
         res.status(201).json({success: true, data: product});
 
