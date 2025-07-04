@@ -69,7 +69,7 @@ const brandSchema = new mongoose.Schema({
     },
     products:[{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'products'
+        ref: 'product'
     }],
     role:{
         type: String,
