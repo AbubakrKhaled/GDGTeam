@@ -1,0 +1,12 @@
+/*
+brand id
+name
+price
+quantity
+imageURL
+description
+category
+color
+size
+discount
+*/
