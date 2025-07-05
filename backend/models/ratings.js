@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema, Types } = mongoose;
 
-const reviewSchema = new Schema({
+const ratingsSchema = new Schema({
   customer: {
     type: Types.ObjectId,
     ref: 'Customer',
@@ -37,4 +37,4 @@ reviewSchema.index(
   { unique: true, partialFilterExpression: { brand: { $exists: true } } }
 );
 
-module.exports = mongoose.model('review', reviewSchema);
+module.exports = mongoose.model('ratings', ratingsSchema);

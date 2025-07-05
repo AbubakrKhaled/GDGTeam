@@ -62,10 +62,8 @@ const brandSchema = new Schema({
         default: false
     },
     ratings:{
-        type: Number,
-        default: 0,
-        min: 0,
-        max: 5
+        type: Types.ObjectId,
+        ref: 'ratings'
     },
     products:[{
         type: mongoose.Schema.Types.ObjectId,

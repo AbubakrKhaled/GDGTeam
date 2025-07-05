@@ -53,13 +53,11 @@ exports.updateBrand = async (req, res) => {
             brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
             payment, description, products
         } = req.body;
-        const isApproved = false;
-        const role = 'brand';
     try{
         
         const brand = await Brand.findByIdAndUpdate(id, {
             brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
-            payment, description, isApproved, products, role
+            payment, description, products
         }, {new: true});
         
         if (!brand) {
@@ -80,11 +78,12 @@ exports.createProduct = async (req, res) => {
         const ratings = 0;
 
         const product = await Product.create({
-            name, price, quantity, imageURL, description, ratings,
+            name, price, quantity, imageURL, description, ratings: 0,
             category: Types.ObjectId(category),
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
             discount: Types.ObjectId(discount),
+            brand: req.user.id
         });
 
         res.status(201).json({success: true, data: product});
@@ -119,7 +118,7 @@ exports.updateProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res, next) => {
     try {
-        const product = await Product.find();
+        const product = await Product.find({ brand: req.user.id });
 
         res.status(200).json({success: true, data: product});
 

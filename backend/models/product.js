@@ -48,9 +48,10 @@ const productSchema = new Schema({
     },
     reviews: {
         type: Types.ObjectId,
-        ref: 'review'
+        ref: 'ratings'
     }    
 
-})
+}, { timestamps: true }
+)
 
 module.exports = mongoose.model('product', productSchema);
