@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const Brand = require("../models/brand.js");
 const Product = require("../models/product.js");
 const ErrorResponse = require('../middlewares/errorresponse');
+const { Schema, model, Types } = mongoose;
+
 
 
 //brand logging in ***************************************************************************

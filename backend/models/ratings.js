@@ -4,16 +4,16 @@ const { Schema, model, Types } = mongoose;
 const ratingsSchema = new Schema({
   customer: {
     type: Types.ObjectId,
-    ref: 'Customer',
+    ref: 'customer',
     required: true
   },
   product: {
     type: Types.ObjectId,
-    ref: 'Product'
+    ref: 'product'
   },
   brand: {
     type: Types.ObjectId,
-    ref: 'Brand'
+    ref: 'brand'
   },
   stars: {
     type: Number,

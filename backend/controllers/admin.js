@@ -4,6 +4,8 @@ const Brand = require("../models/brand.js");
 const Customer = require("../models/customer.js");
 const Order = require("../models/order.js");
 const ErrorResponse = require('../middlewares/errorresponse');
+const { Schema, model, Types } = mongoose;
+
 
 // for logging in **************************************************************************************
 exports.adminLogin = async (req, res) => {

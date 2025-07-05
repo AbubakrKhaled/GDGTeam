@@ -1,14 +1,17 @@
 const ErrorResponse = require('../middlewares/errorresponse');
+const { Schema, model, Types } = mongoose;
+const Product = require("../models/product.js");
+
 
 exports.createProduct = async (req, res,next) => {
     try{
         const {
-            name, price, quantity, imageURL, description, category, color, size, discount
+            productname, price, quantity, imageURL, description, category, color, size, discount
         } = req.body;
         const ratings = 0;
 
         const product = await Product.create({
-            name, price, quantity, imageURL, description, ratings: 0,
+            productname, price, quantity, imageURL, description, ratings: 0,
             category: Types.ObjectId(category),
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
@@ -25,11 +28,11 @@ exports.createProduct = async (req, res,next) => {
 exports.updateProduct = async (req, res) => {
     const id = req.params.id;
     const {
-            name, price, quantity, imageURL, description, category, color, size, discount
+            productname, price, quantity, imageURL, description, category, color, size, discount
         } = req.body;
     try{
         const product = await Product.findByIdAndUpdate(id, {
-            name, price, quantity, imageURL, description,
+            productname, price, quantity, imageURL, description,
             category: Types.ObjectId(category),
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
