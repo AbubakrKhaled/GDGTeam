@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { Schema, model, Types } = mongoose;
 
 const brandSchema = new Schema({
     brandname:{
@@ -37,15 +38,15 @@ const brandSchema = new Schema({
     },
     brandlocation:{
         type: [String],
-        required: [false]
+        required: false
     },
     logoURL:{
         type: String,
-        required: [false]
+        required: false
     },
     deliveryTime:{
         type: String,
-        required: [false]
+        required: false
     },
     payment:{
         type: [String],
@@ -54,7 +55,7 @@ const brandSchema = new Schema({
     },
     description:{
         type: String,
-        required: [false],
+        required: false,
         maxlength: 500
     },
     isApproved:{

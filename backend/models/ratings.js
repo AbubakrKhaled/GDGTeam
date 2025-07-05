@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Schema, Types } = mongoose;
+const { Schema, model, Types } = mongoose;
 
 const ratingsSchema = new Schema({
   customer: {
@@ -28,11 +28,11 @@ const ratingsSchema = new Schema({
 }, {timestamps: true}
 );
 
-reviewSchema.index(
+ratingsSchema.index(
   { customer: 1, product: 1 },
   { unique: true, partialFilterExpression: { product: { $exists: true } } }
 );
-reviewSchema.index(
+ratingsSchema.index(
   { customer: 1, brand: 1 },
   { unique: true, partialFilterExpression: { brand: { $exists: true } } }
 );

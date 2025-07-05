@@ -1,23 +1,23 @@
 const mongoose = require('mongoose');
-const { Schema, Types } = mongoose;
+const { Schema, model, Types } = mongoose;
 
 const productSchema = new Schema({
     brand: {
         type: Types.ObjectId,
         ref: 'brand',
-        required: [true]
+        required: true
     },
     productname: {
         type: String,
-        required: [type]
+        required: type
     },
     price: {
         type: Number,
-        required: [type]
+        required: type
     },
     quantity: {
         type: Number,
-        required: [type]
+        required: type
     },
     imageURL: {
         type: String,
@@ -46,7 +46,7 @@ const productSchema = new Schema({
         type: Types.ObjectId,
         ref: 'discount'
     },
-    reviews: {
+    ratings: {
         type: Types.ObjectId,
         ref: 'ratings'
     }    

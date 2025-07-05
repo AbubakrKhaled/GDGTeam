@@ -5,4 +5,4 @@ const errorHandler = (err, req, res, next) => {
     error: err.message || 'Server Error'
   });
 };
-module.exports = errorhandler;
+module.exports = errorHandler;
