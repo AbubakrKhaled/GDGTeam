@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Brand = require("../models/brand.js");
 const Product = require("../models/product.js");
+const ErrorResponse = require('../middlewares/errorresponse');
+
 
 //brand logging in ***************************************************************************
 exports.brandLogin = async (req, res, next) => {

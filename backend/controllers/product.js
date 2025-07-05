@@ -1,4 +1,6 @@
-exports.createProduct = async (req, res) => {
+const ErrorResponse = require('../middlewares/errorresponse');
+
+exports.createProduct = async (req, res,next) => {
     try{
         const {
             name, price, quantity, imageURL, description, category, color, size, discount
@@ -16,7 +18,7 @@ exports.createProduct = async (req, res) => {
 
         res.status(201).json({success: true, data: product});
     }catch(err){
-        errorHandler(err);
+        next(err);
     }
 }
 
@@ -41,7 +43,7 @@ exports.updateProduct = async (req, res) => {
         res.status(201).json({success: true, data: product});
 
     }catch(err){
-        errorHandler(err);
+        next(err);
     }
 }
 
