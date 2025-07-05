@@ -8,7 +8,7 @@ exports.brandLogin = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
-        const brand = await Brand.findOne({ email });
+        const brand = await Brand.findOne({ email }).select('+password');
         if (!brand)
             return res.status(401).json({ message: 'Invalid email or password' });
 
@@ -43,119 +43,50 @@ exports.createBrand = async (req, res) => {
 
         res.status(201).json({success: true, data: brand});
     }catch(err){
-        errorHandler(err);
+        next(err);
     }
 }
 
-exports.updateBrand = async (req, res) => {
+exports.updateBrand = async (req, res, next) => {
     const id = req.params.id;
+
+    if (req.brand.role !== 'brand' || req.brand.id !== id) {
+        return res.status(403).json({ message: 'Not authorized' });
+    }
+
     const {
-            brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
-            payment, description, products
-        } = req.body;
-    try{
-        
+        brandname, email, categories, phonenumber, page, brandlocation, logoURL,
+        deliveryTime, payment, description, products
+    } = req.body;
+
+    try {
         const brand = await Brand.findByIdAndUpdate(id, {
-            brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
-            payment, description, products
-        }, {new: true});
-        
-        if (!brand) {
-        return next(new ErrorResponse('Brand not found', 404));
-        }
+            brandname, email, categories, phonenumber, page, brandlocation,
+            logoURL, deliveryTime, payment, description, products
+        }, { new: true });
 
-        res.status(201).json({success: true, data: brand});
-    }catch(err){
-        errorHandler(err);
-    }
-}
-//************************************************************************************************
-exports.createProduct = async (req, res) => {
-    try{
-        const {
-            name, price, quantity, imageURL, description, category, color, size, discount
-        } = req.body;
-        const ratings = 0;
+        if (!brand) return next(new ErrorResponse('Brand not found', 404));
 
-        const product = await Product.create({
-            name, price, quantity, imageURL, description, ratings: 0,
-            category: Types.ObjectId(category),
-            color: Types.ObjectId(color),
-            size: Types.ObjectId(size),
-            discount: Types.ObjectId(discount),
-            brand: req.user.id
-        });
-
-        res.status(201).json({success: true, data: product});
-    }catch(err){
-        errorHandler(err);
-    }
-}
-
-exports.updateProduct = async (req, res) => {
-    const id = req.params.id;
-    const {
-            name, price, quantity, imageURL, description, category, color, size, discount
-        } = req.body;
-    try{
-        const product = await Product.findByIdAndUpdate(id, {
-            name, price, quantity, imageURL, description,
-            category: Types.ObjectId(category),
-            color: Types.ObjectId(color),
-            size: Types.ObjectId(size),
-            discount: Types.ObjectId(discount),        }, {new: true});
-
-        if (!product) {
-        return next(new ErrorResponse('Product not found', 404));
-        }
-
-        res.status(201).json({success: true, data: product});
-
-    }catch(err){
-        errorHandler(err);
-    }
-}
-
-exports.getAllProducts = async (req, res, next) => {
-    try {
-        const product = await Product.find({ brand: req.user.id });
-
-        res.status(200).json({success: true, data: product});
-
-    } catch(err) {
+        res.status(201).json({ success: true, data: brand });
+    } catch (err) {
         next(err);
     }
-}
+};
 
-exports.getProductById = async (req, res, next) => {
+exports.getBrandById = async (req, res, next) => {
     const id = req.params.id;
+
+    if (req.brand.role !== 'brand' || req.brand.id !== id) {
+        return res.status(403).json({ message: 'Not authorized' });
+    }
+
     try {
-        const product = await Product.findById(id);
+        const brand = await Brand.findById(id);
+        if (!brand) return next(new ErrorResponse('Brand not found', 404));
 
-        if (!product) {
-        return next(new ErrorResponse('Product not found', 404));
-        }
-
-        res.status(200).json({success: true, data: product});
-
-    } catch(err) {
+        res.status(200).json({ success: true, data: brand });
+    } catch (err) {
         next(err);
     }
-}
+};
 
-exports.deleteProduct = async (req, res, next) => {
-    const id = req.params.id;
-    try {
-        const product = await Product.findById(id);
-
-        if (!product) {
-        return next(new ErrorResponse('Product not found', 404));
-        }
-
-        await Product.findByIdAndDelete(id);
-
-        res.status(200).json({success: true, data: {}});
-    } catch(err){
-        next(err);
-    }
-}

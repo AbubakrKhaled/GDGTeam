@@ -5,10 +5,7 @@ const {
 
     createBrand,
     updateBrand,
-
-    getAllProducts,
-    getProductById,
-    deleteProduct,
+    getBrandById
 } = require('../controllers/brand.js');
 const brandAuth = require('../middlewares/brandauth.js');
 
@@ -16,12 +13,7 @@ router.post('/login', brandLogin)
 
 router.post('/signup', createBrand);
 
-router.put('/:id/profile', brandAuth, updateBrand);
-
-router.get('/products', brandAuth, getAllProducts);
-router.get('/products/:id', brandAuth, getProductById);
-router.delete('/products/:id', brandAuth, deleteProduct);
-
-
+router.put('/:id/update', brandAuth, updateBrand);
+router.get('/:id/profile', brandAuth, getBrandById);
 
 module.exports = router;

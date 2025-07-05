@@ -31,7 +31,8 @@ exports.updateProduct = async (req, res) => {
             category: Types.ObjectId(category),
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
-            discount: Types.ObjectId(discount),        }, {new: true});
+            discount: Types.ObjectId(discount),       
+        }, {new: true});
 
         if (!product) {
         return next(new ErrorResponse('Product not found', 404));
