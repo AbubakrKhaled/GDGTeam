@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const orderSchema = new mongoose.Schema({
+const orderSchema = new Schema({
     customer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'customer',
@@ -40,9 +40,8 @@ const orderSchema = new mongoose.Schema({
         enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
         //pending=while we send order to business. processing=business making order. shipped=business shipping.
         default: 'Pending'
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
     }
-})
+}, { timestamps: true }
+)
+
+module.exports = mongoose.model('order', orderSchema);

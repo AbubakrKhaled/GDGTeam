@@ -4,7 +4,7 @@ const { Schema, model, Types } = mongoose;
 const categorySchema = new Schema({
   category: {
     type: String,
-    required: [true, 'Please enter product category']
+    required: [true, 'Please enter category']
   }
 });
 
@@ -38,17 +38,17 @@ const discountSchema = new Schema({
   validTo: Date,
   targets: [
     {
-      brand: { type: Types.ObjectId, ref: 'Brand' },
-      category: { type: Types.ObjectId, ref: 'Category' },
-      product: { type: Types.ObjectId, ref: 'Product' }
+      brand: { type: Types.ObjectId, ref: 'brand' },
+      category: { type: Types.ObjectId, ref: 'category' },
+      product: { type: Types.ObjectId, ref: 'product' }
     }
   ]
 });
 
 
 module.exports = {
-  Category: model('Category', categorySchema),
-  Color: model('Color', colorSchema),
-  Size: model('Size', sizeSchema),
-  Discount: model('Discount', discountSchema)
+  Category: model('category', categorySchema),
+  Color: model('color', colorSchema),
+  Size: model('size', sizeSchema),
+  Discount: model('discount', discountSchema)
 };

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const brandSchema = new mongoose.Schema({
+const brandSchema = new Schema({
     brandname:{
         type: String,
         required: [true, 'Please add a name']
@@ -75,12 +75,9 @@ const brandSchema = new mongoose.Schema({
         type: String,
         enum: ['brand'],
         default: 'brand'
-    },
-    createdAt:{
-        type: Date,
-        default: Date.now
     }
-});
+}, { timestamps: true }
+);
 
 //Password Hashing
 const passwordHashing = require('../middlewares/hashPassword');

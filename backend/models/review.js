@@ -17,7 +17,7 @@ const reviewSchema = new Schema({
   },
   stars: {
     type: Number,
-    min: 0,
+    min: 1,
     max: 5,
     required: true
   },
@@ -25,9 +25,8 @@ const reviewSchema = new Schema({
     type: String,
     maxlength: 1000
   }
-}, {
-  timestamps: true
-});
+}, {timestamps: true}
+);
 
 reviewSchema.index(
   { customer: 1, product: 1 },
@@ -38,4 +37,4 @@ reviewSchema.index(
   { unique: true, partialFilterExpression: { brand: { $exists: true } } }
 );
 
-module.exports = mongoose.model('Review', reviewSchema);
+module.exports = mongoose.model('review', reviewSchema);

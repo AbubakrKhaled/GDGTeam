@@ -7,13 +7,12 @@ const customerAuth = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (decoded.role !== 'customer') {
-      return res.status(403).json({ message: 'Only customers can perform this action' });
+      return res.status(403).json({ message: 'Not authorized as customer' });
     }
-
-    req.user = decoded;
+    req.customer = decoded;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
+    return res.status(403).json({ message: 'Unauthorized or invalid token' });
   }
 };
 
