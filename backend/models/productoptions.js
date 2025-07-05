@@ -39,7 +39,6 @@ const discountSchema = new Schema({
   targets: [
     {
       brand: { type: Types.ObjectId, ref: 'brand' },
-      category: { type: Types.ObjectId, ref: 'category' },
       product: { type: Types.ObjectId, ref: 'product' }
     }
   ]
