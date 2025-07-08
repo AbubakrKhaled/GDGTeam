@@ -16,7 +16,7 @@ const {
     getOrderById,
     updateOrderStatus,
 } = require('../controllers/admin.js');
-const adminAuth = require('../middlewares/adminauth.js');
+const adminAuth = require('../middlewares/isAuth');
 
 router.post('/login', adminLogin);
 
@@ -24,7 +24,8 @@ router.get('/brands', adminAuth, getAllBrands);
 router.get('/brands/:id', adminAuth, getBrandById);
 router.put('/brands/:id/approve', adminAuth, brandApproval);
 router.delete('/brands/:id', adminAuth, deleteBrand);
-
+router.put('/brand/:id', adminAuth, activate); // Soft delete
+router.put('/brand/:id/activate', adminAuth, deactivate); // Soft delete
 router.get('/customers', adminAuth, getAllCustomers);
 router.get('/customers/:id', adminAuth, getCustomerById);
 router.delete('/customers/:id', adminAuth, deleteCustomer);

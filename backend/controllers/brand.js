@@ -61,7 +61,7 @@ exports.updateBrand = async (req, res, next) => {
 
     const {
         brandname, email, categories, phonenumber, page, brandlocation, logoURL,
-        deliveryTime, payment, description, products
+        deliveryTime, payment, description, products , password
     } = req.body;
 
     try {

@@ -49,7 +49,11 @@ const productSchema = new Schema({
     ratings: {
         type: Types.ObjectId,
         ref: 'ratings'
-    }    
+    } ,
+    isActive:{
+        type: Boolean,
+        default: true
+    }
 
 }, { timestamps: true }
 )

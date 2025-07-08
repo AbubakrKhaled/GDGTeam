@@ -57,6 +57,6 @@ const customerSchema = new Schema(
 
 //Password Hashing
 const passwordHashing = require('../middlewares/hashPassword');
-brandSchema.pre('save', passwordHashing);
+customerSchema.pre('save', passwordHashing);
 
-module.exports = mongoose.model('order', customerSchema);
+module.exports = mongoose.model('customer', customerSchema);

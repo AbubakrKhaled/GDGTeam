@@ -19,10 +19,10 @@ const orderSchema = new Schema({
             }
         }
     ],
-    brands: [{
+    brands: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'brand'
-    }],
+    },
     totalPrice: {
         type: Number,
         required: true

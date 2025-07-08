@@ -39,7 +39,7 @@ const brandSchema = new Schema({
     brandlocation:{
         type: [String],
         required: false
-    },
+    },// search why
     logoURL:{
         type: String,
         required: false
