@@ -9,11 +9,11 @@ const productSchema = new Schema({
     },
     productname: {
         type: String,
-        required: type
+        required: true
     },
     price: {
         type: Number,
-        required: type
+        required: true
     },
     quantity: {
         type: Number,

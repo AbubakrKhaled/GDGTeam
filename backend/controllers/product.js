@@ -1,8 +1,9 @@
 const ErrorResponse = require('../middlewares/errorresponse');
+const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
 const Product = require("../models/product.js");
 
-
+// check if the product already exists
 exports.createProduct = async (req, res,next) => {
     try{
         const {
@@ -25,6 +26,7 @@ exports.createProduct = async (req, res,next) => {
     }
 }
 
+// here search for the product by id and if it exists, update it dont update the product if it does not exist
 exports.updateProduct = async (req, res) => {
     const id = req.params.id;
     const {

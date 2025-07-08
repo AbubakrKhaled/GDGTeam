@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Brand = require("../models/brand.js");
 const Product = require("../models/product.js");
 const ErrorResponse = require('../middlewares/errorresponse');
+const mongoose = require('mongoose'); // need to add this to be able to use mongoose methods like findById, find, etc.
 const { Schema, model, Types } = mongoose;
 
 
@@ -36,7 +37,7 @@ exports.createBrand = async (req, res) => {
             brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
             payment, description, products
         } = req.body;
-        const isApproved = false;
+        const isApproved = false; // excellent ✅
         const ratings = 0;
         const role = 'brand';
 

@@ -1,3 +1,4 @@
+// what is isModified ??
 const bcrypt = require('bcryptjs');
 
 module.exports = async function hashPassword(next) {

@@ -4,6 +4,7 @@ const Brand = require("../models/brand.js");
 const Customer = require("../models/customer.js");
 const Order = require("../models/order.js");
 const ErrorResponse = require('../middlewares/errorresponse');
+const mongoose = require('mongoose'); // need to add this to be able to use mongoose methods like findById, find, etc.
 const { Schema, model, Types } = mongoose;
 
 
@@ -25,6 +26,7 @@ exports.adminLogin = async (req, res) => {
 };
 // ******************************************************************************************************
 //brand operations ***********************************************************************************
+// where is the different cases handling
 exports.getAllBrands = async (req, res, next) => {
 	try {
 		const brand = await Brand.find();
@@ -40,9 +42,10 @@ exports.getBrandById = async (req, res, next) => {
     const id = req.params.id;
     try {
 		const brand = await Brand.findById(id);
-
+		// look it is better and more convenient to send response to the frontend not only threw error apply to all
 		if (!brand) {
-		return next(new ErrorResponse('Brand not found', 404));
+			return res.status(404).json({success: false, message: 'Not Found'});
+			// return next(new ErrorResponse('Brand not found', 404));
 		}
 
         res.status(200).json({success: true, data: brand});
@@ -52,6 +55,7 @@ exports.getBrandById = async (req, res, next) => {
     }
 }
 
+// loved the way you thought about the brand approval ❤️
 exports.brandApproval = async (req, res, next) => {
 	const id = req.params.id;
 	try {
@@ -70,6 +74,7 @@ exports.brandApproval = async (req, res, next) => {
 	}
 };
 
+// good job but for knowledge search for something called soft delete (we will discuss it later)
 exports.deleteBrand = async (req, res, next) => {
     const id = req.params.id;
     try {

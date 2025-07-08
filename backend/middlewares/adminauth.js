@@ -1,3 +1,8 @@
+// it is not common to have separate files for auth middlewares specially when you dont add any new logic
+// you just change the condition to check if the user is admin or whatever role you want
+// you can make this middleware more generic by passing the role as a parameter and then call it isAuth.
+
+
 const jwt = require('jsonwebtoken');
 
 const adminAuth = (req, res, next) => {

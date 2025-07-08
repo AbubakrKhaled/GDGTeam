@@ -48,16 +48,18 @@ const brandSchema = new Schema({
         type: String,
         required: false
     },
-    payment:{
-        type: [String],
-        required: [true, 'Please choose accepted payment methods'],
-        enum: ['Instapay', 'Vodafone Cash']
-    },
+    // remove this field usually we control it by dealing with the business(brands) by signing contracts
+    // payment:{
+    //     type: [String],
+    //     required: [true, 'Please choose accepted payment methods'],
+    //     enum: ['Instapay', 'Vodafone Cash']
+    // },
     description:{
         type: String,
         required: false,
         maxlength: 500
     },
+    // good to have this field to know if the brand is approved by the admin or not
     isApproved:{
         type: Boolean,
         default: false
