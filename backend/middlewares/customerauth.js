@@ -1,19 +1,11 @@
-const jwt = require('jsonwebtoken');
+ const isAuth = require('./isAuth'); // adjust the path as needed
 
-const customerAuth = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'No token provided' });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role !== 'customer') {
-      return res.status(403).json({ message: 'Not authorized as customer' });
-    }
-    req.customer = decoded;
+// Factory returns a middleware restricted to "customer" role
+const customerAuth = (req, res, next) =>
+  isAuth('customer')(req, res, () => {
+    // Optional alias so existing code that reads req.customer still works
+    req.customer = req.user;
     next();
-  } catch (err) {
-    return res.status(403).json({ message: 'Unauthorized or invalid token' });
-  }
-};
+  });
 
 module.exports = customerAuth;
