@@ -1,6 +1,7 @@
-// complete this file
 const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
+const User = require('./User.js');
+
 
 const customerSchema = new Schema({
     gender:{
@@ -27,9 +28,9 @@ const customerSchema = new Schema({
 }, { timestamps: true }
 );
 
-const customer = User.discriminator('customer', customerSchema);
-
 const passwordHashing = require('../middlewares/hashPassword');
-customer.schema.pre('save', passwordHashing);
+customerSchema.pre('save', passwordHashing);
+
+const customer = User.discriminator('customer', customerSchema);
 
 module.exports = customer

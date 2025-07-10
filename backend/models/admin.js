@@ -4,7 +4,7 @@ const User = require('./User.js');
 
 
 const adminSchema = new Schema({
-    role: {
+    adminlevel: {
         type: String,
         enum: ['Root', 'Moderator', 'Support'],
         default: 'Support',
@@ -13,9 +13,9 @@ const adminSchema = new Schema({
 }, { timestamps: true }
 );
 
-const admin = User.discriminator('admin', adminSchema);
-
 const passwordHashing = require('../middlewares/hashPassword');
-admin.schema.pre('save', passwordHashing);
+adminSchema.pre('save', passwordHashing);
+
+const admin = User.discriminator('admin', adminSchema);
   
 module.exports = admin

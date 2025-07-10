@@ -43,19 +43,14 @@ const brandSchema = new Schema({
     products:[{
         type: Types.ObjectId,
         ref: 'product'
-    }],
-    role:{
-        type: String,
-        enum: ['brand'],
-        default: 'brand'
-    }
+    }]
 }, { timestamps: true }
 );
 
-const brand = User.discriminator('brand', brandSchema);
 
 const passwordHashing = require('../middlewares/hashPassword');
-brand.schema.pre('save', passwordHashing);
+brandSchema.pre('save', passwordHashing);
 
+const brand = User.discriminator('brand', brandSchema);
 
 module.exports = brand;

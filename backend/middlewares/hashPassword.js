@@ -1,5 +1,5 @@
 // what is isModified ??
-const bcrypt = require('bcryptjs');
+/*const bcrypt = require('bcryptjs');
 const {brand} = require('../models/brand'); // Adjust the path as necessary
 
 module.exports = async function hashPassword(next) {
@@ -9,4 +9,13 @@ module.exports = async function hashPassword(next) {
     this.password = await bcrypt.hash(this.password, 12);
   }
   next();           // call once, whether we hashed or not
+};
+*/
+
+const bcrypt = require('bcryptjs');
+
+module.exports = async function hashPassword(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 8);
+  next();
 };
