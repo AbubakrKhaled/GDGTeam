@@ -4,19 +4,18 @@ const User = require('./User.js');
 
 
 const adminSchema = new Schema({
-    
-      role: {
+    role: {
         type: String,
-        enum: ['ROOT', 'MODERATOR', 'SUPPORT'],
-        default: 'MODERATOR',
+        enum: ['Root', 'Moderator', 'Support'],
+        default: 'Support',
         required: [true, 'Please assign a role']
-      },
-     
-  }, { timestamps: true }
-  );
+    },
+}, { timestamps: true }
+);
+
+const admin = User.discriminator('admin', adminSchema);
+
+const passwordHashing = require('../middlewares/hashPassword');
+admin.schema.pre('save', passwordHashing);
   
-  // Password Hashing 
-  const passwordHashing = require('../middlewares/hashPassword');
-  adminSchema.pre('save', passwordHashing);
-  
-  module.exports = model('Admin', adminSchema);
+module.exports = admin

@@ -2,35 +2,14 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Schema, model, Types } = mongoose;
+const User = require('./User');
+
 
 const brandSchema = new Schema({
-    brandname:{
-        type: String,
-        required: [true, 'Please add a name']
-    },
-    email:{
-        type: String,
-        required: [true, 'Please add an email'],
-        unique: true,
-        match: [
-            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-            'Please add a valid email'
-        ]
-    },
-    password:{
-        type: String,
-        required: [true, 'Please add a password'],
-        minlength: 6,
-        select: false
-    },
     categories:{
         type: [String],
         enum: ['Clothes', 'Food', 'Skincare', 'Technology'],
         required: [true, 'Please add categories of all products']
-    },
-    phonenumber:{
-        type: String,
-        required: [true, 'Please add phone number']
     },
     page:{
         type: [String],
@@ -62,7 +41,7 @@ const brandSchema = new Schema({
         ref: 'ratings'
     },
     products:[{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: 'product'
     }],
     role:{
@@ -73,9 +52,10 @@ const brandSchema = new Schema({
 }, { timestamps: true }
 );
 
-//Password Hashing
+const brand = User.discriminator('brand', brandSchema);
+
 const passwordHashing = require('../middlewares/hashPassword');
-brandSchema.pre('save', passwordHashing);
+brand.schema.pre('save', passwordHashing);
 
 
-module.exports = mongoose.model('brand', brandSchema);
+module.exports = brand;
