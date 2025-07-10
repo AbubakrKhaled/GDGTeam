@@ -7,7 +7,7 @@ const {
     getProductById,
     deleteProduct
 } = require('../controllers/product.js');
-const brandAuth = require('../middlewares/brandauth.js');
+const { brandAuth } = require('../middlewares/auth.js');
 
 router.get('/', brandAuth, getAllProducts);
 

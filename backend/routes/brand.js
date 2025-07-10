@@ -6,7 +6,7 @@ const {
     updateBrand,
     getBrandById
 } = require('../controllers/brand.js');
-const brandAuth = require('../middlewares/brandauth.js');
+const { brandAuth } = require('../middlewares/auth.js');
 
 router.post('/login', brandLogin)
 
