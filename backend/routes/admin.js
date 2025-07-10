@@ -18,6 +18,7 @@ const {
 } = require('../controllers/admin.js');
 const adminAuth = require('../middlewares/isAuth');
 
+
 router.post('/login', adminLogin);
 
 router.get('/brands', adminAuth, getAllBrands);

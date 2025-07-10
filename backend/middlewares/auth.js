@@ -1,21 +1,16 @@
-/*const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
-const valid_roles = require('../core/constants');
-
-
-const isAuth = (req,res,next) => {
+const authByRole = (role) => {
   return (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'No token provided' });
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-      if (!allowedRoles.includes(decoded.role)) {
-        return res.status(403).json({ message: 'Forbidden: Access denied' });
+      if (decoded.role !== role) {
+        return res.status(403).json({ message: `Not authorized as ${role}` });
       }
-
-      req.user = decoded; // user info like id, role, etc.
+      req[role] = decoded;
       next();
     } catch (err) {
       return res.status(403).json({ message: 'Unauthorized or invalid token' });
@@ -23,4 +18,8 @@ const isAuth = (req,res,next) => {
   };
 };
 
-module.exports = isAuth;*/
+module.exports = {
+  adminAuth: authByRole('admin'),
+  brandAuth: authByRole('brand'),
+  customerAuth: authByRole('customer'),
+};
