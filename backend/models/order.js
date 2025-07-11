@@ -19,7 +19,8 @@ const orderSchema = new Schema({
             }
         }
     ],
-    brands: {
+    // this become brand not brands
+    brand: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'brand'
     },
