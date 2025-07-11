@@ -13,9 +13,6 @@ const adminSchema = new Schema({
 }, { timestamps: true }
 );
 
-const passwordHashing = require('../middlewares/hashPassword');
-adminSchema.pre('save', passwordHashing);
-
 const admin = User.discriminator('admin', adminSchema);
   
 module.exports = admin

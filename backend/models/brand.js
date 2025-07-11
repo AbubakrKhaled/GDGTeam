@@ -47,10 +47,6 @@ const brandSchema = new Schema({
 }, { timestamps: true }
 );
 
-
-const passwordHashing = require('../middlewares/hashPassword');
-brandSchema.pre('save', passwordHashing);
-
 const brand = User.discriminator('brand', brandSchema);
 
 module.exports = brand;

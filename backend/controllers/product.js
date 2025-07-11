@@ -3,13 +3,16 @@ const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
 const Product = require("../models/product.js");
 
-// check if the product already exists
 exports.createProduct = async (req, res,next) => {
     try{
         const {
             productname, price, quantity, imageURL, description, category, color, size, discount
         } = req.body;
         const reviews = 0;
+
+        const existingProduct = await Product.findOne({productname, brand: req.user.id});
+        
+        if (existingProduct) {return next(new ErrorResponse('Product already exists', 400));}
 
         const product = await Product.create({
             productname, price, quantity, imageURL, description, reviews: 0,
@@ -26,7 +29,7 @@ exports.createProduct = async (req, res,next) => {
     }
 }
 
-exports.updateProduct = async (req, res) => {
+exports.updateProduct = async (req, res, next) => {
     const id = req.params.id;
     const {
             productname, price, quantity, imageURL, description, category, color, size, discount
@@ -44,7 +47,7 @@ exports.updateProduct = async (req, res) => {
         return next(new ErrorResponse('Product not found', 404));
         }
 
-        res.status(201).json({success: true, data: product});
+        res.status(200).json({success: true, data: product});
 
     }catch(err){
         next(err);

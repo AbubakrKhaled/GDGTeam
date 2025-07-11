@@ -28,9 +28,6 @@ const customerSchema = new Schema({
 }, { timestamps: true }
 );
 
-const passwordHashing = require('../middlewares/hashPassword');
-customerSchema.pre('save', passwordHashing);
-
 const customer = User.discriminator('customer', customerSchema);
 
 module.exports = customer
