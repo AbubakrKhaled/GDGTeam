@@ -6,6 +6,7 @@ const User = require('./User');
 
 
 const brandSchema = new Schema({
+    // what if we needed to add more categories?// why this is an enum?(This filed should not be fixed, it should be flexible to add more categories in the future)
     categories:{
         type: [String],
         enum: ['Clothes', 'Food', 'Skincare', 'Technology'],
@@ -47,7 +48,7 @@ const brandSchema = new Schema({
 }, { timestamps: true }
 );
 
-
+// this will be in signup and login and update profile as we said in the last session (Apply to all)
 const passwordHashing = require('../middlewares/hashPassword');
 brandSchema.pre('save', passwordHashing);
 

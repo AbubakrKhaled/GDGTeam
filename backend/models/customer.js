@@ -27,7 +27,7 @@ const customerSchema = new Schema({
     ],
 }, { timestamps: true }
 );
-
+// this will be in signup and login and update profile as we saied in last session (Apply to all)
 const passwordHashing = require('../middlewares/hashPassword');
 customerSchema.pre('save', passwordHashing);
 
