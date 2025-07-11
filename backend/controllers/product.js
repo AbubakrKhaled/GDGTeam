@@ -9,10 +9,10 @@ exports.createProduct = async (req, res,next) => {
         const {
             productname, price, quantity, imageURL, description, category, color, size, discount
         } = req.body;
-        const ratings = 0;
+        const reviews = 0;
 
         const product = await Product.create({
-            productname, price, quantity, imageURL, description, ratings: 0,
+            productname, price, quantity, imageURL, description, reviews: 0,
             category: Types.ObjectId(category),
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
@@ -26,7 +26,6 @@ exports.createProduct = async (req, res,next) => {
     }
 }
 
-// here search for the product by id and if it exists, update it dont update the product if it does not exist
 exports.updateProduct = async (req, res) => {
     const id = req.params.id;
     const {

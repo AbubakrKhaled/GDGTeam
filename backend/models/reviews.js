@@ -47,7 +47,6 @@ const reviewSchema = new Schema({
 }, { timestamps: true }
 );
 
-
 reviewSchema.index({ customerId: 1, refType: 1, refId: 1 }, { unique: true });
 
 reviewSchema.pre('save', function (next) {

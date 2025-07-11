@@ -46,7 +46,7 @@ const productSchema = new Schema({
         type: Types.ObjectId,
         ref: 'discount'
     },
-    ratings: {
+    reviews: {
         type: Types.ObjectId,
         ref: 'Review'
     } ,
@@ -54,7 +54,6 @@ const productSchema = new Schema({
         type: Boolean,
         default: true
     }
-
 }, { timestamps: true }
 )
 

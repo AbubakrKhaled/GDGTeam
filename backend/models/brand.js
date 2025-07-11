@@ -3,12 +3,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Schema, model, Types } = mongoose;
 const User = require('./User');
-
+const brand_categories = require('../core/constants.js')
 
 const brandSchema = new Schema({
     categories:{
         type: [String],
-        enum: ['Clothes', 'Food', 'Skincare', 'Technology'],
+        enum: {values: brand_categories},        
         required: [true, 'Please add categories of all products']
     },
     page:{
@@ -36,7 +36,7 @@ const brandSchema = new Schema({
         type: Boolean,
         default: false
     },
-    ratings:{
+    reviews:{
         type: Types.ObjectId,
         ref: 'Review'
     },
