@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
 const User = require('./User.js');
 
-
+// where is the cart
 const customerSchema = new Schema({
     gender:{
         type: String,
