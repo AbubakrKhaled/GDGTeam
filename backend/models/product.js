@@ -48,7 +48,7 @@ const productSchema = new Schema({
     },
     ratings: {
         type: Types.ObjectId,
-        ref: 'ratings'
+        ref: 'Review'
     } ,
     isActive:{
         type: Boolean,

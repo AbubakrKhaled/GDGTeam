@@ -38,7 +38,7 @@ const brandSchema = new Schema({
     },
     ratings:{
         type: Types.ObjectId,
-        ref: 'ratings'
+        ref: 'Review'
     },
     products:[{
         type: Types.ObjectId,
