@@ -89,7 +89,29 @@ exports.getProductById = async (req, res, next) => {
     }
 }
 
-exports.deleteProduct = async (req, res, next) => {
+exports.activateProduct = async (req, res, next) => {
+    const id = req.params.id;
+
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
+    try {
+        const product = await Product.findById(id);
+
+        if (!product) {
+        return next(new ErrorResponse('Product not found', 404));
+        }
+
+        //await Product.findByIdAndDelete(id);
+        await Product.findByIdAndUpdate(id, { isActive: true });
+
+        res.status(200).json({success: true, data: {}});
+    } catch(err){
+        next(err);
+    }
+}
+
+exports.deactivateProduct = async (req, res, next) => {
     const id = req.params.id;
 
     if (!mongoose.isValidObjectId(id))

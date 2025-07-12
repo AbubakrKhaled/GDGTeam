@@ -31,8 +31,8 @@ router.put('/brand/:id/deactivate', adminAuth, deactivateBrand);
 
 router.get('/customers', adminAuth, getAllCustomers);
 router.get('/customers/:id', adminAuth, getCustomerById);
-router.delete('/customers/:id/activate', adminAuth, activateCustomer);
-router.delete('/customers/:id/deactivate', adminAuth, deactivateCustomer);
+router.put('/customers/:id/activate', adminAuth, activateCustomer);
+router.put('/customers/:id/deactivate', adminAuth, deactivateCustomer);
 
 router.get('/orders', adminAuth, getAllOrders);
 router.get('/orders/:id', adminAuth, getOrderById);
