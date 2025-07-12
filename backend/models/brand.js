@@ -43,7 +43,11 @@ const brandSchema = new Schema({
     products:[{
         type: Types.ObjectId,
         ref: 'product'
-    }]
+    }],
+    isActive:{
+        type: Boolean,
+        default: false
+    },
 }, { timestamps: true }
 );
 

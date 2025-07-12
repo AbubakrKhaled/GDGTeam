@@ -31,6 +31,10 @@ exports.createProduct = async (req, res,next) => {
 
 exports.updateProduct = async (req, res, next) => {
     const id = req.params.id;
+
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
     const {
             productname, price, quantity, imageURL, description, category, color, size, discount
         } = req.body;
@@ -67,6 +71,10 @@ exports.getAllProducts = async (req, res, next) => {
 
 exports.getProductById = async (req, res, next) => {
     const id = req.params.id;
+
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
     try {
         const product = await Product.findById(id);
 
@@ -83,6 +91,10 @@ exports.getProductById = async (req, res, next) => {
 
 exports.deleteProduct = async (req, res, next) => {
     const id = req.params.id;
+
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
     try {
         const product = await Product.findById(id);
 
@@ -90,7 +102,8 @@ exports.deleteProduct = async (req, res, next) => {
         return next(new ErrorResponse('Product not found', 404));
         }
 
-        await Product.findByIdAndDelete(id);
+        //await Product.findByIdAndDelete(id);
+        await Product.findByIdAndUpdate(id, { isActive: false });
 
         res.status(200).json({success: true, data: {}});
     } catch(err){

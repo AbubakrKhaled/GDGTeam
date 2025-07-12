@@ -9,7 +9,7 @@ const {
 } = require('../controllers/product.js');
 const { brandAuth } = require('../middlewares/auth.js');
 
-router.get('/', brandAuth, getAllProducts);
+router.get('/', brandAuth || adminAuth, getAllProducts);
 
 router.get('/create', brandAuth, createProduct);
 

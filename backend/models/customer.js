@@ -9,8 +9,7 @@ const customerSchema = new Schema({
         required: [true, 'Please choose your gender'],
         enum: ['Male', 'Female']
     },
-    addresses: [
-    {
+    addresses: [{
         label: { type: String, required: true }, 
         line1: { type: String, required: true },
         city: { type: String, required: true },
@@ -19,12 +18,14 @@ const customerSchema = new Schema({
         isDefault: { type: Boolean, default: false }
     }, { _id: false }
     ],
-    wishlist: [
-    {
+    wishlist: [{
         type: Types.ObjectId,
         ref: 'product'
+    }],
+    isActive:{
+        type: Boolean,
+        default: false
     }
-    ],
 }, { timestamps: true }
 );
 

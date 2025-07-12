@@ -34,6 +34,10 @@ const orderSchema = new Schema({
         enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
         //pending=while we send order to business. processing=business making order. shipped=business shipping.
         default: 'Pending'
+    },
+    isActive:{
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true }
 )

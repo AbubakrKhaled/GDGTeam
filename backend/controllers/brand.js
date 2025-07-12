@@ -57,6 +57,9 @@ exports.createBrand = async (req, res) => {
 exports.updateBrand = async (req, res, next) => {
     const id = req.params.id;
 
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
     if (req.brand.role !== 'brand' || req.brand.id !== id) {
         return res.status(403).json({ message: 'Not authorized' });
     }
@@ -89,6 +92,9 @@ exports.updateBrand = async (req, res, next) => {
 exports.getBrandById = async (req, res, next) => {
     const id = req.params.id;
 
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
     if (req.brand.role !== 'brand' || req.brand.id !== id) {
         return res.status(403).json({ message: 'Not authorized' });
     }

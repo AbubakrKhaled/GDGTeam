@@ -6,11 +6,13 @@ const {
     getAllBrands,
     getBrandById,
     brandApproval,
-    deleteBrand,
+    activateBrand,
+    deactivateBrand,
 
     getAllCustomers,
     getCustomerById,
-    deleteCustomer,
+    activateCustomer,
+    deactivateCustomer,
 
     getAllOrders,
     getOrderById,
@@ -24,14 +26,13 @@ router.post('/login', adminLogin);
 router.get('/brands', adminAuth, getAllBrands);
 router.get('/brands/:id', adminAuth, getBrandById);
 router.put('/brands/:id/approve', adminAuth, brandApproval);
-router.delete('/brands/:id', adminAuth, deleteBrand);
-
-router.put('/brand/:id/activate', adminAuth, activate);
-router.put('/brand/:id/deactivate', adminAuth, deactivate);
+router.put('/brand/:id/activate', adminAuth, activateBrand);
+router.put('/brand/:id/deactivate', adminAuth, deactivateBrand);
 
 router.get('/customers', adminAuth, getAllCustomers);
 router.get('/customers/:id', adminAuth, getCustomerById);
-router.delete('/customers/:id', adminAuth, deleteCustomer);
+router.delete('/customers/:id/activate', adminAuth, activateCustomer);
+router.delete('/customers/:id/deactivate', adminAuth, deactivateCustomer);
 
 router.get('/orders', adminAuth, getAllOrders);
 router.get('/orders/:id', adminAuth, getOrderById);
