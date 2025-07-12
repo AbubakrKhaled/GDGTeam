@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Schema, model, Types } = mongoose;
 const User = require('./User');
-const brand_categories = require('../core/constants.js')
+const {brand_categories} = require('../core/constants.js')
 
 const brandSchema = new Schema({
     categories:{

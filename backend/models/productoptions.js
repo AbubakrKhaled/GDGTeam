@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
-const colors = require('../core/constants.js')
+const {colors} = require('../core/constants.js')
 
 const categorySchema = new Schema({
   category: {
