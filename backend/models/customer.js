@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
 const User = require('./User.js');
 
-
+// where is the cart
 const customerSchema = new Schema({
     gender:{
         type: String,
@@ -28,6 +28,11 @@ const customerSchema = new Schema({
     }
 }, { timestamps: true }
 );
+
+// this will be in signup and login and update profile as we saied in last session (Apply to all)
+const passwordHashing = require('../middlewares/hashPassword');
+customerSchema.pre('save', passwordHashing);
+
 
 const customer = User.discriminator('customer', customerSchema);
 

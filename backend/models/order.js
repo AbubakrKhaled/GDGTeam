@@ -16,6 +16,11 @@ const orderSchema = new Schema({
             type: Number,
             required: true
         }
+    ],
+    // this become brand not brands
+    brand: {
+        type: mongoose.Schema.Types.ObjectId,
+
     }],
     brand: {
         type: Types.ObjectId,
