@@ -9,6 +9,7 @@ const customerSchema = new Schema({
         required: [true, 'Please choose your gender'],
         enum: ['Male', 'Female']
     },
+    // simplify this add this as an array of strings
     addresses: [{
         label: { type: String, required: true }, 
         line1: { type: String, required: true },
