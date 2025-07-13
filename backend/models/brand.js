@@ -3,13 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Schema, model, Types } = mongoose;
 const User = require('./User');
-
+const {brand_categories} = require('../core/constants.js')
 
 const brandSchema = new Schema({
     // what if we needed to add more categories?// why this is an enum?(This filed should not be fixed, it should be flexible to add more categories in the future)
     categories:{
         type: [String],
-        enum: ['Clothes', 'Food', 'Skincare', 'Technology'],
+        enum: {values: brand_categories},        
         required: [true, 'Please add categories of all products']
     },
     page:{
@@ -37,14 +37,18 @@ const brandSchema = new Schema({
         type: Boolean,
         default: false
     },
-    ratings:{
+    reviews:{
         type: Types.ObjectId,
-        ref: 'ratings'
+        ref: 'Review'
     },
     products:[{
         type: Types.ObjectId,
         ref: 'product'
-    }]
+    }],
+    isActive:{
+        type: Boolean,
+        default: false
+    },
 }, { timestamps: true }
 );
 

@@ -61,11 +61,8 @@ exports.getBrandById = async (req, res, next) => {
 exports.brandApproval = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const brand = await Brand.findByIdAndUpdate(
-      id,
-      { isApproved: req.body.isApproved },
-      { new: true }
-    );
+    const brand = await Brand.findByIdAndUpdate(id, { isApproved: req.body.isApproved }, { new: true });
+
     if (!brand) return next(new ErrorResponse('Brand not found', 404));
     res.status(200).json({ success: true, data: brand });
   } catch (err) {
@@ -73,15 +70,23 @@ exports.brandApproval = async (req, res, next) => {
   }
 };
 
-exports.deleteBrand = async (req, res, next) => {
+exports.activateBrand = async (req, res, next) => {
   const { id } = req.params;
   try {
-    // Soft delete: set isActive=false instead of physical removal
-    const brand = await Brand.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
+    const brand = await Brand.findByIdAndUpdate(id, { isActive: true }, { new: true });
+    
+    if (!brand) return next(new ErrorResponse('Brand not found', 404));
+    res.status(200).json({ success: true, data: brand });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deactivateBrand = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const brand = await Brand.findByIdAndUpdate(id, { isActive: false }, { new: true });
+    
     if (!brand) return next(new ErrorResponse('Brand not found', 404));
     res.status(200).json({ success: true, data: brand });
   } catch (err) {
@@ -113,14 +118,23 @@ exports.getCustomerById = async (req, res, next) => {
   }
 };
 
-exports.deleteCustomer = async (req, res, next) => {
+exports.activateCustomer = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const customer = await Customer.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
+    const customer = await Customer.findByIdAndUpdate(id, { isActive: true }, { new: true });
+
+    if (!customer) return next(new ErrorResponse('Customer not found', 404));
+    res.status(200).json({ success: true, data: customer });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deactivateCustomer = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const customer = await Customer.findByIdAndUpdate(id, { isActive: false }, { new: true });
+
     if (!customer) return next(new ErrorResponse('Customer not found', 404));
     res.status(200).json({ success: true, data: customer });
   } catch (err) {

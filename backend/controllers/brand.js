@@ -5,8 +5,7 @@ const Product = require("../models/product.js");
 const ErrorResponse = require('../middlewares/errorresponse');
 const mongoose = require('mongoose'); // need to add this to be able to use mongoose methods like findById, find, etc.
 const { Schema, model, Types } = mongoose;
-
-
+const hashPassword = require('../middlewares/hashPassword');
 
 //brand logging in ***************************************************************************
 exports.brandLogin = async (req, res, next) => {
@@ -34,16 +33,19 @@ exports.brandLogin = async (req, res, next) => {
 exports.createBrand = async (req, res) => {
     try{
         const {
-            brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
-            payment, description, products
+            name, email, phonenumber, categories, page, brandlocation, logoURL, deliveryTime,
+            description, products, password
         } = req.body;
         const isApproved = false; // excellent ✅
         const ratings = 0;
         const role = 'brand';
 
+        const hashed = await hashPassword(password);
+
         const brand = await Brand.create({
-            brandname, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
-            payment, description, isApproved, ratings, products, role
+            name, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
+            description, isApproved, ratings, products, role,
+            password: hashed
         });
 
         res.status(201).json({success: true, data: brand});
@@ -55,24 +57,33 @@ exports.createBrand = async (req, res) => {
 exports.updateBrand = async (req, res, next) => {
     const id = req.params.id;
 
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
     if (req.brand.role !== 'brand' || req.brand.id !== id) {
         return res.status(403).json({ message: 'Not authorized' });
     }
 
     const {
-        brandname, email, categories, phonenumber, page, brandlocation, logoURL,
-        deliveryTime, payment, description, products , password
+        name, email, categories, phonenumber, page, brandlocation, logoURL,
+        deliveryTime, description, products, password
     } = req.body;
+    
+    const updateFields = {
+        name, email, categories, phonenumber, page, brandlocation,
+        logoURL, deliveryTime, description, products,
+    }
+
+    if (password) {
+        updateFields.password = await hashPassword(req.body.password);
+    }
 
     try {
-        const brand = await Brand.findByIdAndUpdate(id, {
-            brandname, email, categories, phonenumber, page, brandlocation,
-            logoURL, deliveryTime, payment, description, products
-        }, { new: true });
+        const brand = await Brand.findByIdAndUpdate(id, updateFields, { new: true });
 
         if (!brand) return next(new ErrorResponse('Brand not found', 404));
 
-        res.status(201).json({ success: true, data: brand });
+        res.status(200).json({ success: true, data: brand });
     } catch (err) {
         next(err);
     }
@@ -81,6 +92,9 @@ exports.updateBrand = async (req, res, next) => {
 exports.getBrandById = async (req, res, next) => {
     const id = req.params.id;
 
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+    
     if (req.brand.role !== 'brand' || req.brand.id !== id) {
         return res.status(403).json({ message: 'Not authorized' });
     }

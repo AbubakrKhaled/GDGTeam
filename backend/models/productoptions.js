@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
+const {colors} = require('../core/constants.js')
 
 const categorySchema = new Schema({
   category: {
@@ -8,20 +9,27 @@ const categorySchema = new Schema({
   }
 });
 
-const colorSchema = new Schema({
+/*const colorSchema = new Schema({
   color: {
     type: String,
     required: [true, 'Please enter product color']
   },
   hex: String
-});
+});*/
+
+const colorSchema = new Schema({
+  color:{
+    type: String,
+    required: [true, 'Please enter product color']
+  },
+  enum: {values: colors}
+})
 
 const sizeSchema = new Schema({
   size: {
     type: String,
     required: [true, 'Please enter product size']
   },
-  hex: String
 });
 
 const discountSchema = new Schema({

@@ -1,3 +1,8 @@
-const valid_roles = ['ROOT', 'MODERATOR', 'SUPPORT'];
+const brand_categories = ['Clothes', 'Food', 'Skincare', 'Technology']
 
-module.exports = valid_roles;
+const colors = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Black']
+
+module.exports = {
+    brand_categories,
+    colors
+}
