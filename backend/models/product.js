@@ -19,6 +19,7 @@ const productSchema = new Schema({
         type: Number,
         required: true
     },
+    // this needs to be an array of images (See the frontend for more details)
     imageURL: {
         type: String,
         required: false

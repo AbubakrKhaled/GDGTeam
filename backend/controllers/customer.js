@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Customer = require('../models/customer');
 const ErrorResponse = require('../middlewares/errorresponse');
+//continue this
 
 // Customer login or signup
 exports.customerLogin = async (req, res, next) => {

@@ -6,6 +6,7 @@ const User = require('./User');
 const {brand_categories} = require('../core/constants.js')
 
 const brandSchema = new Schema({
+    // what if we needed to add more categories?// why this is an enum?(This filed should not be fixed, it should be flexible to add more categories in the future)
     categories:{
         type: [String],
         enum: {values: brand_categories},        
@@ -50,6 +51,10 @@ const brandSchema = new Schema({
     },
 }, { timestamps: true }
 );
+
+// this will be in signup and login and update profile as we said in the last session (Apply to all)
+const passwordHashing = require('../middlewares/hashPassword');
+brandSchema.pre('save', passwordHashing);
 
 const brand = User.discriminator('brand', brandSchema);
 
