@@ -19,7 +19,10 @@ const {
     updateOrderStatus,
 } = require('../controllers/admin.js');
 const { adminAuth } = require('../middlewares/auth.js');
-
+const productController = require('../controllers/product');
+const orderController   = require('../controllers/order');
+const brandController   = require('../controllers/brand');
+const customerController = require('../controllers/customer');
 
 router.post('/login', adminLogin);
 
@@ -38,5 +41,12 @@ router.get('/orders', adminAuth, getAllOrders);
 router.get('/orders/:id', adminAuth, getOrderById);
 router.put('/orders/:id/status', adminAuth, updateOrderStatus);
 
+//Products
+router.get('/products', adminAuth, productController.getAllProducts);
+//router.get('/create', brandAuth, createProduct);
+//router.get('/update/:id', brandAuth, updateProduct);
+router.get('/products/:id', adminAuth, productController.getProductById);
+router.put('/products/:id/activate', adminAuth, productController.activateProduct);
+router.put('/products/:id/deactivate', adminAuth, productController.deactivateProduct);
 
 module.exports = router;
