@@ -19,10 +19,10 @@ const customerSchema = new Schema({
         isDefault: { type: Boolean, default: false }
     }, { _id: false }
     ],*/
-    addresses: [{
-        types: [String],
+    address: {
+        types: String,
         required: true
-    }],
+    },
     wishlist: [{
         type: Types.ObjectId,
         ref: 'product'

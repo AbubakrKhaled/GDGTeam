@@ -19,8 +19,8 @@ router.put('/:id/update', brandAuth, updateBrand);
 router.get('/:id/profile', brandAuth, getBrandById);
 
 router.get('/products', brandAuth, productController.getAllProducts);
-router.get('/products/create', brandAuth, productController.createProduct);
-router.get('/products/update/:id', brandAuth, productController.updateProduct);
+router.post('/products/create', brandAuth, productController.createProduct);
+router.put('/products/update/:id', brandAuth, productController.updateProduct);
 router.get('/products/:id', brandAuth, productController.getProductById);
 router.put('/products/:id/activate', brandAuth, productController.activateProduct);
 router.put('/products/:id/deactivate', brandAuth, productController.deactivateProduct);

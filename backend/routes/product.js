@@ -12,7 +12,7 @@ const { brandAuth } = require('../middlewares/auth.js');
 
 router.get('/', getAllProducts);
 
-router.get('/create', brandAuth, createProduct);
+//router.post('/create', brandAuth, createProduct);
 
 //router.get('/update/:id', brandAuth, updateProduct);
 router.get('/:id', getProductById);
