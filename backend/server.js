@@ -1,4 +1,3 @@
-// reminder: CORS Problem next time
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
@@ -34,7 +33,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/brand', brandRoutes); 
 app.use('/api/customer', customerRoutes);
 app.use('/api/product', productsRoutes);
-// where is the logic for Order? start implement it with customer
 
 app.use(errorHandler);
 

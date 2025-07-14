@@ -10,15 +10,15 @@ const {
 } = require('../controllers/product.js');
 const { brandAuth } = require('../middlewares/auth.js');
 
-router.get('/', brandAuth, getAllProducts);
+router.get('/', getAllProducts);
 
 router.get('/create', brandAuth, createProduct);
 
-router.get('/update/:id', brandAuth, updateProduct);
-router.get('/:id', brandAuth, getProductById);
+//router.get('/update/:id', brandAuth, updateProduct);
+router.get('/:id', getProductById);
 
-router.put('/:id/activate', brandAuth, activateProduct);
-router.put('/:id/deactivate', brandAuth, deactivateProduct);
+//router.put('/:id/activate', brandAuth, activateProduct);
+//router.put('/:id/deactivate', brandAuth, deactivateProduct);
 
 
 module.exports = router;

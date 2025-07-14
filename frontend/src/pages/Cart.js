@@ -66,10 +66,11 @@ function Cart() {
 
     try {
       setLoading(true);
+        console.log("cart",cart);
       
       const orderData = {
         items: cart.map(item => ({
-          product: item.product._id,
+          product: item.product,
           quantity: item.quantity,
           price: item.product.price
         })),

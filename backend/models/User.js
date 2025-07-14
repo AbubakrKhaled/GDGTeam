@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// here add field called Role make it ['admin', 'customer', 'brand']
-// and remove admin table because we dont need any information except what in User table
 const BaseUserSchema = new Schema(
   {
     name:{
@@ -28,6 +26,11 @@ const BaseUserSchema = new Schema(
         type: Number,
         required: [true, 'Please add phone number']
     },
+    role: {
+          type: String,
+          enum: ['admin', 'customer', 'brand'],
+          required: [true, 'Please specify a role']
+    }
   },
   { discriminatorKey: 'role', timestamps: true }
 );

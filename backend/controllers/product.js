@@ -66,7 +66,7 @@ exports.updateProduct = async (req, res, next) => {
 exports.getAllProducts = async (req, res, next) => {
     try {
         const filter = { isActive: true };
-        if (req.user.role === 'brand') filter.brand = req.user.id;
+        //if (req.user.role === 'brand') filter.brand = req.user.id;
 
         const products = await Product.find(filter);
 
@@ -125,7 +125,6 @@ exports.activateProduct = async (req, res, next) => {
         if (req.brand && product.brand.toString() !== req.brand.id) {
         return next(new ErrorResponse('Not your product', 403));
         }
-        //await Product.findByIdAndDelete(id);
         await Product.findByIdAndUpdate(id, { isActive: true });
 
         res.status(200).json({success: true, data: {}});
@@ -152,8 +151,6 @@ exports.deactivateProduct = async (req, res, next) => {
         if (req.brand && product.brand.toString() !== req.brand.id) {
         return next(new ErrorResponse('Not your product', 403));
         }
-
-        //await Product.findByIdAndDelete(id);
         await Product.findByIdAndUpdate(id, { isActive: false });
 
         res.status(200).json({success: true, data: {}});

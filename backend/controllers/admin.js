@@ -143,42 +143,4 @@ exports.deactivateCustomer = async (req, res, next) => {
 };
 
 /* ---------------------------- Orders ----------------------------- */
-exports.getAllOrders = async (_req, res, next) => {
-  try {
-    const orders = await Order.find();
-    res.status(200).json({ success: true, data: orders });
-  } catch (err) {
-    next(err);
-  }
-};
 
-exports.getOrderById = async (req, res, next) => {
-  const { id } = req.params;
-  if (!mongoose.isValidObjectId(id))
-    return next(new ErrorResponse('Invalid ID', 400));
-
-  try {
-    const order = await Order.findById(id);
-    if (!order) return next(new ErrorResponse('Order not found', 404));
-    res.status(200).json({ success: true, data: order });
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.updateOrderStatus = async (req, res, next) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  try {
-    const order = await Order.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
-    if (!order) return next(new ErrorResponse('Order not found', 404));
-    res.status(200).json({ success: true, data: order });
-  } catch (err) {
-    next(err);
-  }
-};

@@ -94,10 +94,6 @@ exports.getBrandById = async (req, res, next) => {
 
     if (!mongoose.isValidObjectId(id))
         return next(new ErrorResponse('Invalid ID', 400));
-    
-    if (req.brand.role !== 'brand' || req.brand.id !== id) {
-        return res.status(403).json({ message: 'Not authorized' });
-    }
 
     try {
         const brand = await Brand.findById(id);
@@ -109,3 +105,14 @@ exports.getBrandById = async (req, res, next) => {
     }
 };
 
+// brand/profile
+exports.getAllProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find();
+
+        res.status(200).json({success: true, data: products});
+
+    } catch(err) {
+        next(err);
+    }
+}

@@ -8,7 +8,7 @@ const customerSchema = new Schema({
         type: String,
         required: [true, 'Please choose your gender'],
         enum: ['Male', 'Female']
-    },
+    },/*
     // simplify this add this as an array of strings
     addresses: [{
         label: { type: String, required: true }, 
@@ -18,8 +18,16 @@ const customerSchema = new Schema({
         zip: { type: String },
         isDefault: { type: Boolean, default: false }
     }, { _id: false }
-    ],
+    ],*/
+    addresses: [{
+        types: [String],
+        required: true
+    }],
     wishlist: [{
+        type: Types.ObjectId,
+        ref: 'product'
+    }],
+    cart: [{
         type: Types.ObjectId,
         ref: 'product'
     }],
@@ -29,11 +37,6 @@ const customerSchema = new Schema({
     }
 }, { timestamps: true }
 );
-
-// this will be in signup and login and update profile as we saied in last session (Apply to all)
-const passwordHashing = require('../middlewares/hashPassword');
-customerSchema.pre('save', passwordHashing);
-
 
 const customer = User.discriminator('customer', customerSchema);
 

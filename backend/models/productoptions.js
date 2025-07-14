@@ -9,14 +9,6 @@ const categorySchema = new Schema({
   }
 });
 
-/*const colorSchema = new Schema({
-  color: {
-    type: String,
-    required: [true, 'Please enter product color']
-  },
-  hex: String
-});*/
-
 const colorSchema = new Schema({
   color:{
     type: String,
@@ -51,7 +43,6 @@ const discountSchema = new Schema({
     }
   ]
 });
-
 
 module.exports = {
   Category: model('category', categorySchema),
