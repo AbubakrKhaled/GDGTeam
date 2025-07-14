@@ -16,25 +16,7 @@ const reviewSchema = new Schema({
       type: Types.ObjectId,
       required: true
     },
-    quality: {
-      type: Number,
-      min: 1,
-      max: 5,
-      required: true
-    },
-    comfort: {
-      type: Number,
-      min: 1,
-      max: 5,
-      required: true
-    },
-    fit: {
-      type: Number,
-      min: 1,
-      max: 5,
-      required: true
-    },
-    total: {
+    rating: {
       type: Number,
       min: 1,
       max: 5
@@ -49,10 +31,6 @@ const reviewSchema = new Schema({
 
 reviewSchema.index({ customerId: 1, refType: 1, refId: 1 }, { unique: true });
 
-reviewSchema.pre('save', function (next) {
-    this.total = Number(((this.quality + this.comfort + this.fit) / 3).toFixed(1));
-    next();
-});
 
 
 module.exports = model('Review', reviewSchema);

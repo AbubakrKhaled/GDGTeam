@@ -41,10 +41,6 @@ const brandSchema = new Schema({
         type: Types.ObjectId,
         ref: 'Review'
     },
-    products:[{
-        type: Types.ObjectId,
-        ref: 'product'
-    }],
     isActive:{
         type: Boolean,
         default: false
@@ -52,9 +48,6 @@ const brandSchema = new Schema({
 }, { timestamps: true }
 );
 
-// this will be in signup and login and update profile as we said in the last session (Apply to all)
-const passwordHashing = require('../middlewares/hashPassword');
-brandSchema.pre('save', passwordHashing);
 
 const brand = User.discriminator('brand', brandSchema);
 

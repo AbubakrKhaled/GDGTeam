@@ -597,6 +597,7 @@ class MockDataService {
   async createOrder(orderData) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     const orders = this.getData('mockOrders');
+    console.log("orderData", orderData);
     const newOrder = {
       _id: this.generateId(),
       customer: localStorage.getItem('currentUserId'),

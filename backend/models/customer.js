@@ -22,7 +22,7 @@ const customerSchema = new Schema({
     wishlist: [{
         type: Types.ObjectId,
         ref: 'product'
-    }],
+    }],// add cart
     isActive:{
         type: Boolean,
         default: false

@@ -17,10 +17,6 @@ const orderSchema = new Schema({
             required: true
         }
     }],
-    brand: {
-        type: Types.ObjectId,
-        ref: 'brand'
-    },
     totalPrice: {
         type: Number,
         required: true
