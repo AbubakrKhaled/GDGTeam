@@ -34,7 +34,8 @@ const customerSchema = new Schema({
     isActive:{
         type: Boolean,
         default: false
-    }
+    },
+    loyaltyPoints: { type: Number, default: 0 }
 }, { timestamps: true }
 );
 

@@ -138,3 +138,24 @@ exports.checkoutOrder = async (req,res,next) => {
 
     }
 }
+
+exports.createOrder = async (req, res, next) => {
+    try {
+        // req.customer should be set by authentication middleware
+        const customerId = req.customer.id;
+        const { products, deliveryAddress, paymentMethod } = req.body;
+
+        // Create the order
+        const order = await Order.create({
+            customer: customerId,
+            products,
+            deliveryAddress,
+            paymentMethod,
+            status: 'pending'
+        });
+
+        res.status(201).json({ success: true, data: order });
+    } catch (err) {
+        next(err);
+    }
+};
