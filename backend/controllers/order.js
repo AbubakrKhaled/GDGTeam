@@ -2,7 +2,7 @@ const ErrorResponse = require('../middlewares/errorresponse');
 const Order   = require('../models/order');
 const Product = require('../models/product');
 const Customer= require('../models/customer');
-
+const mongoose = require('mongoose');
 
 exports.getOrders = async (req, res, next) => {
   try {
@@ -70,28 +70,30 @@ exports.getOrderById = async (req, res, next) => {
 }
 
 exports.updateOrderStatus = async (req, res, next) => {
-  const { id } = req.params;
-  const { status } = req.body;
+    const {id} = req.params;
+    const {status} = req.body;
+    
+    try {
+        const order = await Order.findByIdAndUpdate(id, {status}, {new: true});
 
-if (req.customer !== order.customer.toString() || order.status.toString() !== "Pending") {
-    return next(new ErrorResponse('Order not found', 404));
-}
-   
-if (req.brand !== order.product[0].brand.toString() || order.status.toString() !== "Pending") {
-    return next(new ErrorResponse('Order not found', 404));
-}
+        if (!order) return next(new ErrorResponse('Order not found', 404));
 
-  try {
-    const order = await Order.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
-    if (!order) return next(new ErrorResponse('Order not found', 404));
-    res.status(200).json({ success: true, data: order });
-  } catch (err) {
-    next(err);
-  }
+
+        if (req.customer.id !== order.customer.toString()) {
+            return next(new ErrorResponse('Order not found', 404));
+        }
+        
+        if (req.brand.id !== order.products[0].product.brand.toString()) {
+            return next(new ErrorResponse('Order not found', 404));
+        }
+
+        order.status = status;
+        await order.save();
+        
+        res.status(200).json({ success: true, data: order });
+    } catch (err) {
+        next(err);
+    }
 };
 
 exports.deactivateOrder = async (req, res, next) => {
@@ -100,20 +102,25 @@ exports.deactivateOrder = async (req, res, next) => {
         return next(new ErrorResponse('Invalid ID', 400));
     
     try {
-        const order = await Order.findById(id);
+        const order = await Order.findById(id).populate('products.product');
 
         if (!order) {
         return next(new ErrorResponse('Order not found', 404));
         }
-        if (req.customer === order.customer.toString() && order.status.toString() === "Pending") {
-            await Order.findByIdAndUpdate(id, order.status = "Cancelled", { new: true });
+        if (req.customer.id === order.customer.toString() && order.status.toString() === "Pending") {
+            order.status = 'Cancelled';
+            await order.save();
             res.status(200).json({success: true, data: order});
         }
    
-        if (req.brand === order.product[0].brand.toString() && order.status.toString() === "Pending") {
-            await Order.findByIdAndUpdate(id, order.status = "Cancelled", { new: true });
+        if (req.brand.id === order.products[0].product.brand.toString() && order.status.toString() === "Pending") {
+            order.status = 'Cancelled';
+            await order.save();
             res.status(200).json({success: true, data: order});
         }
+
+        return next(new ErrorResponse('Order status not pending or unauthorized', 403));
+
 
     } catch(err){
         next(err);
@@ -133,29 +140,98 @@ exports.checkoutOrder = async (req,res,next) => {
         let totalPrice = 0;
         const products = [];
 
-    }
-    catch{
+        for (const cartItem of user.cart) { 
+            const product = cartItem.product; 
+ 
+            if (!product) { 
+                return res.status(404).json({ message: 'Product not found in cart.' }); 
+            } 
+ 
+            if (cartItem.quantity > product.quantity) { 
+                return res.status(400).json({ message: `Insufficient stock for product: ${product.name}` }); 
+            } 
+ 
+            products.push({ 
+                product: product._id, 
+                quantity: cartItem.quantity, 
+                price: product.price 
+            }); 
+            totalPrice += cartItem.quantity * product.price; 
+        } 
 
+        const newOrder = new Order({ 
+            customer: id, 
+            products, 
+            totalPrice, 
+            deliveryAddress, 
+            status: 'Pending', 
+            //paymentMethod: 'none', 
+            isActive: true, 
+        }); 
+        await newOrder.save();
+
+
+        for (const cartItem of user.cart) { 
+            const product = cartItem.product; 
+            product.quantity -= cartItem.quantity; // Update stock 
+            if(product.quantity === 0){ 
+                console.log(product + "is out of stock") ; 
+            } 
+            await product.save(); 
+        } 
+        user.cart = []; 
+        await user.save(); 
+ 
+        res.status(201).json({ message: 'Order created successfully', order: newOrder }); 
+
+    }
+    catch (err) {
+        next(err);
     }
 }
 
-exports.createOrder = async (req, res, next) => {
-    try {
-        // req.customer should be set by authentication middleware
-        const customerId = req.customer.id;
-        const { products, deliveryAddress, paymentMethod } = req.body;
 
-        // Create the order
-        const order = await Order.create({
-            customer: customerId,
-            products,
-            deliveryAddress,
-            paymentMethod,
-            status: 'pending'
+exports.getCartDetails = async (req, res) => {
+    try {
+        const id = req.customer.id;
+        const user = await Customer.findById(id).populate('cart.product');
+
+        if (!user || !user.cart || user.cart.length === 0) {
+            return res.status(400).json({
+                message: 'No products in the cart.',
+                cart: [],
+                totalPrice: 0
+            });
+        }
+
+        let totalPrice = 0;
+        const cartItems = user.cart.map(item => {
+            const itemTotal = item.quantity * item.product.price;
+            totalPrice += itemTotal;
+
+            return {
+                product: {
+                    _id: item.product._id,
+                    name: item.product.name,
+                    price: item.product.price,
+                    quantity: item.product.quantity, // available stock
+                    imageUrl: item.product.imageUrl // if available
+                },
+                quantity: item.quantity,
+                itemTotal: itemTotal
+            };
+        });
+            console.log("here",cartItems);
+        res.status(200).json({
+            cart: cartItems,
+            totalPrice: totalPrice,
+            totalItems: cartItems.length
         });
 
-        res.status(201).json({ success: true, data: order });
     } catch (err) {
-        next(err);
+        res.status(500).json({
+            message: 'Error fetching cart details',
+        });
     }
 };
+

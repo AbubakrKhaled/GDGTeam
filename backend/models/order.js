@@ -15,6 +15,10 @@ const orderSchema = new Schema({
         quantity: {
             type: Number,
             required: true
+        },
+        price: {
+            type: Number,
+            required: true
         }
     }],
     totalPrice: {
@@ -33,7 +37,7 @@ const orderSchema = new Schema({
     },
     isActive:{
         type: Boolean,
-        default: false
+        default: true
     }
 }, { timestamps: true }
 )
