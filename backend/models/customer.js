@@ -28,8 +28,8 @@ const customerSchema = new Schema({
         ref: 'product'
     }],
     cart: [{
-        type: Types.ObjectId,
-        ref: 'product'
+        product: {type: Types.ObjectId, ref: 'product'},
+        quantity: {type: Number}    
     }],
     isActive:{
         type: Boolean,
