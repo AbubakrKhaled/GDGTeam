@@ -6,7 +6,8 @@ const {
     getOrders,
     updateOrderStatus,
     deactivateOrder,
-    checkoutOrder
+    checkoutOrder,
+    getOrderHistory
 
 } = require('../controllers/order.js');
 const { customerAuth, adminAuth, brandAuth } = require('../middlewares/auth.js');
@@ -22,7 +23,7 @@ router.put('cancel', adminAuth, brandAuth, customerAuth, deactivateOrder);
 router.post('/checkout', customerAuth, checkoutOrder);
 
 
-
+router.get('/history', customerAuth, getOrderHistory);
 
 
 module.exports = router;

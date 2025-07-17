@@ -235,3 +235,15 @@ exports.getCartDetails = async (req, res) => {
     }
 };
 
+exports.getOrderHistory = async (req, res, next) => {
+    try {
+        const id = req.customer.id;
+
+        const orders = await Order.find({ customer: id }).sort({ createdAt: -1 });
+
+        res.status(200).json({ success: true, data: orders });
+    } catch (err) {
+        next(err);
+    }
+};
+
