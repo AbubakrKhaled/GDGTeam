@@ -364,14 +364,14 @@ function Profile() {
                         {order.items?.map((item, index) => (
                           <div key={index} className="flex justify-between items-center">
                             <span>{item.product?.productname || 'Product'}</span>
-                            <span className="text-gray-600">${item.price} x {item.quantity}</span>
+                            <span className="text-gray-600">{item.price} $ x {item.quantity}</span>
                           </div>
                         ))}
                       </div>
                       <div className="border-t pt-4 mt-4">
                         <div className="flex justify-between items-center">
                           <span className="font-semibold">Total:</span>
-                          <span className="font-bold text-lg">${order.total}</span>
+                          <span className="font-bold text-lg">{order.totalPrice} $</span>
                         </div>
                       </div>
                     </div>

@@ -11,6 +11,7 @@ import {
   FaArrowLeft,
   FaStar
 } from 'react-icons/fa';
+import { Toaster, toast } from 'react-hot-toast';
 
 function Wishlist() {
   const { isAuthenticated } = useAuth();
@@ -42,10 +43,10 @@ function Wishlist() {
   const handleAddToCart = async (product) => {
     try {
       await addToCart(product, 1);
-      alert('Product added to cart!');
+      toast.success('Product added to cart!');
     } catch (error) {
       console.error('Failed to add to cart:', error);
-      alert('Failed to add product to cart');
+      toast.error('Failed to add product to cart');
     }
   };
 
@@ -53,10 +54,10 @@ function Wishlist() {
     try {
       await mockApiService.removeFromWishlist(productId);
       await loadWishlist();
-      alert('Product removed from wishlist!');
+      toast.success('Product removed from wishlist!');
     } catch (error) {
       console.error('Failed to remove from wishlist:', error);
-      alert('Failed to remove product from wishlist');
+      toast.error('Failed to remove product from wishlist');
     }
   };
 
@@ -103,6 +104,7 @@ function Wishlist() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <Toaster position="top-right" />
       {/* Header */}
       <div className="mb-8">
         <button
@@ -264,4 +266,4 @@ function Wishlist() {
   );
 }
 
-export default Wishlist; 
+export default Wishlist;

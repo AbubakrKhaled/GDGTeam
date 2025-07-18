@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaUser, FaStore, FaPlus, FaMinus } from 'react-icons/fa';
+import { Toaster, toast } from 'react-hot-toast';
 
 function Signup() {
   const { signup } = useAuth();
@@ -67,7 +68,7 @@ function Signup() {
       const result = await signup(signupData, formData.userType);
       
       if (result.success) {
-        alert('Account created successfully! Please wait for approval if you registered as a brand.');
+        toast.success('Account created successfully! Please wait for approval if you registered as a brand.');
         navigate('/login');
       } else {
         setError(result.error || 'Registration failed');
@@ -141,6 +142,7 @@ function Signup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 py-12 px-4 sm:px-6 lg:px-8">
+      <Toaster position="top-right" />
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-extrabold text-gray-900">Create Your Account</h2>

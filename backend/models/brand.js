@@ -1,24 +1,25 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { Schema, model, Types } = mongoose;
 const User = require('./User');
-const {brand_categories} = require('../core/constants.js')
+const {brand_categories} = require('../core/constants.js');
 
 const brandSchema = new Schema({
     categories:{
         type: [String],
-        enum: {values: brand_categories},        
+        enum: brand_categories,        
         required: [true, 'Please add categories of all products']
     },
-    page:{
-        type: [String],
-        required: [true, 'Please add all social media pages']
+    socialMedia: {
+        facebook: String,
+        instagram: String,
+        twitter: String
     },
-    brandlocation:{
-        type: [String],
-        required: false
-    },
+    locations: [{
+        address: String,
+        city: String,
+        governorate: String,
+        zip: String
+    }],
     logoURL:{
         type: String,
         required: false
@@ -36,18 +37,21 @@ const brandSchema = new Schema({
         type: Boolean,
         default: false
     },
-    reviews:{
+    reviews: [{
         type: Types.ObjectId,
         ref: 'Review'
+    }],
+    averageRating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5
     },
     isActive:{
         type: Boolean,
         default: false
     },
-}, { timestamps: true }
-);
+}, { timestamps: true });
 
-
-const brand = User.discriminator('brand', brandSchema);
-
-module.exports = brand;
+const Brand = User.discriminator('Brand', brandSchema);
+module.exports = Brand;
