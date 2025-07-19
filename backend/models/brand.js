@@ -6,20 +6,17 @@ const {brand_categories} = require('../core/constants.js');
 const brandSchema = new Schema({
     categories:{
         type: [String],
-        enum: brand_categories,        
+        enum: {values: brand_categories},        
         required: [true, 'Please add categories of all products']
     },
-    socialMedia: {
-        facebook: String,
-        instagram: String,
-        twitter: String
+    page:{
+        type: [String],
+        required: [true, 'Please add all social media pages']
     },
-    locations: [{
-        address: String,
-        city: String,
-        governorate: String,
-        zip: String
-    }],
+    brandlocation:{
+        type: [String],
+        required: false
+    },
     logoURL:{
         type: String,
         required: false
@@ -39,7 +36,7 @@ const brandSchema = new Schema({
     },
     reviews: [{
         type: Types.ObjectId,
-        ref: 'Review'
+        ref: 'reviews'
     }],
     averageRating: {
         type: Number,
@@ -53,5 +50,5 @@ const brandSchema = new Schema({
     },
 }, { timestamps: true });
 
-const Brand = User.discriminator('Brand', brandSchema);
+const Brand = User.discriminator('brand', brandSchema);
 module.exports = Brand;
