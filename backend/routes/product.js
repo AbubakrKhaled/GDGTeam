@@ -9,6 +9,9 @@ const {
     deactivateProduct
 } = require('../controllers/product.js');
 const { brandAuth } = require('../middlewares/auth.js');
+const orderController   = require('../controllers/order');
+const brandController   = require('../controllers/brand');
+const customerController = require('../controllers/customer');
 
 router.get('/', getAllProducts);
 

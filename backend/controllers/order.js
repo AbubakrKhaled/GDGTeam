@@ -79,11 +79,11 @@ exports.updateOrderStatus = async (req, res, next) => {
         if (!order) return next(new ErrorResponse('Order not found', 404));
 
 
-        if (req.customer.id !== order.customer.toString()) {
+        if (req.customer && req.customer.id !== order.customer.toString()) {
             return next(new ErrorResponse('Order not found', 404));
         }
         
-        if (req.brand.id !== order.products[0].product.brand.toString()) {
+        if (req.brand && req.brand.id !== order.products[0].product.brand.toString()) {
             return next(new ErrorResponse('Order not found', 404));
         }
 
@@ -110,15 +110,15 @@ exports.deactivateOrder = async (req, res, next) => {
         if (req.customer.id === order.customer.toString() && order.status.toString() === "Pending") {
             order.status = 'Cancelled';
             await order.save();
-            res.status(200).json({success: true, data: order});
+            return res.status(200).json({success: true, data: order});
         }
    
         if (req.brand.id === order.products[0].product.brand.toString() && order.status.toString() === "Pending") {
             order.status = 'Cancelled';
             await order.save();
-            res.status(200).json({success: true, data: order});
+            return res.status(200).json({success: true, data: order});
         }
-
+        
         return next(new ErrorResponse('Order status not pending or unauthorized', 403));
 
 
@@ -173,7 +173,7 @@ exports.checkoutOrder = async (req,res,next) => {
 
         for (const cartItem of user.cart) { 
             const product = cartItem.product; 
-            product.quantity -= cartItem.quantity; // Update stock 
+            product.quantity -= cartItem.quantity;
             if(product.quantity === 0){ 
                 console.log(product + "is out of stock") ; 
             } 
@@ -214,8 +214,8 @@ exports.getCartDetails = async (req, res) => {
                     _id: item.product._id,
                     name: item.product.name,
                     price: item.product.price,
-                    quantity: item.product.quantity, // available stock
-                    imageUrl: item.product.imageUrl // if available
+                    quantity: item.product.quantity, 
+                    imageUrl: item.product.imageUrl 
                 },
                 quantity: item.quantity,
                 itemTotal: itemTotal

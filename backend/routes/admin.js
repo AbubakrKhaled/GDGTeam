@@ -34,7 +34,7 @@ router.get('/customers/:id', adminAuth, getCustomerById);
 router.put('/customers/:id/activate', adminAuth, activateCustomer);
 router.put('/customers/:id/deactivate', adminAuth, deactivateCustomer);
 
-router.get('/orders', adminAuth, orderController.getAllOrders);
+router.get('/orders', adminAuth, orderController.getOrders);
 router.get('/orders/:id', adminAuth, orderController.getOrderById);
 router.put('/orders/:id/status', adminAuth, orderController.updateOrderStatus);
 router.put('/orders/:id/deactivate', adminAuth, orderController.deactivateOrder);

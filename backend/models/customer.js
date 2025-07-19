@@ -4,7 +4,7 @@ const User = require('./User.js');
 
 const customerSchema = new Schema({
     address: [{
-        types: String,
+        type: String,
         required: true
     }],
     wishlist: [{

@@ -13,6 +13,9 @@ const {
 const { customerAuth, adminAuth, brandAuth } = require('../middlewares/auth.js');
 const adminController = require('../controllers/admin');
 const productController = require('../controllers/product');
+const brandController   = require('../controllers/brand');
+const customerController = require('../controllers/customer');
+
 
 router.get('/', adminAuth, brandAuth, customerAuth, getOrders);
 router.get('/:id', adminAuth, brandAuth, customerAuth, getOrderById);
