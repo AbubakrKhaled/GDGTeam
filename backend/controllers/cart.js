@@ -65,19 +65,47 @@ exports.deleteWishlistProduct = async (req, res, next) => {
 };
 
 //Cart ------------------------------------------------------------------
-exports.getCart = async (req, res, next) => {
+exports.getCart = async (req, res) => {
     try {
         const id = req.customer.id;
+        const user = await Customer.findById(id).populate('cart.product');
 
-        const user = await Customer.findById(id).populate({ path: 'cart.product' }).exec();
-
-        if (!user || !user.cart) {
-            return res.status(404).json({ message: 'Cart not found.' });
+        if (!user || !user.cart || user.cart.length === 0) {
+            return res.status(400).json({
+                message: 'No products in the cart.',
+                cart: [],
+                totalPrice: 0
+            });
         }
 
-        res.status(200).json({ cart: user.cart });
+        let totalPrice = 0;
+        const cartItems = user.cart.map(item => {
+            const itemTotal = item.quantity * item.product.price;
+            totalPrice += itemTotal;
+
+            return {
+                product: {
+                    _id: item.product._id,
+                    name: item.product.name,
+                    price: item.product.price,
+                    quantity: item.product.quantity, 
+                    imageUrl: item.product.imageUrl 
+                },
+                quantity: item.quantity,
+                itemTotal: itemTotal
+            };
+        });
+            console.log("here",cartItems);
+        res.status(200).json({
+            cart: cartItems,
+            totalPrice: totalPrice,
+            totalItems: cartItems.length
+        });
+
     } catch (err) {
-        next(err)
+        res.status(500).json({
+            message: 'Error fetching cart details',
+        });
     }
 };
 
