@@ -3,6 +3,14 @@ import axios from "axios";
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 const token = localStorage.getItem("accessToken");
 
+// ------------------------------ Admin --------------------------
+export const adminLogin = async (username, password) => {
+  return await axios.post(`${API_BASE_URL}/admin/login`, {
+    username,
+    password,
+  });
+};
+
 
 // ------------------------------ Brands -------------------------
 export const getAllBrands = async () => {
