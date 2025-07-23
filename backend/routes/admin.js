@@ -26,8 +26,8 @@ router.post('/login', adminLogin);
 router.get('/brands', adminAuth, getAllBrands);
 router.get('/brands/:id', adminAuth, getBrandById);
 router.put('/brands/:id/approve', adminAuth, brandApproval);
-router.put('/brand/:id/activate', adminAuth, activateBrand);
-router.put('/brand/:id/deactivate', adminAuth, deactivateBrand);
+router.put('/brands/:id/activate', adminAuth, activateBrand);
+router.put('/brands/:id/deactivate', adminAuth, deactivateBrand);
 
 router.get('/customers', adminAuth, getAllCustomers);
 router.get('/customers/:id', adminAuth, getCustomerById);
