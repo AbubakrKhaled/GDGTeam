@@ -22,13 +22,13 @@ const customerController = require('../controllers/customer');
 router.get('/', customerAuth, getCart);
 
 router.get('/wishlist', customerAuth, getWishlist);
-router.put('/wishlist/add/:id', customerAuth, addToWishlist);
-router.put('/wishlist/delete/:id', customerAuth, deleteWishlistProduct);
+router.post('/wishlist/:id', customerAuth, addToWishlist);
+router.delete('/wishlist/:id', customerAuth, deleteWishlistProduct);
 
-router.put('/addToCartFromWishlist', customerAuth, addToCartFromWishlist);
-router.put('/addToCart', customerAuth, addToCart);
-router.put('/updateCartProductAmount', customerAuth, updateCartProductAmount);
-router.put('/deleteCartProduct', customerAuth, deleteCartProduct);
+router.put('/addToCartFromWishlist/:id', customerAuth, addToCartFromWishlist);
+router.post('/:id', customerAuth, addToCart);
+router.patch('/updateCartProductAmount/:id', customerAuth, updateCartProductAmount);
+router.delete('/:id', customerAuth, deleteCartProduct);
 
 
 

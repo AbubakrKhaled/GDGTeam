@@ -188,6 +188,7 @@ exports.updateCartProductAmount = async (req, res, next) => {
         }
         const user = await Customer.findById(userId);
         const cartItem = user.cart.find(item => item.product.toString() === productId);
+        //to find the product in the cart the user wants to update its amount
 
         if (!cartItem) {
             return res.status(404).json({ message: 'Product not found in cart.' });
