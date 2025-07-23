@@ -4,7 +4,9 @@ const {
     brandLogin,
     createBrand,
     updateBrand,
-    getBrandById
+    getBrandById,
+    getBrandProfile,
+    getAllBrands
 } = require('../controllers/brand.js');
 const { brandAuth } = require('../middlewares/auth.js');
 const adminController = require('../controllers/admin');
@@ -17,12 +19,15 @@ router.post('/login', brandLogin)
 
 router.post('/signup', createBrand);
 
+router.get('/', getAllBrands)
+
 router.put('/:id/update', brandAuth, updateBrand);
-router.get('/:id/profile', brandAuth, getBrandById);
+router.get('/:id/', getBrandById);
+router.get('/:id/profile', brandAuth, getBrandProfile);
 
 router.get('/products', brandAuth, productController.getAllProducts);
 router.post('/products/create', brandAuth, productController.createProduct);
-router.put('/products/update/:id', brandAuth, productController.updateProduct);
+router.put('/products/:id/update', brandAuth, productController.updateProduct);
 router.get('/products/:id', brandAuth, productController.getProductById);
 router.put('/products/:id/activate', brandAuth, productController.activateProduct);
 router.put('/products/:id/deactivate', brandAuth, productController.deactivateProduct);

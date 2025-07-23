@@ -3,7 +3,7 @@ import axios from "axios";
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 const token = localStorage.getItem("accessToken");
 
-// ------------------------------ Admin --------------------------
+// ------------------------------ Login --------------------------
 export const adminLogin = async (username, password) => {
   return await axios.post(`${API_BASE_URL}/admin/login`, {
     username,
@@ -21,8 +21,8 @@ export const getAllBrands = async () => {
   });
 }
 
-export const getBrandById = async (id) => {
-  return await axios.get(`${API_BASE_URL}/admin/brands/${id}`, {
+export const getBrandProfile = async (id) => {
+  return await axios.get(`${API_BASE_URL}/admin/brands/${id}/profile`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
     },
@@ -147,7 +147,7 @@ export const deactivateOrder = async (id) => {
   );
 };
 
-// ------------------------------ Customer -------------------------
+// ------------------------------ Products -------------------------
 export const getAllProducts = async () => {
   return await axios.get(`${API_BASE_URL}/admin/products/`, {
     headers: {

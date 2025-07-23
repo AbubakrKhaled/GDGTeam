@@ -43,7 +43,7 @@ exports.getAllBrands = async (_req, res, next) => {
     next(err);
   }
 };
-
+/*
 exports.getBrandById = async (req, res, next) => {
   const { id } = req.params;
   if (!mongoose.isValidObjectId(id))
@@ -57,7 +57,7 @@ exports.getBrandById = async (req, res, next) => {
     next(err);
   }
 };
-
+*/
 exports.brandApproval = async (req, res, next) => {
   const { id } = req.params;
   try {

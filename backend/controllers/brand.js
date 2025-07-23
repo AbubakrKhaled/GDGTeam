@@ -30,7 +30,17 @@ exports.brandLogin = async (req, res, next) => {
     }
 };
 //************************************************************************************************
-exports.createBrand = async (req, res) => {
+exports.getAllBrands = async (req, res, next) => {
+    try{
+        const brands = await Brand.find({isApproved : true, isActive : true})
+        res.status(200).json({ success: true, data: brands });
+
+    } catch (err) {
+        next(err);
+    }
+}
+
+exports.createBrand = async (req, res, next) => {
     try{
         const {
             name, email, phonenumber, categories, page, brandlocation, logoURL, deliveryTime,
@@ -49,7 +59,7 @@ exports.createBrand = async (req, res) => {
         });
 
         res.status(201).json({success: true, data: brand});
-    }catch(err){
+    } catch (err) {
         next(err);
     }
 }
@@ -99,11 +109,39 @@ exports.getBrandById = async (req, res, next) => {
         const brand = await Brand.findById(id);
         if (!brand) return next(new ErrorResponse('Brand not found', 404));
 
-        res.status(200).json({ success: true, data: brand });
+        const products = await Product.find({ brand: id, isActive: true });
+
+        res.status(200).json({
+            success: true,
+            data: { brand, products }
+        });
     } catch (err) {
         next(err);
     }
 };
+
+exports.getBrandProfile = async (req, res, next) => {
+    const id = req.params.id;
+
+    if (!mongoose.isValidObjectId(id))
+        return next(new ErrorResponse('Invalid ID', 400));
+
+    try {
+        const brand = await Brand.findById(id);
+        if (!brand) return next(new ErrorResponse('Brand not found', 404));
+
+        const products = await Product.find({ brand: id });
+
+        res.status(200).json({
+            success: true,
+            data: { brand, products }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+
 
 // brand/profile
 exports.getAllProducts = async (req, res, next) => {

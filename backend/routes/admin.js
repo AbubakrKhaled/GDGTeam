@@ -24,7 +24,7 @@ const customerController = require('../controllers/customer');
 router.post('/login', adminLogin);
 
 router.get('/brands', adminAuth, getAllBrands);
-router.get('/brands/:id', adminAuth, getBrandById);
+router.get('/brands/:id/profile', adminAuth, brandController.getBrandProfile);
 router.put('/brands/:id/approve', adminAuth, brandApproval);
 router.put('/brands/:id/activate', adminAuth, activateBrand);
 router.put('/brands/:id/deactivate', adminAuth, deactivateBrand);
