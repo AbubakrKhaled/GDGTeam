@@ -1,5 +1,10 @@
 import axios from "axios";
 
+/*
+axios.HTTPMETHOD(url, [data], { headers }).
+POST/PUT need data. GET/DELETE do not.
+*/
+
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 const token = localStorage.getItem("accessToken");
 
@@ -10,9 +15,32 @@ export const brandLogin = async (username, password) => {
     password,
   });
 };
-
-
+//-------------------------------- singup ----------------------------
+export const createBrand = async (brandData) => {
+  return await axios.post(
+    `${API_BASE_URL}/brand/signup`,
+    brandData,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+};
 // ------------------------------- Brands --------------------------
+
+export const updateBrand = async (updatedBrandData) => {
+  return await axios.put(
+    `${API_BASE_URL}/brand/profile/update`,
+    updatedBrandData,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+};
+
 export const getAllBrands = async () => {
   return await axios.get(`${API_BASE_URL}/brand/`, {
     headers: {
@@ -27,8 +55,8 @@ export const getBrandById = async (id) => {
     },
   });
 }
-export const getBrandProfile = async (id) => {
-  return await axios.get(`${API_BASE_URL}/brand/${id}/profile`, {
+export const getBrandProfile = async () => {
+  return await axios.get(`${API_BASE_URL}/brand/profile`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
     },

@@ -3,9 +3,10 @@ const jwt = require('jsonwebtoken');
 const Brand = require("../models/brand.js");
 const Product = require("../models/product.js");
 const ErrorResponse = require('../middlewares/errorresponse');
-const mongoose = require('mongoose'); // need to add this to be able to use mongoose methods like findById, find, etc.
+const mongoose = require('mongoose');
 const { Schema, model, Types } = mongoose;
 const hashPassword = require('../middlewares/hashPassword');
+const Order = require('../models/order.js');
 
 //brand logging in ***************************************************************************
 exports.brandLogin = async (req, res, next) => {
@@ -46,7 +47,7 @@ exports.createBrand = async (req, res, next) => {
             name, email, phonenumber, categories, page, brandlocation, logoURL, deliveryTime,
             description, products, password
         } = req.body;
-        const isApproved = false; // excellent ✅
+        const isApproved = false;
         const ratings = 0;
         const role = 'brand';
 
@@ -65,12 +66,12 @@ exports.createBrand = async (req, res, next) => {
 }
 
 exports.updateBrand = async (req, res, next) => {
-    const id = req.params.id;
+    const id = req.brand._id;
 
-    if (!mongoose.isValidObjectId(id))
+    if (!mongoose.isValidObjectId(id.toString()))
         return next(new ErrorResponse('Invalid ID', 400));
     
-    if (req.brand.role !== 'brand' || req.brand.id !== id) {
+    if (req.brand.role !== 'brand' || req.brand._id.toString() !== id) {
         return res.status(403).json({ message: 'Not authorized' });
     }
 
@@ -121,9 +122,10 @@ exports.getBrandById = async (req, res, next) => {
 };
 
 exports.getBrandProfile = async (req, res, next) => {
-    const id = req.params.id;
+    //const id = req.params.id;
+    const id = req.brand._id
 
-    if (!mongoose.isValidObjectId(id))
+    if (!mongoose.isValidObjectId(id.toString()))
         return next(new ErrorResponse('Invalid ID', 400));
 
     try {
@@ -131,10 +133,11 @@ exports.getBrandProfile = async (req, res, next) => {
         if (!brand) return next(new ErrorResponse('Brand not found', 404));
 
         const products = await Product.find({ brand: id });
+        const orders = await Order.find({ brand: id });
 
         res.status(200).json({
             success: true,
-            data: { brand, products }
+            data: { brand, products, orders }
         });
     } catch (err) {
         next(err);
@@ -143,7 +146,6 @@ exports.getBrandProfile = async (req, res, next) => {
 
 
 
-// brand/profile
 exports.getAllProducts = async (req, res, next) => {
     try {
         const products = await Product.find();

@@ -1,5 +1,10 @@
 import axios from "axios";
 
+/*
+axios.HTTPMETHOD(url, [data], { headers }).
+POST/PUT need data. GET/DELETE do not.
+*/
+
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 const token = localStorage.getItem("accessToken");
 

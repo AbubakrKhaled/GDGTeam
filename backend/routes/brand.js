@@ -21,9 +21,9 @@ router.post('/signup', createBrand);
 
 router.get('/', getAllBrands)
 
-router.put('/:id/update', brandAuth, updateBrand);
-router.get('/:id/', getBrandById);
-router.get('/:id/profile', brandAuth, getBrandProfile);
+router.put('/profile/update', brandAuth, updateBrand);
+router.get('/:id', getBrandById);
+router.get('/profile', brandAuth, getBrandProfile);
 
 router.get('/products', brandAuth, productController.getAllProducts);
 router.post('/products/create', brandAuth, productController.createProduct);
