@@ -18,7 +18,7 @@ const brandSchema = new Schema({
         required: false
     },
     logoURL:{
-        type: String,
+        type: [String],
         required: false
     },
     deliveryTime:{
@@ -46,7 +46,7 @@ const brandSchema = new Schema({
     },
     isActive:{
         type: Boolean,
-        default: false
+        default: true
     },
 }, { timestamps: true });
 
