@@ -69,7 +69,10 @@ exports.deleteWishlistProduct = async (req, res, next) => {
 exports.getCart = async (req, res) => {
     try {
         const id = req.customer.id;
-        const user = await Customer.findById(id).populate('cart.product');
+        const user = await Customer.findById(id).populate({
+            path: 'cart.product',
+            select: 'name price quantity imageURL'
+        });
 
         if (!user || !user.cart || user.cart.length === 0) {
             return res.status(400).json({
@@ -85,18 +88,12 @@ exports.getCart = async (req, res) => {
             totalPrice += itemTotal;
 
             return {
-                product: {
-                    _id: item.product._id,
-                    name: item.product.name,
-                    price: item.product.price,
-                    quantity: item.product.quantity, 
-                    imageUrl: item.product.imageUrl 
-                },
+                product: item.product,
                 quantity: item.quantity,
                 itemTotal: itemTotal
             };
         });
-            console.log("here",cartItems);
+
         res.status(200).json({
             cart: cartItems,
             totalPrice: totalPrice,
