@@ -3,10 +3,10 @@ const { Schema, model, Types } = mongoose;
 const User = require('./User.js');
 
 const customerSchema = new Schema({
-    address: [{
-        type: String,
+    address: {
+        type: [String],
         required: true
-    }],
+    },
     wishlist: [{
         type: Types.ObjectId,
         ref: 'product'
