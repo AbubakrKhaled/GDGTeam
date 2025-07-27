@@ -142,7 +142,7 @@ export const updateOrderStatus = async (id, status) => {
 
 export const deactivateOrder = async (id) => {
   return await axios.put(
-    `${API_BASE_URL}/admin/brands/${id}/deactivate`,
+    `${API_BASE_URL}/admin/orders/${id}/deactivate`,
     {},
     {
       headers: {
