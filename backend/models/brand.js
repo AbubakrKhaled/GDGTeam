@@ -32,7 +32,8 @@ const brandSchema = new Schema({
     },
     isApproved:{
         type: Boolean,
-        default: false
+        default: false,
+        select: false
     },
     reviews: [{
         type: Types.ObjectId,
@@ -46,7 +47,8 @@ const brandSchema = new Schema({
     },
     isActive:{
         type: Boolean,
-        default: true
+        default: true,
+        select: false
     },
 }, { timestamps: true });
 

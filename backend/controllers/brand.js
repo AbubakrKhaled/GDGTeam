@@ -33,7 +33,7 @@ exports.brandLogin = async (req, res, next) => {
 //************************************************************************************************
 exports.getAllBrands = async (req, res, next) => {
     try{
-        const brands = await Brand.find({isApproved : true, isActive : true})
+        const brands = await Brand.find({isApproved : true, isActive : true}).select('name logoURL categories')
         res.status(200).json({ success: true, data: brands });
 
     } catch (err) {
@@ -71,7 +71,7 @@ exports.updateBrand = async (req, res, next) => {
     if (!mongoose.isValidObjectId(id.toString()))
         return next(new ErrorResponse('Invalid ID', 400));
     
-    if (req.brand.role !== 'brand' || req.brand._id.toString() !== id) {
+    if (req.brand.role !== 'brand') {
         return res.status(403).json({ message: 'Not authorized' });
     }
 
@@ -107,10 +107,10 @@ exports.getBrandById = async (req, res, next) => {
         return next(new ErrorResponse('Invalid ID', 400));
 
     try {
-        const brand = await Brand.findById(id);
+        const brand = await Brand.findOne({ _id : id, isApproved : true, isActive : true }).populate('reviews');
         if (!brand) return next(new ErrorResponse('Brand not found', 404));
 
-        const products = await Product.find({ brand: id, isActive: true });
+        const products = await Product.find({ brand: id, isActive: true }).populate('imageURL color category price productname');
 
         res.status(200).json({
             success: true,
@@ -145,7 +145,7 @@ exports.getBrandProfile = async (req, res, next) => {
 };
 
 
-
+/*
 exports.getAllProducts = async (req, res, next) => {
     try {
         const products = await Product.find();
@@ -156,3 +156,4 @@ exports.getAllProducts = async (req, res, next) => {
         next(err);
     }
 }
+*/

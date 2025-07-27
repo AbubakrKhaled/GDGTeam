@@ -27,9 +27,9 @@ const BaseUserSchema = new Schema(
         required: [true, 'Please add phone number']
     },
     role: {
-          type: String,
-          enum: ['admin', 'customer', 'brand'],
-          required: [true, 'Please specify a role']
+        type: String,
+        enum: ['admin', 'customer', 'brand'],
+        required: [true, 'Please specify a role']
     }
   },
   { discriminatorKey: 'role', timestamps: true }

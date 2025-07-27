@@ -12,9 +12,9 @@ const categorySchema = new Schema({
 const colorSchema = new Schema({
   color:{
     type: String, 
-    required: [true, 'Please enter product color']
+    required: [true, 'Please enter product color'],
+    enum: {values: colors}
   },
-  enum: {values: colors}
 })
 
 const sizeSchema = new Schema({

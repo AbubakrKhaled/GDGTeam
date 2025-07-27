@@ -35,7 +35,7 @@ exports.adminLogin = async (req, res, next) => {
 };
 
 /* --------------------------- Brand CRUD -------------------------- */
-exports.getAllBrands = async (_req, res, next) => {
+exports.getAllBrands = async (req, res, next) => {
   try {
     const brands = await Brand.find();
     res.status(200).json({ success: true, data: brands });

@@ -13,7 +13,7 @@ exports.createProduct = async (req, res,next) => {
         } = req.body;
         const reviews = 0;
 
-        const existingProduct = await Product.findOne({productname, brand: req.user.id});
+        const existingProduct = await Product.findOne({productname, brand: req.brand.id});
         
         if (existingProduct) {return next(new ErrorResponse('Product already exists', 400));}
 
@@ -23,7 +23,7 @@ exports.createProduct = async (req, res,next) => {
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
             discount: Types.ObjectId(discount),
-            brand: req.user.id
+            brand: req.brand.id
         });
 
         res.status(201).json({success: true, data: product});
@@ -65,10 +65,7 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.getAllProducts = async (req, res, next) => {
     try {
-        const filter = { isActive: true };
-        //if (req.user.role === 'brand') filter.brand = req.user.id;
-
-        const products = await Product.find(filter);
+        const products = await Product.find({ isActive: true });
 
         res.status(200).json({success: true, data: products});
 
@@ -97,7 +94,7 @@ exports.getProductById = async (req, res, next) => {
         }
               
         if (!product || !product.isActive) {
-        return next(new ErrorResponse('Product not found', 404));
+            return next(new ErrorResponse('Product not found', 404));
         }
         
         res.status(200).json({success: true, data: product});

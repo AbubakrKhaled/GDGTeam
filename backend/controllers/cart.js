@@ -8,7 +8,7 @@ const Product = require("../models/product.js");
 exports.getWishlist = async (req, res, next) => {
     try {
         const id = req.customer.id;
-        const user = await Customer.findById(id).populate({ path: 'wishlist'}).exec();
+        const user = await Customer.findById(id).populate('wishlist');
 
         if (!user || !user.wishlist) {
             return res.status(404).json({ message: 'Wishlist not found.' });
@@ -37,6 +37,7 @@ exports.addToWishlist = async (req, res, next) => {
 
         user.wishlist.push(productId);
         await user.save();
+        await user.populate('wishlist');
         res.status(200).json({ message: 'Product added to wishlist.', wishlist: user.wishlist });
     } catch (err) {
         next(err)
@@ -57,7 +58,7 @@ exports.deleteWishlistProduct = async (req, res, next) => {
         user.wishlist = user.wishlist.filter(item => item.toString() !== productId);
 
         await user.save();
-
+        await user.populate('wishlist');
         res.status(200).json({ message: 'Product removed from wishlist.', wishlist: user.wishlist });
     } catch (err) {
         next(err)
@@ -135,6 +136,7 @@ exports.addToCartFromWishlist = async (req, res, next) => {
         }
         user.wishlist = user.wishlist.filter(item => item.toString() !== productId);
         await user.save();
+        await user.populate('cart.product')
         res.status(200).json({ message: 'Product moved from wishlist to cart.', cart: user.cart });
     } catch (err) {
         next(err);
@@ -166,7 +168,7 @@ exports.addToCart = async (req, res, next) => {
         }
 
         await user.save();
-
+        await user.populate('cart.product')
         res.status(200).json({ message: 'Product added to cart.', cart: user.cart });
     } catch (err) {
         next(err);
@@ -197,7 +199,7 @@ exports.updateCartProductAmount = async (req, res, next) => {
         cartItem.quantity = quantity;
 
         await user.save();
-
+        await user.populate('cart.product')
         res.status(200).json({ message: 'Product quantity updated in cart.', cart: user.cart });
     } catch (err) {
         next(err);
@@ -219,7 +221,7 @@ exports.deleteCartProduct = async (req, res, next) => {
         user.cart = user.cart.filter(item => item.product.toString() !== productId);
 
         await user.save();
-
+        await user.populate('cart.product')
         res.status(200).json({ message: 'Product removed from cart.', cart: user.cart });
     } catch (err) {
         next(err);

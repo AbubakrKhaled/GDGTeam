@@ -7,6 +7,11 @@ const orderSchema = new Schema({
         ref: 'customer',
         required: true
     },
+    brand: {
+        type: Types.ObjectId,
+        ref: 'brand',
+        required: true
+    },
     products: [{
         product: {
             type: Types.ObjectId,

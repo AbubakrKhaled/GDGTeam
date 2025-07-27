@@ -12,12 +12,12 @@ exports.getOrders = async (req, res, next) => {
         orders = await Order.find().populate('products.product');
     } 
     else if (req.brand) {
-        orders = await Order.find().populate('products.product');
+        orders = await Order.find({brand: id}).populate('products.product');
 
-        orders = orders.filter(order => {
+        /*orders = orders.filter(order => {
             const firstProduct = order.products[0].product;
             return firstProduct && firstProduct.brand?.toString() === req.brand.id;
-        });
+        });*/
     } 
     else if (req.customer) {
       orders = await Order.find({ customer: req.customer.id }).populate('products.product');
@@ -48,10 +48,10 @@ exports.getOrderById = async (req, res, next) => {
             return res.status(200).json({ success: true, data: order });
         }
 
-        if (req.brand && order.products[0].product.brand.toString() !== req.brand.id) {
+        if (req.brand && order.brand.toString() !== req.brand.id) {
             return next(new ErrorResponse("Not your brand's order", 403));
         }
-        if (req.brand && order.products[0].product.brand.toString() === req.brand.id) {
+        if (req.brand && order.brand.toString() === req.brand.id) {
             return res.status(200).json({ success: true, data: order });
         } 
         
@@ -83,7 +83,7 @@ exports.updateOrderStatus = async (req, res, next) => {
             return next(new ErrorResponse('Order not found', 404));
         }
         
-        if (req.brand && req.brand.id !== order.products[0].product.brand.toString()) {
+        if (req.brand && req.brand.id !== order.brand.toString()) {
             return next(new ErrorResponse('Order not found', 404));
         }
 
@@ -132,6 +132,7 @@ exports.checkoutOrder = async (req,res,next) => {
         const id = req.customer.id;
         const deliveryAddress = req.customer.address
         const user = await Customer.findById(id).populate('cart.product');
+        const brand = user.cart[0].product.brand;
 
         if (!user || !user.cart || user.cart.length === 0) {
             return res.status(400).json({ message: 'No products in the cart to create an order.' });
@@ -161,6 +162,7 @@ exports.checkoutOrder = async (req,res,next) => {
 
         const newOrder = new Order({ 
             customer: id, 
+            brand,
             products, 
             totalPrice, 
             deliveryAddress, 

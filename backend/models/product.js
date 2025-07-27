@@ -20,10 +20,10 @@ const productSchema = new Schema({
         required: true
     },
     // this needs to be an array of images (See the frontend for more details)
-    imageURL: [{
-        type: String,
+    imageURL: {
+        type: [String],
         required: false
-    }],
+    },
     description: {
         type: String,
         required: false
@@ -53,7 +53,8 @@ const productSchema = new Schema({
     } ,
     isActive:{
         type: Boolean,
-        default: true
+        default: true,
+        select: false
     }
 }, { timestamps: true }
 )
