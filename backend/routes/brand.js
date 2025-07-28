@@ -22,6 +22,7 @@ router.post('/signup', createBrand);
 router.get('/', getAllBrands)
 
 router.put('/profile/update', brandAuth, updateBrand);
+
 router.get('/:id', getBrandById);
 router.get('/profile', brandAuth, getBrandProfile);
 

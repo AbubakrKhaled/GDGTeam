@@ -35,6 +35,7 @@ exports.adminLogin = async (req, res, next) => {
 };
 
 /* --------------------------- Brand CRUD -------------------------- */
+// handle cases
 exports.getAllBrands = async (req, res, next) => {
   try {
     const brands = await Brand.find();

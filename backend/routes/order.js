@@ -17,10 +17,12 @@ const customerController = require('../controllers/customer');
 
 
 router.get('/', adminAuth, brandAuth, customerAuth, getOrders);
-router.get('/:id', adminAuth, brandAuth, customerAuth, getOrderById);
+// this will cause problem related to order of routes you made (Search about it and understand)
 
+router.get('/:id', adminAuth, brandAuth, customerAuth, getOrderById);
 router.put('/status', adminAuth, brandAuth, updateOrderStatus);
-router.put('cancel', adminAuth, brandAuth, customerAuth, deactivateOrder);
+
+router.put('/cancel', adminAuth, brandAuth, customerAuth, deactivateOrder);
 
 router.post('/checkout', customerAuth, checkoutOrder);
 
