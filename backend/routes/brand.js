@@ -23,7 +23,6 @@ router.get('/', getAllBrands)
 
 router.put('/profile/update', brandAuth, updateBrand);
 
-router.get('/:id', getBrandById);
 router.get('/profile', brandAuth, getBrandProfile);
 
 router.get('/products', brandAuth, productController.getAllProducts);
@@ -37,5 +36,8 @@ router.get('/orders', brandAuth, orderController.getOrders);
 router.get('/orders/:id', brandAuth, orderController.getOrderById);
 router.put('/orders/:id/status', brandAuth, orderController.updateOrderStatus);
 router.put('/orders/:id/deactivate', brandAuth, orderController.deactivateOrder);
+
+router.get('/:id', getBrandById);
+
 
 module.exports = router;

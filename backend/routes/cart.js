@@ -26,8 +26,8 @@ router.post('/wishlist/:id', customerAuth, addToWishlist);
 router.delete('/wishlist/:id', customerAuth, deleteWishlistProduct);
 
 router.put('/addToCartFromWishlist/:id', customerAuth, addToCartFromWishlist);
-router.post('/:id', customerAuth, addToCart);
 router.patch('/updateCartProductAmount/:id', customerAuth, updateCartProductAmount);
+router.post('/:id', customerAuth, addToCart);
 router.delete('/:id', customerAuth, deleteCartProduct);
 
 
