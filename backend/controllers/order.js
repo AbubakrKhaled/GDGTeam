@@ -12,12 +12,7 @@ exports.getOrders = async (req, res, next) => {
         orders = await Order.find().populate('products.product');
     } 
     else if (req.brand) {
-        orders = await Order.find({brand: id}).populate('products.product');
-
-        /*orders = orders.filter(order => {
-            const firstProduct = order.products[0].product;
-            return firstProduct && firstProduct.brand?.toString() === req.brand.id;
-        });*/
+        orders = await Order.find({brand: req.brand.id}).populate('products.product');
     } 
     else if (req.customer) {
       orders = await Order.find({ customer: req.customer.id }).populate('products.product');
@@ -75,16 +70,15 @@ exports.updateOrderStatus = async (req, res, next) => {
     
     try {
         const order = await Order.findByIdAndUpdate(id, {status}, {new: true});
-
         if (!order) return next(new ErrorResponse('Order not found', 404));
 
 
         if (req.customer && req.customer.id !== order.customer.toString()) {
-            return next(new ErrorResponse('Order not found', 404));
+            return res.status(403).json({ message: 'Not authorized' });
         }
-        
+
         if (req.brand && req.brand.id !== order.brand.toString()) {
-            return next(new ErrorResponse('Order not found', 404));
+            return res.status(403).json({ message: 'Not authorized' });
         }
 
         order.status = status;

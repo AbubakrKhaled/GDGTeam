@@ -12,8 +12,9 @@ const brandController   = require('../controllers/brand');
 const customerController = require('../controllers/customer');
 
 
-router.post('/', customerLogin);
-router.put('/update', customerAuth, updateCustomer);
+router.post('/login', customerLogin);
+router.put('/profile/update', customerAuth, updateCustomer);
+
 
 
 module.exports = router;
