@@ -32,7 +32,8 @@ function Wishlist() {
   const loadWishlist = async () => {
     try {
       setLoading(true);
-      const response = await mockApiService.getCustomerWishlist();
+      //const response = await mockApiService.getCustomerWishlist();
+      const response = await cartApi.getWishlist();
       setWishlist(response.data || []);
     } catch (error) {
       console.error('Failed to load wishlist:', error);
@@ -53,7 +54,8 @@ function Wishlist() {
 
   const handleRemoveFromWishlist = async (productId) => {
     try {
-      await mockApiService.removeFromWishlist(productId);
+      //await mockApiService.removeFromWishlist(productId);
+      await cartApi.deleteWishlistProduct(productId);
       await loadWishlist();
       toast.success('Product removed from wishlist!');
     } catch (error) {
