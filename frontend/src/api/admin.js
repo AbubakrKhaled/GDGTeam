@@ -192,3 +192,26 @@ export const deactivateProduct = async (id) => {
     }
   );
 };
+
+const adminApi = {
+  adminLogin,
+  getAllBrands,
+  getBrandProfile,
+  brandApproval,
+  activateBrand,
+  deactivateBrand,
+  getAllCustomers,
+  getCustomerById,
+  activateCustomer,
+  deactivateCustomer,
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus,
+  deactivateOrder,
+  getAllProducts,
+  getProductById,
+  activateProduct,
+  deactivateProduct,
+};
+
+export {adminApi};

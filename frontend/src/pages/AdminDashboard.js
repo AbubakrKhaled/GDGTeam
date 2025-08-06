@@ -16,6 +16,7 @@ import {
   FaStar
 } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
+import { adminApi } from '../api/admin';
 
 function AdminDashboard() {
   const { user, userType, isAuthenticated } = useAuth();
@@ -39,8 +40,10 @@ function AdminDashboard() {
       setLoading(true);
       const [dashboardRes, brandsRes, ordersRes] = await Promise.all([
         mockApiService.getAdminDashboard(),
-        mockApiService.getAllBrands(),
-        mockApiService.getAllOrders()
+        //mockApiService.getAllBrands(),
+        adminApi.getAllBrands(),
+        //mockApiService.getAllOrders()
+        adminApi.getAllOrders(),
       ]);
       
       setDashboardData(dashboardRes.data);
@@ -55,7 +58,8 @@ function AdminDashboard() {
 
   const handleApproveBrand = async (brandId) => {
     try {
-      await mockApiService.approveBrand(brandId);
+      //await mockApiService.approveBrand(brandId);
+      await adminApi.brandApproval(brandId)
       await loadDashboardData();
       toast.success('Brand approved successfully!');
     } catch (error) {
@@ -67,7 +71,7 @@ function AdminDashboard() {
   const handleRejectBrand = async (brandId) => {
     if (window.confirm('Are you sure you want to reject this brand? This action cannot be undone.')) {
       try {
-        await mockApiService.rejectBrand(brandId);
+        await mockApiService.rejectBrand(brandId); //will do rejectbrand controller and change this
         await loadDashboardData();
         toast.success('Brand rejected successfully!');
       } catch (error) {
