@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { mockApiService } from '../services/mockData';
 import { FaTrash, FaHeart, FaShoppingBag, FaArrowLeft } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
+import { cartApi } from '../api/cart';
+import product from '../../../backend/models/product';
 
 function Cart() {
  
@@ -28,7 +30,8 @@ function Cart() {
   const handleQuantityChange = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
     try {
-      await updateCartItem(productId, newQuantity);
+      //await updateCartItem(productId, newQuantity); <------------------------
+      await cartApi.updateCartProductAmount(productId, newQuantity)
     } catch (error) {
       console.error('Failed to update quantity:', error);
     }
@@ -36,17 +39,18 @@ function Cart() {
 
   const handleRemoveItem = async (productId) => {
     try {
-      await removeFromCart(productId);
+      //await removeFromCart(productId);
+      await cartApi.deleteCartProduct(productId)
     } catch (error) {
       console.error('Failed to remove item:', error);
     }
   };
 
-  const addToWishlist = async (product) => {
+  const addToWishlist = async (productId) => {
     try {
       //await apiService.addToWishlist(product._id);
-      await mockApiService.addToWishlist(product._id);
-      await removeFromCart(product._id);
+      //await mockApiService.addToWishlist(product._id);
+      await cartApi.addToWishlist(productId)   // <----------------- not sure i changed id
     } catch (error) {
       console.error('Failed to add to wishlist:', error);
     }
@@ -80,8 +84,9 @@ function Cart() {
         paymentMethod: checkoutData.paymentMethod,
         notes: checkoutData.notes
       };
-//      const response = await apiService.createOrder(orderData); 
-      const response = await mockApiService.createOrder(orderData);
+      //const response = await apiService.createOrder(orderData); 
+      //const response = await mockApiService.createOrder(orderData);
+      //ORDER API
       
       if (response.success) {
         clearCart();

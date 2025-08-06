@@ -52,7 +52,7 @@ export const deleteWishlistProduct = async (productId) => {
 }
 
 //-------------------------------------------------------------------------------------------------
-export const addToCartFromWishlist2 = async (productId) => {
+export const addToCartFromWishlist = async (productId) => {
     try {
       const response = await axios.put(
         `${API_BASE_URL}/cart/addToCartFromWishlist/${productId}`,
@@ -84,11 +84,11 @@ export const addToCart = async (productId) => {
       return response.data;
     } catch (err) {
       console.error("Error adding product to cart:", err);
-      throw err; //for UI
+      throw err;
     }
   };
 
-  export const updateCartProductAmount = async (productId ,quantity) => {
+  export const updateCartProductAmount = async (productId, quantity) => {
     return await axios.patch(`${API_BASE_URL}/cart/updateCartProductAmount/${productId}`, 
         {quantity:quantity},
         {
@@ -105,3 +105,16 @@ export const deleteCartProduct = async (productId) => {
         },
     });
 }
+
+const cartApi = {
+  getCart,
+  getWishlist,
+  addToWishlist,
+  deleteWishlistProduct,
+  addToCartFromWishlist,
+  addToCart,
+  updateCartProductAmount,
+  deleteCartProduct,
+};
+
+export { cartApi };
