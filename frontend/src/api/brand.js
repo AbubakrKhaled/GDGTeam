@@ -175,3 +175,24 @@ export const deactivateOrder = async (id) => {
   );
 };
 
+
+const brandApi = {
+  brandLogin,
+  createBrand,
+  updateBrand,
+  getAllBrands,
+  getBrandById,
+  getBrandProfile,
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  activateProduct,
+  deactivateProduct,
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus,
+  deactivateOrder,
+};
+
+export { brandApi };

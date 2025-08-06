@@ -18,6 +18,7 @@ import {
   FaTruck
 } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
+import { brandApi } from '../api/brand';
 
 function BrandDashboard() {
   const { user, userType } = useAuth();
@@ -51,10 +52,13 @@ function BrandDashboard() {
     try {
       setLoading(true);
       const [productsRes, ordersRes] = await Promise.all([
-        //const response = await apiService.getBrandProducts();
-        //const response = await apiService.getBrandOrders();
-        mockApiService.getBrandProducts(),
-        mockApiService.getBrandOrders()
+        //const response = await apiService.getBrandProducts();    <-------?
+        //const response = await apiService.getBrandOrders();      <-------?
+        
+        //mockApiService.getBrandProducts(),
+        brandApi.getAllProducts(),
+        //mockApiService.getBrandOrders(),
+        brandApi.getAllOrders()
       ]);
       setProducts(productsRes.data || []);
       setOrders(ordersRes.data || []);
@@ -69,7 +73,8 @@ function BrandDashboard() {
     e.preventDefault();
     try {
       setLoading(true);
-      await mockApiService.createProduct(productForm);
+      //await mockApiService.createProduct(productForm);
+      await brandApi.createProduct(productForm);
       setShowAddProduct(false);
       setProductForm({
         productname: '',
@@ -95,8 +100,9 @@ function BrandDashboard() {
     
     try {
       setLoading(true);
-      //await apiService.updateProduct(showEditProduct._id, productForm);
-      await mockApiService.updateProduct(showEditProduct._id, productForm);
+      //await apiService.updateProduct(showEditProduct._id, productForm); <------ ?
+      //await mockApiService.updateProduct(showEditProduct._id, productForm);
+      await brandApi.updateProduct(showEditProduct._id, productForm)
       setShowEditProduct(null);
       setProductForm({
         productname: '',
@@ -106,7 +112,8 @@ function BrandDashboard() {
         imageURL: '',
         category: '',
         color: '',
-        size: ''
+        size: '',
+        discount: ''
       });
       await loadDashboardData();
     } catch (error) {
@@ -120,7 +127,8 @@ function BrandDashboard() {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         //await apiService.deleteProduct(productId);
-        await mockApiService.deleteProduct(productId);
+        //await mockApiService.deleteProduct(productId);
+        await brandApi.deactivateProduct(productId);
         await loadDashboardData();
       } catch (error) {
         console.error('Failed to delete product:', error);
@@ -131,7 +139,8 @@ function BrandDashboard() {
   const handleUpdateOrderStatus = async (orderId, status) => {
     try {
       //await apiService.updateOrderStatus(orderId, status);
-      await mockApiService.updateOrderStatus(orderId, status);
+      //await mockApiService.updateOrderStatus(orderId, status);
+      await brandApi.updateOrderStatus(orderId, status);
       await loadDashboardData();
       toast.success(`Order status updated to ${status}!`);
     } catch (error) {
