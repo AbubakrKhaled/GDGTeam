@@ -12,6 +12,7 @@ import {
   FaStar
 } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
+import { cartApi } from '../api/cart';
 
 function Wishlist() {
   const { isAuthenticated } = useAuth();

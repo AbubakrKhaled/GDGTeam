@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 //import apiService from '../services/api';
 import { mockApiService, mockCart } from '../services/mockData';
+import { cartApi } from '../api/cart';
 
 const CartContext = createContext();
 
@@ -29,7 +30,8 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       if (isAuthenticated) {
-        const response = await mockApiService.getCustomerCart();
+        //const response = await mockApiService.getCustomerCart();
+        const response = await cartApi.getCart();
         setCart(response.data || []);
       } else {
         // Load from localStorage for non-authenticated users
@@ -43,10 +45,11 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const addToCart = async (product, quantity = 1) => {
+  const addToCart = async (productId) => {
     try {
       if (isAuthenticated) {
-        await mockApiService.addToCart(product._id, quantity);
+        //await mockApiService.addToCart(product._id, quantity);
+        await cartApi.addToCart(productId)
         await loadCart(); // Reload cart from backend
       } else {
         // Handle local cart for non-authenticated users
@@ -73,7 +76,8 @@ export const CartProvider = ({ children }) => {
     try {
       if (isAuthenticated) {
         //await apiService.updateCartItem(productId, quantity);
-        await mockApiService.updateCartItem(productId, quantity);
+        //await mockApiService.updateCartItem(productId, quantity);
+        await cartApi.updateCartProductAmount(productId, quantity)
         await loadCart();
       } else {
         setCart(prevCart =>
@@ -93,8 +97,9 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (productId) => {
     try {
       if (isAuthenticated) {
-        //     await apiService.removeFromCart(productId);
-        await mockApiService.removeFromCart(productId);
+        //await apiService.removeFromCart(productId);
+        //await mockApiService.removeFromCart(productId);
+        await cartApi.deleteCartProduct(productId);
         await loadCart();
       } else {
         setCart(prevCart => prevCart.filter(item => item.product._id !== productId));
