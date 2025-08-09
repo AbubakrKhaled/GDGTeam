@@ -24,6 +24,10 @@ export const adminLogin = async (username, password) => {
   });
 };
 
+export const getAdminDashboard = async () => {
+  return await axios.get(`${API_BASE_URL}/admin/dashboard/`, authHeader());
+}
+
 
 // ------------------------------ Brands -------------------------
 export const getAllBrands = async () => {
@@ -34,7 +38,7 @@ export const getBrandProfile = async (id) => {
   return await axios.get(`${API_BASE_URL}/admin/brands/${id}/profile`, authHeader());
 }
 
-export const brandApprove = async (id, isApproved) => {
+export const brandApprove = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/brands/${id}/approve`,
     {},
@@ -42,7 +46,7 @@ export const brandApprove = async (id, isApproved) => {
   );
 };
 
-export const brandDisapprove = async (id, isApproved) => {
+export const brandDisapprove = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/brands/${id}/disapprove`,
     {},
@@ -143,6 +147,7 @@ export const deactivateProduct = async (id) => {
 
 const adminApi = {
   adminLogin,
+  getAdminDashboard,
   getAllBrands,
   getBrandProfile,
   brandApprove,

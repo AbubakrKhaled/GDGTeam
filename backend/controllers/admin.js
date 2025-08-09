@@ -5,6 +5,8 @@ const Admin   = require('../models/admin');
 const Brand   = require('../models/brand');
 const Customer= require('../models/customer');
 const Order   = require('../models/order');
+const User = require('../models/User');
+const Product = require('../models/product');
 const ErrorResponse = require('../middlewares/errorresponse');
 const mongoose = require('mongoose');
 
@@ -31,6 +33,33 @@ exports.adminLogin = async (req, res, next) => {
     res.status(200).json({ token });
   } catch (err) {
     next(err);
+  }
+};
+
+exports.getAdminDashboard = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    const products = await Product.find();
+    const orders = await Order.find();
+
+    const customers = users.filter(u => u.role === 'customer');
+    const brands = users.filter(u => u.role === 'brand');
+
+    const pendingBrands = brands.filter(b => !b.isApproved);
+    const recentOrders = orders.slice(-5);
+    const revenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+
+    res.status(200).json({
+      totalCustomers: customers.length,
+      totalBrands: brands.length,
+      totalProducts: products.length,
+      totalOrders: orders.length,
+      pendingBrands,
+      recentOrders,
+      revenue
+    });
+  } catch (error) {
+    next(error);
   }
 };
 

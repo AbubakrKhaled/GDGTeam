@@ -15,6 +15,7 @@ const {
     getCustomerById,
     activateCustomer,
     deactivateCustomer,
+    getAdminDashboard,
 
 } = require('../controllers/admin.js');
 const { adminAuth } = require('../middlewares/auth.js');
@@ -25,6 +26,7 @@ const customerController = require('../controllers/customer');
 
 
 router.post('/login', adminLogin);
+router.get('/dashboard', getAdminDashboard)
 router.get('/brands', adminAuth, getAllBrands);
 
 router.get('/brands/:id/profile', adminAuth, brandController.getBrandProfile);

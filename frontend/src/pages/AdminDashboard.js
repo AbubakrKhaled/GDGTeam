@@ -39,7 +39,8 @@ function AdminDashboard() {
     try {
       setLoading(true);
       const [dashboardRes, brandsRes, ordersRes] = await Promise.all([
-        mockApiService.getAdminDashboard(),
+        //mockApiService.getAdminDashboard(),
+        adminApi.getAdminDashboard(),
         //mockApiService.getAllBrands(),
         adminApi.getAllBrands(),
         //mockApiService.getAllOrders()
@@ -59,7 +60,7 @@ function AdminDashboard() {
   const handleApproveBrand = async (brandId) => {
     try {
       //await mockApiService.approveBrand(brandId);
-      await adminApi.brandApproval(brandId)
+      await adminApi.brandApprove(brandId)
       await loadDashboardData();
       toast.success('Brand approved successfully!');
     } catch (error) {
@@ -71,7 +72,8 @@ function AdminDashboard() {
   const handleRejectBrand = async (brandId) => {
     if (window.confirm('Are you sure you want to reject this brand? This action cannot be undone.')) {
       try {
-        await mockApiService.rejectBrand(brandId); //will do rejectbrand controller and change this
+        //await mockApiService.rejectBrand(brandId); //will do rejectbrand controller and change this
+        await adminApi.brandDisapprove(brandId);
         await loadDashboardData();
         toast.success('Brand rejected successfully!');
       } catch (error) {
