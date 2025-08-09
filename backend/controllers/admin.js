@@ -59,10 +59,22 @@ exports.getBrandById = async (req, res, next) => {
   }
 };
 */
-exports.brandApproval = async (req, res, next) => {
+exports.brandApprove = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const brand = await Brand.findByIdAndUpdate(id, { isApproved: req.body.isApproved }, { new: true });
+    const brand = await Brand.findByIdAndUpdate(id, { isApproved: true }, { new: true });
+
+    if (!brand) return next(new ErrorResponse('Brand not found', 404));
+    res.status(200).json({ success: true, data: brand });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.brandDisapprove = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const brand = await Brand.findByIdAndUpdate(id, { isApproved: false }, { new: true });
 
     if (!brand) return next(new ErrorResponse('Brand not found', 404));
     res.status(200).json({ success: true, data: brand });

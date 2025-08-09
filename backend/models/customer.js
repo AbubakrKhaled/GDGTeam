@@ -26,10 +26,10 @@ const customerSchema = new Schema({
         type: Boolean,
         default: true
     },
-    loyaltyPoints: { 
+    /*loyaltyPoints: { 
         type: Number, 
         default: 0 
-    }
+    }*/
 }, { timestamps: true }
 );
 

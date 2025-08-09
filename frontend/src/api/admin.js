@@ -6,7 +6,15 @@ POST/PUT need data. GET/DELETE do not.
 */
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
-const token = localStorage.getItem("accessToken");
+
+const authHeader = () => {
+  const token = localStorage.getItem("accessToken");
+  return {
+  headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+}
 
 // ------------------------------ Login --------------------------
 export const adminLogin = async (username, password) => {
@@ -19,30 +27,26 @@ export const adminLogin = async (username, password) => {
 
 // ------------------------------ Brands -------------------------
 export const getAllBrands = async () => {
-  return await axios.get(`${API_BASE_URL}/admin/brands/`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/brands/`, authHeader());
 }
 
 export const getBrandProfile = async (id) => {
-  return await axios.get(`${API_BASE_URL}/admin/brands/${id}/profile`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/brands/${id}/profile`, authHeader());
 }
 
-export const brandApproval = async (id, isApproved) => {
+export const brandApprove = async (id, isApproved) => {
   return await axios.put(
     `${API_BASE_URL}/admin/brands/${id}/approve`,
-    { isApproved },
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    {},
+    authHeader()
+  );
+};
+
+export const brandDisapprove = async (id, isApproved) => {
+  return await axios.put(
+    `${API_BASE_URL}/admin/brands/${id}/disapprove`,
+    {},
+    authHeader()
   );
 };
 
@@ -50,11 +54,7 @@ export const activateBrand = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/brands/${id}/activate`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
@@ -62,40 +62,24 @@ export const deactivateBrand = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/brands/${id}/deactivate`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
 // ------------------------------ Customer -------------------------
 export const getAllCustomers = async () => {
-  return await axios.get(`${API_BASE_URL}/admin/customers/`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/customers/`, authHeader());
 }
 
 export const getCustomerById = async (id) => {
-  return await axios.get(`${API_BASE_URL}/admin/customers/${id}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/customers/${id}`, authHeader());
 }
 
 export const activateCustomer = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/customers/${id}/activate`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
@@ -103,40 +87,24 @@ export const deactivateCustomer = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/customers/${id}/deactivate`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
 // ------------------------------ Orders -------------------------
 export const getAllOrders = async () => {
-  return await axios.get(`${API_BASE_URL}/admin/orders/`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/orders/`, authHeader());
 }
 
 export const getOrderById = async (id) => {
-  return await axios.get(`${API_BASE_URL}/admin/orders/${id}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/orders/${id}`, authHeader());
 }
 
 export const updateOrderStatus = async (id, status) => {
   return await axios.put(
     `${API_BASE_URL}/admin/orders/${id}/status`,
     { status },
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
@@ -144,40 +112,24 @@ export const deactivateOrder = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/orders/${id}/deactivate`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
 // ------------------------------ Products -------------------------
 export const getAllProducts = async () => {
-  return await axios.get(`${API_BASE_URL}/admin/products/`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/products/`, authHeader());
 }
 
 export const getProductById = async (id) => {
-  return await axios.get(`${API_BASE_URL}/admin/products/${id}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/admin/products/${id}`, authHeader());
 }
 
 export const activateProduct = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/products/${id}/activate`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
@@ -185,11 +137,7 @@ export const deactivateProduct = async (id) => {
   return await axios.put(
     `${API_BASE_URL}/admin/products/${id}/deactivate`,
     {},
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    }
+    authHeader()
   );
 };
 
@@ -197,7 +145,8 @@ const adminApi = {
   adminLogin,
   getAllBrands,
   getBrandProfile,
-  brandApproval,
+  brandApprove,
+  brandDisapprove,
   activateBrand,
   deactivateBrand,
   getAllCustomers,

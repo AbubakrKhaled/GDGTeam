@@ -6,23 +6,23 @@ POST/PUT need data. GET/DELETE do not.
 */
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
-const token = localStorage.getItem("accessToken");
+
+const authHeader = () => {
+  const token = localStorage.getItem("accessToken");
+  return {
+  headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+}
 
 export const getCart = async () => {
-  return await axios.get(`${API_BASE_URL}/cart/`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return await axios.get(`${API_BASE_URL}/cart/`, authHeader());
 }
 
 //-------------------------------------------------------------------------------------------
 export const getWishlist = async () => {
-    return await axios.get(`${API_BASE_URL}/cart/wishlist`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    });
+    return await axios.get(`${API_BASE_URL}/cart/wishlist`, authHeader());
 };
 
 export const addToWishlist = async (productId) => {
@@ -30,25 +30,17 @@ export const addToWishlist = async (productId) => {
       const response = await axios.post(
         `${API_BASE_URL}/cart/wishlist/${productId}`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
+        authHeader()
       );
       return response.data;
     } catch (err) {
       console.error("Error adding product to wishlist:", err);
-      throw err; //for UI
+      throw err;
       }
 };
 
 export const deleteWishlistProduct = async (productId) => {
-    return await axios.delete(`${API_BASE_URL}/cart/wishlist/${productId}`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-    });
+    return await axios.delete(`${API_BASE_URL}/cart/wishlist/${productId}`, authHeader());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -57,16 +49,12 @@ export const addToCartFromWishlist = async (productId) => {
       const response = await axios.put(
         `${API_BASE_URL}/cart/addToCartFromWishlist/${productId}`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
+        authHeader()
       );
       return response.data;
     } catch (err) {
       console.error("Error adding product to cart from wishlist:", err);
-      throw err; //for UI
+      throw err;
       }
 };
 
@@ -75,11 +63,7 @@ export const addToCart = async (productId) => {
       const response = await axios.post(
         `${API_BASE_URL}/cart/${productId}`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
+        authHeader()
       );
       return response.data;
     } catch (err) {
@@ -91,19 +75,11 @@ export const addToCart = async (productId) => {
   export const updateCartProductAmount = async (productId, quantity) => {
     return await axios.patch(`${API_BASE_URL}/cart/updateCartProductAmount/${productId}`, 
         {quantity:quantity},
-        {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-    });
+        authHeader());
 }
 
 export const deleteCartProduct = async (productId) => {
-    return await axios.delete(`${API_BASE_URL}/cart/${productId}`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-    });
+    return await axios.delete(`${API_BASE_URL}/cart/${productId}`, authHeader());
 }
 
 const cartApi = {
