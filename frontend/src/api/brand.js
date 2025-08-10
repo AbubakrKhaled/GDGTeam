@@ -47,8 +47,8 @@ export const getAllBrands = async () => {
 export const getBrandById = async (id) => {
   return await axios.get(`${API_BASE_URL}/brand/${id}`, authHeader());
 }
-export const getBrandProfile = async () => {
-  return await axios.get(`${API_BASE_URL}/brand/profile`, authHeader());
+export const getBrandProfile = async (brandId) => {
+  return await axios.get(`${API_BASE_URL}/brand/profile/${brandId}`, authHeader());
 }
 
 // ------------------------------ Products -------------------------

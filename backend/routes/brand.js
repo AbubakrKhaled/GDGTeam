@@ -23,7 +23,7 @@ router.get('/', getAllBrands)
 
 router.put('/profile/update', brandAuth, updateBrand);
 
-router.get('/profile', brandAuth, getBrandProfile);
+router.get('/profile/:id', brandAuth, getBrandProfile);
 
 router.get('/products', brandAuth, productController.getAllProducts);
 router.post('/products/create', brandAuth, productController.createProduct);

@@ -121,7 +121,7 @@ exports.getBrandById = async (req, res, next) => {
     }
 };
 
-exports.getBrandProfile = async (req, res, next) => {
+/*exports.getBrandProfile = async (req, res, next) => {
     //const id = req.params.id;
     const id = req.brand._id
 
@@ -131,6 +131,35 @@ exports.getBrandProfile = async (req, res, next) => {
     try {
         const brand = await Brand.findById(id);
         if (!brand) return next(new ErrorResponse('Brand not found', 404));
+
+        const products = await Product.find({ brand: id });
+        const orders = await Order.find({ brand: id });
+
+        res.status(200).json({
+            success: true,
+            data: { brand, products, orders }
+        });
+    } catch (err) {
+        next(err);
+    }
+};*/
+
+exports.getBrandProfile = async (req, res, next) => {
+    const id = req.params.id;
+    //const brandId = req.brand.id
+
+    if (!mongoose.isValidObjectId(id.toString()))
+        return next(new ErrorResponse('Invalid ID', 400));
+
+    try {
+        const brand = await Brand.findById(id);
+        if (!brand) return next(new ErrorResponse('Brand not found', 404));
+
+        if (req.customer) return next(new ErrorResponse('Insufficient authentication', 403))
+
+        if (req.brand.id !== req.params.id) {
+            return next(new ErrorResponse('Brand not found', 404));
+        }
 
         const products = await Product.find({ brand: id });
         const orders = await Order.find({ brand: id });
