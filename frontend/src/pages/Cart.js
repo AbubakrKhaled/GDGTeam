@@ -8,6 +8,7 @@ import { FaTrash, FaHeart, FaShoppingBag, FaArrowLeft } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { cartApi } from '../api/cart';
 import product from '../../../backend/models/product';
+import { orderApi } from '../api/order';
 
 function Cart() {
  
@@ -73,7 +74,7 @@ function Cart() {
       setLoading(true);
         console.log("cart",cart);
       
-      const orderData = {
+      /*const orderData = {
         items: cart.map(item => ({
           product: item.product,
           quantity: item.quantity,
@@ -83,10 +84,10 @@ function Cart() {
         shippingAddress: checkoutData.shippingAddress,
         paymentMethod: checkoutData.paymentMethod,
         notes: checkoutData.notes
-      };
+      };*/
       //const response = await apiService.createOrder(orderData); 
       //const response = await mockApiService.createOrder(orderData);
-      //ORDER API
+      const response = await orderApi.checkoutOrder()
       
       if (response.success) {
         clearCart();

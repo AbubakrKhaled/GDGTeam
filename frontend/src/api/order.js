@@ -73,3 +73,14 @@ export const checkoutOrder = async () => {
       throw err;
     }
   };
+
+  const orderApi = {
+    getOrderById,
+    getOrderHistory,
+    getOrders,
+    updateOrderStatus,
+    deactivateOrder,
+    checkoutOrder
+  }
+
+  export { orderApi };
