@@ -18,9 +18,9 @@ const customerController = require('../controllers/customer');
 
 router.get('/', authAny, getOrders);
 
-router.put('/status', authAny, updateOrderStatus);
+router.put('/status/:id', authAny, updateOrderStatus);
 
-router.put('/cancel', authAny, deactivateOrder);
+router.put('/cancel/:id', authAny, deactivateOrder);
 
 router.post('/checkout', customerAuth, checkoutOrder);
 
