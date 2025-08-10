@@ -1,4 +1,5 @@
 import axios from "axios";
+//import product from '../../../backend/models/product';
 
 /*
 axios.HTTPMETHOD(url, [data], { headers }).
@@ -32,7 +33,11 @@ export const addToWishlist = async (productId) => {
         {},
         authHeader()
       );
-      return response.data;
+      if (response.success) {
+        return response.data;
+      } else {
+        throw new Error('Failed to add to wishlist');
+      }
     } catch (err) {
       console.error("Error adding product to wishlist:", err);
       throw err;
@@ -82,6 +87,24 @@ export const deleteCartProduct = async (productId) => {
     return await axios.delete(`${API_BASE_URL}/cart/${productId}`, authHeader());
 }
 
+export const createOrder = async (orderData) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/order`,
+      orderData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error("Error creating order:", err);
+    throw err;
+  }
+};
+
 const cartApi = {
   getCart,
   getWishlist,
@@ -91,6 +114,7 @@ const cartApi = {
   addToCart,
   updateCartProductAmount,
   deleteCartProduct,
+  createOrder,
 };
 
 export { cartApi };
