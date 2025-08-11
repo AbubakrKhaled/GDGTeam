@@ -6,16 +6,18 @@ axios.HTTPMETHOD(url, [data], { headers }).
 POST/PUT need data. GET/DELETE do not.
 */
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 
 const authHeader = () => {
-  const token = localStorage.getItem("accessToken");
-  return {
-  headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-}
+  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+  return token
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : {};
+};
 
 export const getCart = async () => {
   return await axios.get(`${API_BASE_URL}/cart/`, authHeader());
@@ -33,11 +35,7 @@ export const addToWishlist = async (productId) => {
         {},
         authHeader()
       );
-      if (response.success) {
-        return response.data;
-      } else {
-        throw new Error('Failed to add to wishlist');
-      }
+      return response.data;
     } catch (err) {
       console.error("Error adding product to wishlist:", err);
       throw err;
@@ -92,11 +90,7 @@ export const createOrder = async (orderData) => {
     const response = await axios.post(
       `${API_BASE_URL}/order`,
       orderData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      }
+      authHeader()
     );
     return response.data;
   } catch (err) {

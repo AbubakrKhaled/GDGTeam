@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { mockApiService, mockProducts } from '../services/mockData';
+import apiService from '../services/api';
 import { 
   FaHeart, 
   FaShoppingCart, 
@@ -29,20 +29,53 @@ function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState('');
   const [activeImage, setActiveImage] = useState(0);
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
     loadProduct();
-  }, [id]);
+    if (isAuthenticated) {
+      checkWishlistStatus();
+    }
+  }, [id, isAuthenticated]);
 
   const loadProduct = async () => {
     try {
       setLoading(true);
-      const response = await mockApiService.getProductById(id);
+      const response = await apiService.getProductById(id);
       setProduct(response.data);
+      
+      // Load related products
+      if (response.data?.category) {
+        loadRelatedProducts(response.data.category);
+      }
     } catch (error) {
       console.error('Failed to load product:', error);
+      toast.error('Failed to load product');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadRelatedProducts = async (category) => {
+    try {
+      const response = await apiService.getAllProducts({ category });
+      // Filter out current product and limit to 4
+      const filtered = response.data
+        .filter(p => p._id !== id)
+        .slice(0, 4);
+      setRelatedProducts(filtered);
+    } catch (error) {
+      console.error('Failed to load related products:', error);
+    }
+  };
+
+  const checkWishlistStatus = async () => {
+    try {
+      const response = await apiService.getCustomerWishlist();
+      const wishlistIds = response.data.map(item => item._id);
+      setIsInWishlist(wishlistIds.includes(id));
+    } catch (error) {
+      console.error('Failed to check wishlist status:', error);
     }
   };
 
@@ -65,7 +98,7 @@ function ProductDetails() {
     }
     
     try {
-      await mockApiService.addToWishlist(product._id);
+      await apiService.addToWishlist(product._id);
       setIsInWishlist(true);
       toast.success('Product added to wishlist!');
     } catch (error) {
@@ -87,15 +120,13 @@ function ProductDetails() {
     }
   };
 
-  const getRelatedProducts = () => {
-    if (!product || !product.category) return [];
-    return mockProducts
-      .filter(p => p.category === product.category && p._id !== product._id)
-      .slice(0, 4);
-  };
+  // Normalize imageURL to an array
+  const primaryImages = Array.isArray(product?.imageURL)
+    ? product.imageURL
+    : (product?.imageURL ? [product.imageURL] : []);
 
   const productImages = [
-    product?.imageURL,
+    ...primaryImages,
     'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400',
     'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
     'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400'
@@ -357,7 +388,7 @@ function ProductDetails() {
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {getRelatedProducts().map((relatedProduct) => (
+            {relatedProducts.map((relatedProduct) => (
               <div
                 key={relatedProduct._id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"

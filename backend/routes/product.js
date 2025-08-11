@@ -13,6 +13,7 @@ const orderController   = require('../controllers/order');
 const brandController   = require('../controllers/brand');
 const customerController = require('../controllers/customer');
 
+// Get all products with filtering and search
 router.get('/', getAllProducts);
 
 //router.post('/create', brandAuth, createProduct);

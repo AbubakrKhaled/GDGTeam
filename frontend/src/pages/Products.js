@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-//import apiService from '../services/api';
-import { mockApiService } from '../services/mockData';
+import apiService from '../services/api';
 import { FaHeart, FaShoppingCart, FaSearch, FaFilter, FaStar } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 
@@ -27,14 +26,30 @@ function Products() {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    // Debounce search to avoid too many API calls
+    const timeoutId = setTimeout(() => {
+      loadProducts();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, selectedCategory, selectedPriceRange]);
+
   const loadProducts = async () => {
     try {
       setLoading(true);
-      //const response = await apiService.getAllProducts();
-      const response = await mockApiService.getAllProducts();
+      
+      // Build query parameters
+      const filters = {};
+      if (searchTerm) filters.search = searchTerm;
+      if (selectedCategory) filters.category = selectedCategory;
+      if (selectedPriceRange) filters.priceRange = selectedPriceRange;
+      
+      const response = await apiService.getAllProducts(filters);
       setProducts(response.data || []);
     } catch (error) {
       console.error('Failed to load products:', error);
+      toast.error('Failed to load products');
     } finally {
       setLoading(false);
     }
@@ -42,7 +57,7 @@ function Products() {
 
   const loadWishlist = async () => {
     try {
-      const response = await mockApiService.getCustomerWishlist();
+      const response = await apiService.getCustomerWishlist();
       setWishlistIds((response.data || []).map(item => item._id));
     } catch (error) {
       console.error('Failed to load wishlist:', error);
@@ -65,7 +80,7 @@ function Products() {
       return;
     }
     try {
-      await mockApiService.addToWishlist(product._id);
+      await apiService.addToWishlist(product._id);
       setWishlistIds(prev => [...prev, product._id]);
       toast.success('Product added to wishlist!');
     } catch (error) {
@@ -74,43 +89,20 @@ function Products() {
     }
   };
 
-  // Filter and sort products
-  const filteredProducts = products
-    .filter(product => {
-      const matchesSearch = (product.productname && product.productname.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                           (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesCategory = !selectedCategory || product.category === selectedCategory;
-      const matchesPrice = !selectedPriceRange || checkPriceRange(product.price, selectedPriceRange);
-      return matchesSearch && matchesCategory && matchesPrice;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
-        case 'name':
-          return a.productname.localeCompare(b.productname);
-        case 'newest':
-        default:
-          return new Date(b.createdAt) - new Date(a.createdAt);
-      }
-    });
-
-  const checkPriceRange = (price, range) => {
-    switch (range) {
-      case '0-50':
-        return price >= 0 && price <= 50;
-      case '50-100':
-        return price > 50 && price <= 100;
-      case '100-200':
-        return price > 100 && price <= 200;
-      case '200+':
-        return price > 200;
+  // Sort products
+  const sortedProducts = [...products].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'name':
+        return a.productname.localeCompare(b.productname);
+      case 'newest':
       default:
-        return true;
+        return new Date(b.createdAt) - new Date(a.createdAt);
     }
-  };
+  });
 
   const categories = ['Clothes', 'Food', 'Skincare', 'Technology'];
   const priceRanges = [
@@ -203,12 +195,12 @@ function Products() {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-gray-600">
-            Showing {filteredProducts.length} of {products.length} products
+            Showing {sortedProducts.length} of {products.length} products
           </p>
         </div>
 
         {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
+        {sortedProducts.length === 0 ? (
           <div className="text-center py-12">
             <FaSearch className="text-4xl text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
@@ -216,7 +208,7 @@ function Products() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
+            {sortedProducts.map((product) => (
               <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
                 {/* Product Image */}
                 <div className="relative">
@@ -326,7 +318,7 @@ function Products() {
         )}
 
         {/* Load More Button (if needed) */}
-        {filteredProducts.length > 0 && filteredProducts.length < products.length && (
+        {sortedProducts.length > 0 && sortedProducts.length < products.length && (
           <div className="text-center mt-8">
             <button className="px-6 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
               Load More Products
