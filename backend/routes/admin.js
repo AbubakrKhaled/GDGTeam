@@ -4,6 +4,7 @@ const router = express.Router();
 const {
     adminLogin,
     getAllBrands,
+    userLogout,
     getBrandById,
     brandApproval,
     brandApprove,
@@ -26,7 +27,9 @@ const customerController = require('../controllers/customer');
 
 
 router.post('/login', adminLogin);
-router.get('/dashboard', getAdminDashboard)
+router.post('/logout', userLogout);
+
+router.get('/dashboard', adminAuth, getAdminDashboard)
 router.get('/brands', adminAuth, getAllBrands);
 
 router.get('/brands/:id/profile', adminAuth, brandController.getBrandProfile);

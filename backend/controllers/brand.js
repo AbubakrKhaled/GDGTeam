@@ -14,7 +14,7 @@ const setTokenCookie = (res, token) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
     });
 };
 
@@ -25,7 +25,12 @@ const generateToken = async (brandId) => {
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
     );
-    await Token.create({ token });
+    await Token.create({
+            token,
+            userId: brandId,
+            userType: 'brand'
+        });
+        
     return token;
 };
 
@@ -54,21 +59,6 @@ exports.brandLogin = async (req, res, next) => {
                 role: 'brand'
             }
         });
-    } catch (err) {
-        next(err);
-    }
-};
-
-exports.brandLogout = async (req, res, next) => {
-    try {
-        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-        
-        if (token) {
-            await Token.findOneAndUpdate({ token }, { blackListedToken: true });
-            res.clearCookie('token');
-        }
-        
-        res.json({ success: true, message: 'Logged out successfully' });
     } catch (err) {
         next(err);
     }

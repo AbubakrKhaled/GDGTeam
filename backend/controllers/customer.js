@@ -14,7 +14,7 @@ function validateCustomerInput(email, password) {
 }
 
 // Customer login or signup
-exports.customerLogin = async (req, res, next) => {
+/*exports.customerLogin = async (req, res, next) => {
     const { email, password } = req.body;
 
     // 1. Input validation
@@ -54,7 +54,7 @@ exports.customerLogin = async (req, res, next) => {
         );
 
         // Save token to database
-        await Token.create({ token });
+        //await Token.create({ token });
 
         // Set cookie
         res.cookie('token', token, {
@@ -81,8 +81,89 @@ exports.customerLogin = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};*/
+
+// Login
+exports.customerLogin = async (req, res, next) => {
+    const { email, password } = req.body;
+    const validationError = validateCustomerInput(email, password);
+    if (validationError) return res.status(400).json({ message: validationError });
+
+    try {
+        const customer = await Customer.findOne({ email }).select('+password');
+        if (!customer) return res.status(404).json({ message: 'Customer not found' });
+
+        const isMatch = await bcrypt.compare(password, customer.password);
+        if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
+
+        const token = jwt.sign(
+            { id: customer._id, role: 'customer' },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 3 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({
+            success: true,
+            token,
+            customer: {
+                id: customer._id,
+                email: customer.email,
+                role: 'customer'
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
 };
 
+// Signup
+exports.customerSignup = async (req, res, next) => {
+    const { email, password } = req.body;
+    const validationError = validateCustomerInput(email, password);
+    if (validationError) return res.status(400).json({ message: validationError });
+
+    try {
+        const existing = await Customer.findOne({ email });
+        if (existing) return res.status(409).json({ message: 'Email already registered' });
+
+        const customer = new Customer({ email, password, role: 'customer' });
+        await customer.save();
+
+        const token = jwt.sign(
+            { id: customer._id, role: 'customer' },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(201).json({
+            success: true,
+            token,
+            customer: {
+                id: customer._id,
+                email: customer.email,
+                role: 'customer'
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+/*
 // Logout endpoint
 exports.customerLogout = async (req, res, next) => {
     try {
@@ -96,30 +177,25 @@ exports.customerLogout = async (req, res, next) => {
             );
             
             // Clear cookie
-            res.clearCookie('token');
         }
+
+        res.clearCookie('token');
+
         
         res.json({ success: true, message: 'Logged out successfully' });
     } catch (err) {
         next(err);
     }
 };
+*/
 
 // 4. Profile update endpoint
 exports.updateCustomer = async (req, res, next) => {
-    const id = req.params.id;
-    if (!mongoose.isValidObjectId(id))
-        return next(new ErrorResponse('Invalid ID', 400));
-
-    // Only allow the customer to update their own profile
-    if (!req.customer || req.customer.id !== id)
-        return res.status(403).json({ message: 'Not authorized' });
-
     const { email, password, ...otherFields } = req.body;
     let updateData = { ...otherFields };
-    if (password) {
-        updateData.password = await bcrypt.hash(password, 8);
-    }
+
+    if (password) updateData.password = await bcrypt.hash(password, 8);
+
     if (email) {
         if (!/\S+@\S+\.\S+/.test(email)) {
             return res.status(400).json({ message: 'Invalid email format' });
@@ -128,7 +204,7 @@ exports.updateCustomer = async (req, res, next) => {
     }
 
     try {
-        const customer = await Customer.findByIdAndUpdate(id, updateData, { new: true });
+        const customer = await Customer.findByIdAndUpdate(req.customer.id, updateData, { new: true });
         if (!customer) return next(new ErrorResponse('Customer not found', 404));
         res.status(200).json({ success: true, data: customer });
     } catch (err) {

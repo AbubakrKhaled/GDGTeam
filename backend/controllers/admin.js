@@ -17,7 +17,7 @@ const setTokenCookie = (res, token) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
     });
 };
 
@@ -71,7 +71,74 @@ exports.adminLogin = async (req, res, next) => {
     }
 };
 
-exports.adminLogout = async (req, res, next) => {
+/*
+exports.userLogin = async (req, res, next) => {
+  const { email, password, type } = req.body;
+
+  if (!email || !password || !type) {
+    return next(new ErrorResponse('Please provide email, password, and type', 400));
+  }
+
+  let model;
+  switch (type) {
+    case 'customer':
+      model = Customer;
+      break;
+    case 'brand':
+      model = Brand;
+      break;
+    case 'admin':
+      model = Admin;
+      break;
+    default:
+      return next(new ErrorResponse('Invalid user type', 400));
+  }
+
+  try {
+    const user = await model.findOne({ email }).select('+password');
+    if (!user) return next(new ErrorResponse('Invalid credentials', 401));
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) return next(new ErrorResponse('Invalid credentials', 401));
+
+    const token = generateToken({ id: user._id, role: type });
+    setTokenCookie(res, token);
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        role: type,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+*/
+exports.userLogout = async (req, res, next) => {
+  try {
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(200).json({ success: true, message: 'Already logged out' });
+
+    await Token.findOneAndUpdate(
+      { token },
+      { blackListedToken: true },
+      { upsert: true } //ensure token is stored as blacklisted
+    );
+
+    res.clearCookie('token');
+    res.status(200).json({ success: true, message: 'Logged out successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/*
+exports.userLogout = async (req, res, next) => {
     try {
         const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
         
@@ -91,7 +158,7 @@ exports.adminLogout = async (req, res, next) => {
         next(err);
     }
 };
-
+*/
 exports.getAdminDashboard = async (req, res, next) => {
   try {
     const users = await User.find();

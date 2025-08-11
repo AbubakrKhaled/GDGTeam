@@ -14,8 +14,11 @@ const productController = require('../controllers/product');
 const orderController   = require('../controllers/order');
 const brandController   = require('../controllers/brand');
 const customerController = require('../controllers/customer');
+const {userLogin, userLogout} = require('../controllers/admin.js')
 
-router.post('/login', brandLogin)
+
+router.post('/login', brandLogin);
+router.post('/logout', userLogout);
 
 router.post('/signup', createBrand);
 
