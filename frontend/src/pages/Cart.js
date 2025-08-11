@@ -7,7 +7,7 @@ import { mockApiService } from '../services/mockData';
 import { FaTrash, FaHeart, FaShoppingBag, FaArrowLeft } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { cartApi } from '../api/cart';
-import product from '../../../backend/models/product';
+//import product from '../../../backend/models/product';
 import { orderApi } from '../api/order';
 
 function Cart() {
@@ -180,7 +180,7 @@ function Cart() {
                         <p className="font-bold text-lg">${(item.product.price * item.quantity).toFixed(2)}</p>
                         <div className="flex space-x-2 mt-2">
                           <button
-                            onClick={() => addToWishlist(item.product)}
+                            onClick={() => addToWishlist(item.product._id)}
                             className="text-pink-600 hover:text-pink-700"
                             title="Move to Wishlist"
                           >

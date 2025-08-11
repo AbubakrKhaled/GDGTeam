@@ -33,11 +33,11 @@ export const CartProvider = ({ children }) => {
         //const response = await mockApiService.getCustomerCart();
         const response = await cartApi.getCart();
         setCart(response.data || []);
-      } else {
+      } /*else {
         // Load from localStorage for non-authenticated users
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
         setCart(localCart);
-      }
+      }*/
     } catch (error) {
       console.error('Failed to load cart:', error);
     } finally {
@@ -45,7 +45,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const addToCart = async (productId) => {
+  /*const addToCart = async (productId) => {
     try {
       if (isAuthenticated) {
         //await mockApiService.addToCart(product._id, quantity);
@@ -70,6 +70,21 @@ export const CartProvider = ({ children }) => {
       console.error('Failed to add to cart:', error);
       throw error;
     }
+  };*/
+
+
+  const addToCart = async (productId) => {
+    try {
+      if (isAuthenticated && userType === 'customer') {
+        await cartApi.addToCart(productId);
+        await loadCart();
+      } else {
+        console.warn("Only logged in customers can add to cart.");
+      }
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      throw error;
+    }
   };
 
   const updateCartItem = async (productId, quantity) => {
@@ -79,7 +94,7 @@ export const CartProvider = ({ children }) => {
         //await mockApiService.updateCartItem(productId, quantity);
         await cartApi.updateCartProductAmount(productId, quantity)
         await loadCart();
-      } else {
+      } /*else {
         setCart(prevCart =>
           prevCart.map(item =>
             item.product._id === productId
@@ -87,7 +102,7 @@ export const CartProvider = ({ children }) => {
               : item
           )
         );
-      }
+      }*/
     } catch (error) {
       console.error('Failed to update cart item:', error);
       throw error;
@@ -101,9 +116,9 @@ export const CartProvider = ({ children }) => {
         //await mockApiService.removeFromCart(productId);
         await cartApi.deleteCartProduct(productId);
         await loadCart();
-      } else {
+      } /*else {
         setCart(prevCart => prevCart.filter(item => item.product._id !== productId));
-      }
+      }*/
     } catch (error) {
       console.error('Failed to remove from cart:', error);
       throw error;
