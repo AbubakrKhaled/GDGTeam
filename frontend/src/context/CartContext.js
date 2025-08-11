@@ -48,11 +48,9 @@ export const CartProvider = ({ children }) => {
   /*const addToCart = async (productId) => {
     try {
       if (isAuthenticated) {
-        //await mockApiService.addToCart(product._id, quantity);
-        await cartApi.addToCart(productId)
-        await loadCart(); // Reload cart from backend
+        await cartApi.addToCart(product._id); // Adjust if your API expects quantity
+        await loadCart();
       } else {
-        // Handle local cart for non-authenticated users
         setCart(prevCart => {
           const existingItem = prevCart.find(item => item.product._id === product._id);
           if (existingItem) {
@@ -156,4 +154,4 @@ export const CartProvider = ({ children }) => {
       {children}
     </CartContext.Provider>
   );
-}; 
+};

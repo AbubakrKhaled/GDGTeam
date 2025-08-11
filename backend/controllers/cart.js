@@ -224,3 +224,43 @@ exports.deleteCartProduct = async (req, res, next) => {
         next(err);
     }
 };
+
+// Clear entire cart
+exports.clearCart = async (req, res, next) => {
+    try {
+        const userId = req.customer.id;
+        const user = await Customer.findById(userId);
+        user.cart = [];
+        await user.save();
+        res.status(200).json({ message: 'Cart cleared.', cart: user.cart });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Get cart item count
+exports.getCartCount = async (req, res, next) => {
+    try {
+        const userId = req.customer.id;
+        const user = await Customer.findById(userId);
+        const count = user.cart.reduce((sum, item) => sum + item.quantity, 0);
+        res.status(200).json({ count });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Get cart total price
+exports.getCartTotal = async (req, res, next) => {
+    try {
+        const userId = req.customer.id;
+        const user = await Customer.findById(userId).populate('cart.product');
+        let total = 0;
+        user.cart.forEach(item => {
+            total += item.quantity * (item.product.price || 0);
+        });
+        res.status(200).json({ total });
+    } catch (err) {
+        next(err);
+    }
+};

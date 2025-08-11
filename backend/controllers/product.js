@@ -65,15 +65,77 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.getAllProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({ isActive: true });
+        // Get query parameters for filtering
+        const { category, priceRange, search } = req.query;
+        
+        let filter = { isActive: true };
+        
+        // Apply category filter
+        if (category) {
+            filter.category = category;
+        }
+        
+        // Apply search filter
+        if (search) {
+            filter.$or = [
+                { productname: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
+        }
 
-        res.status(200).json({success: true, data: products});
+        const products = await Product.find(filter)
+            .populate('brand', 'name')
+            .populate('category', 'category')
+            .populate('color', 'color')
+            .populate('size', 'size')
+            .populate('reviews', 'rating count')
+            .lean();
+
+        // Apply price range filter after fetching (since price is a number)
+        let filteredProducts = products;
+        if (priceRange) {
+            filteredProducts = products.filter(product => {
+                switch (priceRange) {
+                    case '0-50':
+                        return product.price >= 0 && product.price <= 50;
+                    case '50-100':
+                        return product.price > 50 && product.price <= 100;
+                    case '100-200':
+                        return product.price > 100 && product.price <= 200;
+                    case '200+':
+                        return product.price > 200;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // Transform the data to match frontend expectations
+        const transformedProducts = filteredProducts.map(product => ({
+            _id: product._id,
+            productname: product.productname,
+            price: product.price,
+            quantity: product.quantity,
+            imageURL: Array.isArray(product.imageURL) ? product.imageURL[0] : product.imageURL,
+            description: product.description,
+            category: product.category?.category || 'Unknown',
+            color: product.color?.color || 'Unknown',
+            size: product.size?.size || 'Unknown',
+            brand: product.brand,
+            reviews: {
+                rating: product.reviews?.rating || 0,
+                count: product.reviews?.count || 0
+            },
+            createdAt: product.createdAt,
+            updatedAt: product.updatedAt
+        }));
+
+        res.status(200).json({success: true, data: transformedProducts});
 
     } catch(err) {
         next(err);
     }
 }
-
 
 exports.getProductById = async (req, res, next) => {
     const id = req.params.id;
@@ -82,23 +144,50 @@ exports.getProductById = async (req, res, next) => {
         return next(new ErrorResponse('Invalid ID', 400));
     
     try {
-        const product = await Product.findById(id);
+        const product = await Product.findById(id)
+            .populate('brand', 'name')
+            .populate('category', 'category')
+            .populate('color', 'color')
+            .populate('size', 'size')
+            .populate('reviews', 'rating count')
+            .lean();
+
         if (req.admin) {
             return res.status(200).json({ success: true, data: product });
         }
 
-        if (req.brand && product.brand.toString() !== req.brand.id && product.isActive === false) {
+        if (req.brand && product.brand._id.toString() !== req.brand.id && product.isActive === false) {
             return next(new ErrorResponse('Not your product', 403));
         }
-        if (req.brand && product.brand.toString() === req.brand.id) {
+        if (req.brand && product.brand._id.toString() === req.brand.id) {
             return res.status(200).json({ success: true, data: product });
         }
               
         if (!product || !product.isActive) {
             return next(new ErrorResponse('Product not found', 404));
         }
+
+        // Transform the data to match frontend expectations
+        const transformedProduct = {
+            _id: product._id,
+            productname: product.productname,
+            price: product.price,
+            quantity: product.quantity,
+            imageURL: Array.isArray(product.imageURL) ? product.imageURL : [product.imageURL],
+            description: product.description,
+            category: product.category?.category || 'Unknown',
+            color: product.color?.color || 'Unknown',
+            size: product.size?.size || 'Unknown',
+            brand: product.brand,
+            reviews: {
+                rating: product.reviews?.rating || 0,
+                count: product.reviews?.count || 0
+            },
+            createdAt: product.createdAt,
+            updatedAt: product.updatedAt
+        };
         
-        res.status(200).json({success: true, data: product});
+        res.status(200).json({success: true, data: transformedProduct});
 
     } catch(err) {
         next(err);

@@ -17,16 +17,19 @@ const productSchema = new Schema({
     },
     quantity: {
         type: Number,
-        required: true
+        required: true,
+        default: 0
     },
-    // this needs to be an array of images (See the frontend for more details)
+    // Handle both single image and multiple images
     imageURL: {
         type: [String],
-        required: false
+        required: false,
+        default: []
     },
     description: {
         type: String,
-        required: false
+        required: false,
+        default: ''
     },
     category: {
         type: Types.ObjectId,
@@ -36,21 +39,23 @@ const productSchema = new Schema({
     color: {
         type: Types.ObjectId,
         ref: 'color',
-        required: true
+        required: false
     },
     size: {
         type: Types.ObjectId,
         ref: 'size',
-        required: true
+        required: false
     },
     discount: {
         type: Types.ObjectId,
-        ref: 'discount'
+        ref: 'discount',
+        required: false
     },
     reviews: {
         type: Types.ObjectId,
-        ref: 'reviews'
-    } ,
+        ref: 'reviews',
+        required: false
+    },
     isActive:{
         type: Boolean,
         default: true,

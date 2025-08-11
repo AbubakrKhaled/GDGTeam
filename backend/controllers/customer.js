@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Customer = require('../models/customer');
+const Token = require('../models/token');
 const ErrorResponse = require('../middlewares/errorresponse');
-//continue this
 
 // Input validation helper
 function validateCustomerInput(email, password) {
@@ -39,28 +39,67 @@ exports.customerLogin = async (req, res, next) => {
                 role: 'customer'
             });
             await customer.save();
-
-            const token = jwt.sign(
-                { id: customer._id, role: 'customer' },
-                process.env.JWT_SECRET,
-                { expiresIn: process.env.JWT_EXPIRES_IN }
-            );
-
-            return res.status(201).json({ token, message: 'Signed up and logged in.' });
+        } else {
+            // Sign in - verify password
+            const isMatch = await bcrypt.compare(password, customer.password);
+            if (!isMatch)
+                return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Sign in
-        const isMatch = await bcrypt.compare(password, customer.password);
-        if (!isMatch)
-            return res.status(401).json({ message: 'Invalid email or password' });
-
+        // Generate token
         const token = jwt.sign(
             { id: customer._id, role: 'customer' },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
-        res.status(200).json({ token, message: 'Signed in.' });
+        // Save token to database
+        await Token.create({ token });
+
+        // Set cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
+        // Send response
+        const statusCode = customer ? 200 : 201;
+        const message = customer ? 'Signed in.' : 'Signed up and logged in.';
+        
+        res.status(statusCode).json({
+            success: true,
+            token,
+            message,
+            customer: {
+                id: customer._id,
+                email: customer.email,
+                role: 'customer'
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Logout endpoint
+exports.customerLogout = async (req, res, next) => {
+    try {
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+        
+        if (token) {
+            // Blacklist the token
+            await Token.findOneAndUpdate(
+                { token },
+                { blackListedToken: true }
+            );
+            
+            // Clear cookie
+            res.clearCookie('token');
+        }
+        
+        res.json({ success: true, message: 'Logged out successfully' });
     } catch (err) {
         next(err);
     }
@@ -92,6 +131,19 @@ exports.updateCustomer = async (req, res, next) => {
         const customer = await Customer.findByIdAndUpdate(id, updateData, { new: true });
         if (!customer) return next(new ErrorResponse('Customer not found', 404));
         res.status(200).json({ success: true, data: customer });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Get customer profile
+exports.getCustomerProfile = async (req, res, next) => {
+    try {
+        const customer = await Customer.findById(req.customer.id);
+        if (!customer) {
+            return next(new ErrorResponse('Customer not found', 404));
+        }
+        res.json({ success: true, data: customer });
     } catch (err) {
         next(err);
     }

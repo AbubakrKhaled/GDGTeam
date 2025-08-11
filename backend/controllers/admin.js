@@ -7,33 +7,89 @@ const Customer= require('../models/customer');
 const Order   = require('../models/order');
 const User = require('../models/User');
 const Product = require('../models/product');
+const Token = require('../models/token');
 const ErrorResponse = require('../middlewares/errorresponse');
 const mongoose = require('mongoose');
 
+// Helper function to set cookie
+const setTokenCookie = (res, token) => {
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+};
+
+// Helper function to generate and save token
+const generateToken = async (adminId) => {
+    const token = jwt.sign(
+        { id: adminId, role: 'admin' },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+    
+    await Token.create({
+        token,
+        userId: adminId,
+        userType: 'admin'
+    });
+    
+    return token;
+};
+
 /* --------------------------- Admin Auth --------------------------- */
 exports.adminLogin = async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
+    try {
+        const { username, password } = req.body;
 
-    // 1. Fetch admin user
-    const admin = await Admin.findOne({ username }).select('+password');
-    if (!admin) return next(new ErrorResponse('Invalid credentials', 401));
+        // 1. Fetch admin user
+        const admin = await Admin.findOne({ username }).select('+password');
+        if (!admin) return next(new ErrorResponse('Invalid credentials', 401));
 
-    // 2. Validate password
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) return next(new ErrorResponse('Invalid credentials', 401));
+        // 2. Validate password
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch) return next(new ErrorResponse('Invalid credentials', 401));
 
-    // 3. Issue JWT with role
-    const token = jwt.sign(
-      { id: admin._id, role: admin.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
+        // 3. Generate and save token
+        const token = await generateToken(admin._id);
+        
+        // 4. Set cookie
+        setTokenCookie(res, token);
 
-    res.status(200).json({ token });
-  } catch (err) {
-    next(err);
-  }
+        res.status(200).json({
+            success: true,
+            token,
+            admin: {
+                id: admin._id,
+                username: admin.username,
+                role: admin.role
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.adminLogout = async (req, res, next) => {
+    try {
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+        
+        if (token) {
+            // Blacklist the token
+            await Token.findOneAndUpdate(
+                { token },
+                { blackListedToken: true }
+            );
+            
+            // Clear cookie
+            res.clearCookie('token');
+        }
+        
+        res.json({ success: true, message: 'Logged out successfully' });
+    } catch (err) {
+        next(err);
+    }
 };
 
 exports.getAdminDashboard = async (req, res, next) => {

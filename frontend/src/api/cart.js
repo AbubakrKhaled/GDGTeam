@@ -1,20 +1,23 @@
 import axios from "axios";
+//import product from '../../../backend/models/product';
 
 /*
 axios.HTTPMETHOD(url, [data], { headers }).
 POST/PUT need data. GET/DELETE do not.
 */
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 
 const authHeader = () => {
-  const token = localStorage.getItem("accessToken");
-  return {
-  headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-}
+  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+  return token
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : {};
+};
 
 export const getCart = async () => {
   return await axios.get(`${API_BASE_URL}/cart/`, authHeader());
@@ -82,6 +85,20 @@ export const deleteCartProduct = async (productId) => {
     return await axios.delete(`${API_BASE_URL}/cart/${productId}`, authHeader());
 }
 
+export const createOrder = async (orderData) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/order`,
+      orderData,
+      authHeader()
+    );
+    return response.data;
+  } catch (err) {
+    console.error("Error creating order:", err);
+    throw err;
+  }
+};
+
 const cartApi = {
   getCart,
   getWishlist,
@@ -91,6 +108,7 @@ const cartApi = {
   addToCart,
   updateCartProductAmount,
   deleteCartProduct,
+  createOrder,
 };
 
 export { cartApi };

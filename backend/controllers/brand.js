@@ -2,115 +2,142 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Brand = require("../models/brand.js");
 const Product = require("../models/product.js");
+const Token = require('../models/token');
 const ErrorResponse = require('../middlewares/errorresponse');
 const mongoose = require('mongoose');
-const { Schema, model, Types } = mongoose;
 const hashPassword = require('../middlewares/hashPassword');
 const Order = require('../models/order.js');
 
-//brand logging in ***************************************************************************
+// Helper function to set cookie
+const setTokenCookie = (res, token) => {
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+};
+
+// Helper function to generate token
+const generateToken = async (brandId) => {
+    const token = jwt.sign(
+        { id: brandId, role: 'brand' },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+    await Token.create({ token });
+    return token;
+};
+
+// Brand Authentication Controllers
 exports.brandLogin = async (req, res, next) => {
-    const { email, password } = req.body;
-
     try {
+        const { email, password } = req.body;
+
+        // Find brand and validate password
         const brand = await Brand.findOne({ email }).select('+password');
-        if (!brand)
+        if (!brand || !(await bcrypt.compare(password, brand.password))) {
             return res.status(401).json({ message: 'Invalid email or password' });
+        }
 
-        const isMatch = await bcrypt.compare(password, brand.password);
-        if (!isMatch)
-            return res.status(401).json({ message: 'Invalid email or password' });
+        // Generate and save token
+        const token = await generateToken(brand._id);
+        setTokenCookie(res, token);
 
-        const token = jwt.sign({ id: brand._id, role: 'brand' }, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN
+        res.status(200).json({ 
+            success: true,
+            token,
+            brand: {
+                id: brand._id,
+                name: brand.name,
+                email: brand.email,
+                role: 'brand'
+            }
         });
-
-        res.status(200).json({ token });
     } catch (err) {
         next(err);
     }
 };
-//************************************************************************************************
-exports.getAllBrands = async (req, res, next) => {
-    try{
-        const brands = await Brand.find({isApproved : true, isActive : true}).select('name logoURL categories')
-        res.status(200).json({ success: true, data: brands });
 
+exports.brandLogout = async (req, res, next) => {
+    try {
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+        
+        if (token) {
+            await Token.findOneAndUpdate({ token }, { blackListedToken: true });
+            res.clearCookie('token');
+        }
+        
+        res.json({ success: true, message: 'Logged out successfully' });
     } catch (err) {
         next(err);
     }
-}
+};
 
+// Brand CRUD Operations
 exports.createBrand = async (req, res, next) => {
-    try{
+    try {
         const {
-            name, email, phonenumber, categories, page, brandlocation, logoURL, deliveryTime,
-            description, products, password
+            name, email, phonenumber, categories, page, brandlocation, logoURL,
+            deliveryTime, description, products, password
         } = req.body;
-        const isApproved = false;
-        const ratings = 0;
-        const role = 'brand';
-
-        const hashed = await hashPassword(password);
-
+        
+        // Create brand with hashed password
         const brand = await Brand.create({
-            name, email, categories, phonenumber, page, brandlocation, logoURL, deliveryTime,
-            description, isApproved, ratings, products, role,
-            password: hashed
+            name, email, categories, phonenumber, page, brandlocation, logoURL,
+            deliveryTime, description, isApproved: false, ratings: 0, products,
+            role: 'brand', password: await hashPassword(password)
         });
 
-        res.status(201).json({success: true, data: brand});
+        // Generate and save token
+        const token = await generateToken(brand._id);
+        setTokenCookie(res, token);
+
+        res.status(201).json({
+            success: true,
+            token,
+            data: brand
+        });
     } catch (err) {
         next(err);
     }
-}
+};
 
-exports.updateBrand = async (req, res, next) => {
-    const id = req.brand._id;
-
-    if (!mongoose.isValidObjectId(id.toString()))
-        return next(new ErrorResponse('Invalid ID', 400));
-    
-    if (req.brand.role !== 'brand') {
-        return res.status(403).json({ message: 'Not authorized' });
-    }
-
-    const {
-        name, email, categories, phonenumber, page, brandlocation, logoURL,
-        deliveryTime, description, products, password
-    } = req.body;
-    
-    const updateFields = {
-        name, email, categories, phonenumber, page, brandlocation,
-        logoURL, deliveryTime, description, products,
-    }
-
-    if (password) {
-        updateFields.password = await hashPassword(req.body.password);
-    }
-
+exports.getAllBrands = async (req, res, next) => {
     try {
-        const brand = await Brand.findByIdAndUpdate(id, updateFields, { new: true });
-
-        if (!brand) return next(new ErrorResponse('Brand not found', 404));
-
-        res.status(200).json({ success: true, data: brand });
+        const brands = await Brand.find({
+            isApproved: true,
+            isActive: true
+        }).select('name logoURL categories');
+        
+        res.status(200).json({ success: true, data: brands });
     } catch (err) {
         next(err);
     }
 };
 
 exports.getBrandById = async (req, res, next) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
-    if (!mongoose.isValidObjectId(id))
+    if (!mongoose.isValidObjectId(id)) {
         return next(new ErrorResponse('Invalid ID', 400));
+    }
 
     try {
-        const brand = await Brand.findOne({ _id : id, isApproved : true, isActive : true }).populate('reviews');
-        if (!brand) return next(new ErrorResponse('Brand not found', 404));
+        const brand = await Brand.findOne({
+            _id: id,
+            isApproved: true,
+            isActive: true
+        }).populate('reviews');
 
-        const products = await Product.find({ brand: id, isActive: true }).populate('imageURL color category price productname');
+        if (!brand) {
+            return next(new ErrorResponse('Brand not found', 404));
+        }
+
+        const products = await Product.find({
+            brand: id,
+            isActive: true
+        }).populate('imageURL color category price productname');
 
         res.status(200).json({
             success: true,
@@ -121,48 +148,60 @@ exports.getBrandById = async (req, res, next) => {
     }
 };
 
-/*exports.getBrandProfile = async (req, res, next) => {
-    //const id = req.params.id;
-    const id = req.brand._id
+exports.updateBrand = async (req, res, next) => {
+    const id = req.brand._id;
 
-    if (!mongoose.isValidObjectId(id.toString()))
+    if (!mongoose.isValidObjectId(id.toString())) {
         return next(new ErrorResponse('Invalid ID', 400));
-
-    try {
-        const brand = await Brand.findById(id);
-        if (!brand) return next(new ErrorResponse('Brand not found', 404));
-
-        const products = await Product.find({ brand: id });
-        const orders = await Order.find({ brand: id });
-
-        res.status(200).json({
-            success: true,
-            data: { brand, products, orders }
-        });
-    } catch (err) {
-        next(err);
     }
-};*/
 
-exports.getBrandProfile = async (req, res, next) => {
-    const id = req.params.id;
-    //const brandId = req.brand.id
-
-    if (!mongoose.isValidObjectId(id.toString()))
-        return next(new ErrorResponse('Invalid ID', 400));
+    if (req.brand.role !== 'brand') {
+        return res.status(403).json({ message: 'Not authorized' });
+    }
 
     try {
-        const brand = await Brand.findById(id);
-        if (!brand) return next(new ErrorResponse('Brand not found', 404));
+        const {
+            name, email, categories, phonenumber, page, brandlocation,
+            logoURL, deliveryTime, description, products, password
+        } = req.body;
+        
+        const updateFields = {
+            name, email, categories, phonenumber, page, brandlocation,
+            logoURL, deliveryTime, description, products
+        };
 
-        if (req.customer) return next(new ErrorResponse('Insufficient authentication', 403))
+        if (password) {
+            updateFields.password = await hashPassword(password);
+        }
 
-        if (req.brand.id !== req.params.id) {
+        const brand = await Brand.findByIdAndUpdate(id, updateFields, { new: true });
+        if (!brand) {
             return next(new ErrorResponse('Brand not found', 404));
         }
 
-        const products = await Product.find({ brand: id });
-        const orders = await Order.find({ brand: id });
+        res.status(200).json({ success: true, data: brand });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getBrandProfile = async (req, res, next) => {
+    const id = req.brand._id;
+
+    if (!mongoose.isValidObjectId(id.toString())) {
+        return next(new ErrorResponse('Invalid ID', 400));
+    }
+
+    try {
+        const brand = await Brand.findById(id);
+        if (!brand) {
+            return next(new ErrorResponse('Brand not found', 404));
+        }
+
+        const [products, orders] = await Promise.all([
+            Product.find({ brand: id }),
+            Order.find({ brand: id })
+        ]);
 
         res.status(200).json({
             success: true,
@@ -173,16 +212,4 @@ exports.getBrandProfile = async (req, res, next) => {
     }
 };
 
-
-/*
-exports.getAllProducts = async (req, res, next) => {
-    try {
-        const products = await Product.find();
-
-        res.status(200).json({success: true, data: products});
-
-    } catch(err) {
-        next(err);
-    }
-}
-*/
+module.exports = exports;

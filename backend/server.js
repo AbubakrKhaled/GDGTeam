@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const cookieParser = require('cookie-parser'); // Add this line
 const errorHandler = require('./middlewares/errorhandle.js');
 
 dotenv.config();
@@ -31,11 +32,12 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use(cookieParser()); // Add this line AFTER express.json()
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/brand', brandRoutes); 
 app.use('/api/customer', customerRoutes);
-app.use('/api/product', productsRoutes);
+app.use('/api/products', productsRoutes); // Changed from /api/product to /api/products
 app.use('/api/order', orderRoutes);
 app.use('/api/cart', cartRoutes);
 
