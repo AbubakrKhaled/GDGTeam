@@ -9,14 +9,6 @@ const categorySchema = new Schema({
   }
 });
 
-const colorSchema = new Schema({
-  color:{
-    type: String, 
-    required: [true, 'Please enter product color'],
-    enum: {values: colors}
-  },
-})
-
 const sizeSchema = new Schema({
   size: {
     type: String,
@@ -24,29 +16,8 @@ const sizeSchema = new Schema({
   },
 });
 
-const discountSchema = new Schema({
-  type: {
-    type: String,
-    enum: ['percentage', 'flat'],
-    required: true
-  },
-  value: {
-    type: Number,
-    required: true
-  },
-  validFrom: Date,
-  validTo: Date,
-  targets: [
-    {
-      brand: { type: Types.ObjectId, ref: 'brand' },
-      product: { type: Types.ObjectId, ref: 'product' }
-    }
-  ]
-});
 
 module.exports = {
   Category: model('category', categorySchema),
-  Color: model('color', colorSchema),
-  Size: model('size', sizeSchema),
-  Discount: model('discount', discountSchema)
+  Size: model('size', sizeSchema)
 };

@@ -1,4 +1,4 @@
-    const brand_categories = ['Clothes', 'Food', 'Skincare', 'Technology']
+const brand_categories = ['Clothes', 'Food', 'Skincare', 'Technology']
 
 const colors = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Black']
 
