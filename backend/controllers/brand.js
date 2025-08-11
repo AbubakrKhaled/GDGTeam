@@ -52,7 +52,7 @@ exports.brandLogin = async (req, res, next) => {
         res.status(200).json({ 
             success: true,
             token,
-            brand: {
+            user: {
                 id: brand._id,
                 name: brand.name,
                 email: brand.email,

@@ -41,10 +41,10 @@ const generateToken = async (adminId) => {
 /* --------------------------- Admin Auth --------------------------- */
 exports.adminLogin = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { email, password } = req.body;
 
         // 1. Fetch admin user
-        const admin = await Admin.findOne({ username }).select('+password');
+        const admin = await Admin.findOne({ email }).select('+password');
         if (!admin) return next(new ErrorResponse('Invalid credentials', 401));
 
         // 2. Validate password
@@ -60,9 +60,9 @@ exports.adminLogin = async (req, res, next) => {
         res.status(200).json({
             success: true,
             token,
-            admin: {
+            user: {
                 id: admin._id,
-                username: admin.username,
+                email: admin.email,
                 role: admin.role
             }
         });

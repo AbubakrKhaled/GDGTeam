@@ -17,8 +17,8 @@ const authHeader = () => {
 }
 
 // ------------------------------ Login --------------------------
-export const adminLogin = async (username, password) => {
-  return await axios.post(`${API_BASE_URL}/admin/login`, { username, password });
+export const adminLogin = async (email, password) => {
+  return await axios.post(`${API_BASE_URL}/admin/login`, { email, password });
 };
 
 export const adminLogout = async () => {

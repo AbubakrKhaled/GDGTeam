@@ -60,77 +60,57 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-
-  const loginAdmin = async (username, password) => {
+  const login = async (email,password ,userType) => {
     try {
-      const res = await adminApi.adminLogin(username, password);
-      const { token, admin } = res.data;
+      let response;
+      switch (userType) {
+        case 'customer':
+          response = await customerApi.loginCustomer(email, password);
+          break;
+        case 'brand':
+          response = await brandApi.brandLogin(email, password);
+          break;
+        case 'admin':
+          response = await adminApi.adminLogin(email, password);
+          break;
+        default:
+          throw new Error('Invalid user type');
+      }
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("userType", "admin");
+      const { token, user } = response.data || response;
 
-      setUserType("admin");
-      setUser(admin);
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  };
-
-  const loginCustomer = async (email, password) => {
-    try {
-      const response = await customerApi.loginCustomer(email, password);
-      const { token, customer } = response;
-      
       localStorage.setItem('token', token);
-      localStorage.setItem('userType', 'customer');
-      localStorage.setItem('currentUserId', customer._id);
-      
-      setUserType('customer');
-      setUser(customer);
-      
+      localStorage.setItem('userType', userType);
+      localStorage.setItem('currentUserId', user.id);
+
+      setUserType(userType);
+      setUser(user);
+
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
     }
-  };
+  }
 
-  const loginBrand = async (email, password) => {
-    try {
-      const response = await brandApi.brandLogin(email, password);
-      const { token, brand } = response;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('userType', 'brand');
-      localStorage.setItem('currentUserId', brand._id);
-      
-      setUserType('brand');
-      setUser(brand);
-      
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  };
 
-const createBrand = async (brandData) => {
+  const signup = async (data , userType)=>{
     try {
-      const response = await brandApi.createBrand(brandData);
+      let response;
+      switch (userType) {
+        case 'customer':
+          response = await customerApi.signupCustomer(data);
+          break;
+        case 'brand':
+          response = await brandApi.createBrand(data);
+          break;
+        default:
+          throw new Error('Invalid user type');
+      }
       return { success: true, data: response.data };
     } catch (error) {
       return { success: false, error: error.message };
     }
-  };
-
-
-  const signupCustomer = async (email, password) => {
-    try {
-      const response = await customerApi.signupCustomer({email, password});
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  };
+  }
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -144,11 +124,8 @@ const createBrand = async (brandData) => {
     user,
     userType,
     loading,
-    loginAdmin,
-    loginCustomer,
-    loginBrand,
-    signupCustomer,
-    createBrand,
+    login,
+    signup,
     logout,
     isAuthenticated: !!user,
   };
