@@ -154,12 +154,9 @@ exports.getProductById = async (req, res, next) => {
 
         if (req.admin) {
             return res.status(200).json({ success: true, data: product });
-        }
-
-        if (req.brand && product.brand._id.toString() !== req.brand.id && product.isActive === false) {
+        }else if (req.brand && product.brand._id.toString() !== req.brand.id && product.isActive === false) {
             return next(new ErrorResponse('Not your product', 403));
-        }
-        if (req.brand && product.brand._id.toString() === req.brand.id) {
+        }else if (req.brand && product.brand._id.toString() === req.brand.id) {
             return res.status(200).json({ success: true, data: product });
         }
               

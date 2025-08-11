@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 //import apiService from '../services/api';
 import { mockApiService } from '../services/mockData';
+import {getWishlist} from '../api/cart'
 import { FaHeart, FaShoppingBag, FaUser, FaMapMarkerAlt, FaEdit, FaTrash } from 'react-icons/fa';
 
 function Profile() {
@@ -44,8 +45,10 @@ function Profile() {
     try {
       setLoading(true);
       //const response = await apiService.getCustomerWishlist();
-      const response = await mockApiService.getCustomerWishlist();
+      // const response = await mockApiService.getCustomerWishlist();
+        const response = await getWishlist();
       setWishlist(response.data || []);
+
     } catch (error) {
       console.error('Failed to load wishlist:', error);
     } finally {
