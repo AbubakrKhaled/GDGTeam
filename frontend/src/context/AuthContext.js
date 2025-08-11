@@ -40,17 +40,12 @@ export const AuthProvider = ({ children }) => {
       let profile;
       switch (type) {
         case 'customer':
-          //profile = await apiService.getCustomerProfile();
-          //profile = await mockApiService.getCustomerProfile();
           profile = await customerApi.getCustomerProfile();
           break;
         case 'brand':
-          //profile = await apiService.getBrandProfile();
-          //profile = await mockApiService.getBrandProfile(); 
           profile = await brandApi.getBrandProfile();
           break;
         case 'admin':
-          //profile = { data: { role: 'admin', name: 'Admin User' } };
           profile = await adminApi.getAdminDashboard();
           break;
         default:
@@ -71,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       const res = await adminApi.adminLogin(username, password);
       const { token, admin } = res.data;
 
-      localStorage.setItem("accessToken", token);
+      localStorage.setItem("token", token);
       localStorage.setItem("userType", "admin");
 
       setUserType("admin");
@@ -84,8 +79,6 @@ export const AuthProvider = ({ children }) => {
 
   const loginCustomer = async (email, password) => {
     try {
-      // const response = await apiService.login(email, password, type);
-      //const response = await mockApiService.login(email, password, type);
       const response = await customerApi.loginCustomer(email, password);
       const { token, customer } = response;
       
@@ -102,11 +95,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signupCustomer = async (userData) => {
+  const loginBrand = async (email, password) => {
     try {
-      //const response = await apiService.signup(userData, type);
-      //const response = await mockApiService.signup(userData, type);
-      const response = await customerApi.signupCustomer(userData)
+      const response = await brandApi.brandLogin(email, password);
+      const { token, brand } = response;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('userType', 'brand');
+      localStorage.setItem('currentUserId', brand._id);
+      
+      setUserType('brand');
+      setUser(brand);
+      
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+const createBrand = async (brandData) => {
+    try {
+      const response = await brandApi.createBrand(brandData);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+
+  const signupCustomer = async (email, password) => {
+    try {
+      const response = await customerApi.signupCustomer({email, password});
       return { success: true, data: response.data };
     } catch (error) {
       return { success: false, error: error.message };
@@ -127,7 +146,9 @@ export const AuthProvider = ({ children }) => {
     loading,
     loginAdmin,
     loginCustomer,
+    loginBrand,
     signupCustomer,
+    createBrand,
     logout,
     isAuthenticated: !!user,
   };
