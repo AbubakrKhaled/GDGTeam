@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockApiService, mockCustomer, mockBrand } from '../services/mockData';
 //import apiService from '../services/api';
+import { brandApi } from '../api/brand';
+import { adminApi } from '../api/admin';
+import { customerApi } from '../api/customer';
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -23,6 +27,7 @@ export const AuthProvider = ({ children }) => {
     
     if (token && storedUserType) {
       setUserType(storedUserType);
+      
       // Fetch user profile
       fetchUserProfile(storedUserType);
     } else {
@@ -36,15 +41,17 @@ export const AuthProvider = ({ children }) => {
       switch (type) {
         case 'customer':
           //profile = await apiService.getCustomerProfile();
-          profile = await mockApiService.getCustomerProfile();
+          //profile = await mockApiService.getCustomerProfile();
+          profile = await customerApi.getCustomerProfile();
           break;
         case 'brand':
           //profile = await apiService.getBrandProfile();
-          profile = await mockApiService.getBrandProfile();
+          //profile = await mockApiService.getBrandProfile(); 
+          profile = await brandApi.getBrandProfile();
           break;
         case 'admin':
-          // Admin profile might be different
-          profile = { data: { role: 'admin', name: 'Admin User' } };
+          //profile = { data: { role: 'admin', name: 'Admin User' } };
+          profile = await adminApi.getAdminDashboard();
           break;
         default:
           throw new Error('Invalid user type');
@@ -58,18 +65,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password, type = 'customer') => {
+
+  const loginAdmin = async (username, password) => {
     try {
-      //      const response = await apiService.login(email, password, type);
-      const response = await mockApiService.login(email, password, type);
-      const { token, user } = response;
+      const res = await adminApi.adminLogin(username, password);
+      const { token, admin } = res.data;
+
+      localStorage.setItem("accessToken", token);
+      localStorage.setItem("userType", "admin");
+
+      setUserType("admin");
+      setUser(admin);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const loginCustomer = async (email, password) => {
+    try {
+      // const response = await apiService.login(email, password, type);
+      //const response = await mockApiService.login(email, password, type);
+      const response = await customerApi.loginCustomer(email, password);
+      const { token, customer } = response;
       
       localStorage.setItem('token', token);
-      localStorage.setItem('userType', type);
-      localStorage.setItem('currentUserId', user._id);
+      localStorage.setItem('userType', 'customer');
+      localStorage.setItem('currentUserId', customer._id);
       
-      setUserType(type);
-      setUser(user);
+      setUserType('customer');
+      setUser(customer);
       
       return { success: true };
     } catch (error) {
@@ -77,10 +102,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (userData, type = 'customer') => {
+  const signupCustomer = async (userData) => {
     try {
       //const response = await apiService.signup(userData, type);
-      const response = await mockApiService.signup(userData, type);
+      //const response = await mockApiService.signup(userData, type);
+      const response = await customerApi.signupCustomer(userData)
       return { success: true, data: response.data };
     } catch (error) {
       return { success: false, error: error.message };
@@ -90,6 +116,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
+    localStorage.removeItem('currentUserId');
     setUser(null);
     setUserType(null);
   };
@@ -98,8 +125,9 @@ export const AuthProvider = ({ children }) => {
     user,
     userType,
     loading,
-    login,
-    signup,
+    loginAdmin,
+    loginCustomer,
+    signupCustomer,
     logout,
     isAuthenticated: !!user,
   };

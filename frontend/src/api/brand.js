@@ -17,12 +17,17 @@ const authHeader = () => {
 }
 
 // ------------------------------ Login --------------------------
-export const brandLogin = async (username, password) => {
+export const brandLogin = async (email, password) => {
   return await axios.post(`${API_BASE_URL}/brand/login`, {
-    username,
+    email,
     password,
   });
 };
+
+export const brandLogout = async () => {
+  return await axios.post(`${API_BASE_URL}/brand/logout`, {}, authHeader());
+};
+
 //-------------------------------- singup ----------------------------
 export const createBrand = async (brandData) => {
   return await axios.post(
@@ -126,6 +131,7 @@ export const deactivateOrder = async (id) => {
 
 const brandApi = {
   brandLogin,
+  brandLogout,
   createBrand,
   updateBrand,
   getAllBrands,

@@ -18,15 +18,16 @@ const authHeader = () => {
 
 // ------------------------------ Login --------------------------
 export const adminLogin = async (username, password) => {
-  return await axios.post(`${API_BASE_URL}/admin/login`, {
-    username,
-    password,
-  });
+  return await axios.post(`${API_BASE_URL}/admin/login`, { username, password });
+};
+
+export const adminLogout = async () => {
+  return await axios.post(`${API_BASE_URL}/admin/logout`, {}, authHeader());
 };
 
 export const getAdminDashboard = async () => {
-  return await axios.get(`${API_BASE_URL}/admin/dashboard/`, authHeader());
-}
+  return await axios.get(`${API_BASE_URL}/admin/dashboard`, authHeader());
+};
 
 
 // ------------------------------ Brands -------------------------
@@ -147,6 +148,7 @@ export const deactivateProduct = async (id) => {
 
 const adminApi = {
   adminLogin,
+  adminLogout,
   getAdminDashboard,
   getAllBrands,
   getBrandProfile,

@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { FaTrash, FaHeart, FaShoppingBag, FaArrowLeft } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { cartApi } from '../api/cart';
-import product from '../../../backend/models/product';
 import { orderApi } from '../api/order';
 
 function Cart() {
