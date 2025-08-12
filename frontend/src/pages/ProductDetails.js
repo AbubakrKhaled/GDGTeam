@@ -16,6 +16,8 @@ import {
   FaCheckCircle
 } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
+import { productApi } from '../api/product';
+import { cartApi } from '../api/cart';
 
 function ProductDetails() {
   const { id } = useParams();
@@ -41,7 +43,8 @@ function ProductDetails() {
   const loadProduct = async () => {
     try {
       setLoading(true);
-      const response = await apiService.getProductById(id);
+      //const response = await apiService.getProductById(id);
+      const response = await productApi.getProductById(id);
       setProduct(response.data);
       
       // Load related products
@@ -58,7 +61,8 @@ function ProductDetails() {
 
   const loadRelatedProducts = async (category) => {
     try {
-      const response = await apiService.getAllProducts({ category });
+      //const response = await apiService.getAllProducts({ category });
+      const response = await productApi.getAllProducts({ category });
       // Filter out current product and limit to 4
       const filtered = response.data
         .filter(p => p._id !== id)
@@ -71,7 +75,8 @@ function ProductDetails() {
 
   const checkWishlistStatus = async () => {
     try {
-      const response = await apiService.getCustomerWishlist();
+      //const response = await apiService.getCustomerWishlist();
+      const response = await cartApi.getWishlist();
       const wishlistIds = response.data.map(item => item._id);
       setIsInWishlist(wishlistIds.includes(id));
     } catch (error) {
@@ -83,7 +88,8 @@ function ProductDetails() {
     if (!product) return;
     
     try {
-      await addToCart(product, selectedQuantity);
+      await addToCart(product, selectedQuantity); //<-------- check this bc product and quantity input we want product only
+      await cartApi.addToCart(product);
       toast.success('Product added to cart!');
     } catch (error) {
       console.error('Failed to add to cart:', error);
@@ -98,7 +104,8 @@ function ProductDetails() {
     }
     
     try {
-      await apiService.addToWishlist(product._id);
+      //await apiService.addToWishlist(product._id);
+      await cartApi.addToWishlist(product._id);
       setIsInWishlist(true);
       toast.success('Product added to wishlist!');
     } catch (error) {

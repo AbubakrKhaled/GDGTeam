@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import apiService from '../services/api';
+import apiService from '../services/api';  // <--------------------- nice
 import { FaHeart, FaShoppingCart, FaSearch, FaFilter, FaStar } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
+import { productApi } from '../api/product';
+import { customerApi } from '../api/customer';
+import { cartApi } from '../api/cart';
 
 function Products() {
   const navigate = useNavigate();
@@ -39,13 +42,14 @@ function Products() {
     try {
       setLoading(true);
       
-      // Build query parameters
+      /*// Build query parameters
       const filters = {};
       if (searchTerm) filters.search = searchTerm;
       if (selectedCategory) filters.category = selectedCategory;
       if (selectedPriceRange) filters.priceRange = selectedPriceRange;
-      
-      const response = await apiService.getAllProducts(filters);
+      */                          //                                                <------------- product filters
+      //const response = await apiService.getAllProducts(filters);
+      const response = await productApi.getAllProducts();
       setProducts(response.data || []);
     } catch (error) {
       console.error('Failed to load products:', error);
@@ -57,16 +61,18 @@ function Products() {
 
   const loadWishlist = async () => {
     try {
-      const response = await apiService.getCustomerWishlist();
+      //const response = await apiService.getCustomerWishlist();
+      const response = await cartApi.getWishlist();
       setWishlistIds((response.data || []).map(item => item._id));
     } catch (error) {
       console.error('Failed to load wishlist:', error);
     }
   };
 
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = async (product) => { 
     try {
-      await addToCart(product, 1);
+      //await addToCart(product, 1);
+      await cartApi.addToCart(product._id)
       toast.success('Product added to cart!');
     } catch (error) {
       console.error('Failed to add to cart:', error);
@@ -80,7 +86,8 @@ function Products() {
       return;
     }
     try {
-      await apiService.addToWishlist(product._id);
+      //await apiService.addToWishlist(product._id);
+      await cartApi.addToWishlist(product._id);
       setWishlistIds(prev => [...prev, product._id]);
       toast.success('Product added to wishlist!');
     } catch (error) {
