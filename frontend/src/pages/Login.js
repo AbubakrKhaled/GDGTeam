@@ -177,11 +177,15 @@ function Login() {
                 </label>
               </div>
               <div className="text-sm">
-                <a href="#" className="font-medium text-pink-600 hover:text-pink-500">
+                <a
+                  href="/forgot-password"
+                  className="font-medium text-pink-600 hover:text-pink-500"
+                >
                   Forgot password?
                 </a>
               </div>
             </div>
+
 
             <button
               type="submit"

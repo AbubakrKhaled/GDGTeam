@@ -36,7 +36,8 @@ function ProductDetails() {
     if (isAuthenticated) {
       checkWishlistStatus();
     }
-  }, [id, isAuthenticated]);
+  }, [id, isAuthenticated, loadProduct, checkWishlistStatus]);
+
 
   const loadProduct = async () => {
     try {
