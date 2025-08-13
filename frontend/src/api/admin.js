@@ -35,7 +35,7 @@ export const getAllBrands = async () => {
   return await axios.get(`${API_BASE_URL}/admin/brands/`, authHeader());
 }
 
-export const getBrandProfile = async (id) => {
+export const getBrandProfile = async (id) => { //page for this so that admin can view brand profiles even if not active
   return await axios.get(`${API_BASE_URL}/admin/brands/${id}/profile`, authHeader());
 }
 
@@ -55,7 +55,7 @@ export const brandDisapprove = async (id) => {
   );
 };
 
-export const activateBrand = async (id) => {
+export const activateBrand = async (id) => { ///this  added as a button to getbrandprofile
   return await axios.put(
     `${API_BASE_URL}/admin/brands/${id}/activate`,
     {},
@@ -63,7 +63,7 @@ export const activateBrand = async (id) => {
   );
 };
 
-export const deactivateBrand = async (id) => {
+export const deactivateBrand = async (id) => { ///this added to admindashboard
   return await axios.put(
     `${API_BASE_URL}/admin/brands/${id}/deactivate`,
     {},
@@ -72,15 +72,15 @@ export const deactivateBrand = async (id) => {
 };
 
 // ------------------------------ Customer -------------------------
-export const getAllCustomers = async () => {
+export const getAllCustomers = async () => { //added this to admindashboard
   return await axios.get(`${API_BASE_URL}/admin/customers/`, authHeader());
 }
 
-export const getCustomerById = async (id) => {
+export const getCustomerById = async (id) => { //add this
   return await axios.get(`${API_BASE_URL}/admin/customers/${id}`, authHeader());
 }
 
-export const activateCustomer = async (id) => {
+export const activateCustomer = async (id) => { //add this as a button to getcustomerbyid
   return await axios.put(
     `${API_BASE_URL}/admin/customers/${id}/activate`,
     {},
@@ -88,7 +88,7 @@ export const activateCustomer = async (id) => {
   );
 };
 
-export const deactivateCustomer = async (id) => {
+export const deactivateCustomer = async (id) => { //add this as a button to getcustomerbyid
   return await axios.put(
     `${API_BASE_URL}/admin/customers/${id}/deactivate`,
     {},
@@ -101,9 +101,9 @@ export const getAllOrders = async () => {
   return await axios.get(`${API_BASE_URL}/admin/orders/`, authHeader());
 }
 
-export const getOrderById = async (id) => {
+export const getOrderById = async (id) => { //need to add this. its the same page for admin and brand
   return await axios.get(`${API_BASE_URL}/admin/orders/${id}`, authHeader());
-}
+} //for abubakr: make this one
 
 export const updateOrderStatus = async (id, status) => {
   return await axios.put(
@@ -113,7 +113,7 @@ export const updateOrderStatus = async (id, status) => {
   );
 };
 
-export const deactivateOrder = async (id) => {
+export const deactivateOrder = async (id) => {// need to add a button for this
   return await axios.put(
     `${API_BASE_URL}/admin/orders/${id}/deactivate`,
     {},
@@ -122,15 +122,15 @@ export const deactivateOrder = async (id) => {
 };
 
 // ------------------------------ Products -------------------------
-export const getAllProducts = async () => {
+export const getAllProducts = async () => { //for abubakr: make this one
   return await axios.get(`${API_BASE_URL}/admin/products/`, authHeader());
 }
 
-export const getProductById = async (id) => {
+export const getProductById = async (id) => { // for abubakr: make this one
   return await axios.get(`${API_BASE_URL}/admin/products/${id}`, authHeader());
 }
 
-export const activateProduct = async (id) => {
+export const activateProduct = async (id) => { //need to add this button if product is deactivated
   return await axios.put(
     `${API_BASE_URL}/admin/products/${id}/activate`,
     {},

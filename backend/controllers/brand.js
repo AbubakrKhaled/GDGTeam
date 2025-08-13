@@ -176,7 +176,7 @@ exports.updateBrand = async (req, res, next) => {
 };
 
 exports.getBrandProfile = async (req, res, next) => {
-    const id = req.brand._id;
+    const id = req.params.id;
 
     if (!mongoose.isValidObjectId(id.toString())) {
         return next(new ErrorResponse('Invalid ID', 400));
@@ -188,6 +188,13 @@ exports.getBrandProfile = async (req, res, next) => {
             return next(new ErrorResponse('Brand not found', 404));
         }
 
+        if (req.brand.id !== id && (brand.isApproved === false || brand.isActive === false)){
+            return next(new ErrorResponse('Not authorized. Cant view inactive brand', 403));
+        }
+        else if (req.customer) {
+            return next(new ErrorResponse('Not authorized.', 403));
+        }
+        
         const [products, orders] = await Promise.all([
             Product.find({ brand: id }),
             Order.find({ brand: id })
