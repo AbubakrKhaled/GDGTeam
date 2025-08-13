@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-//import apiService from '../services/api';
-import { mockApiService } from '../services/mockData';
 import { 
   FaBox, 
   FaShoppingBag, 
@@ -10,7 +8,6 @@ import {
   FaPlus, 
   FaEdit, 
   FaTrash, 
-  FaEye,
   FaChartLine,
   FaCheckCircle,
   FaTimesCircle,
@@ -54,13 +51,8 @@ function BrandDashboard() {
     try {
       setLoading(true);
       const [productsRes, ordersRes] = await Promise.all([
-        //const response = await apiService.getBrandProducts();    <-------?
-        //const response = await apiService.getBrandOrders();      <-------?
-        
-        //mockApiService.getBrandProducts(),
-        brandApi.getAllProducts(),
-        //mockApiService.getBrandOrders(),
-        brandApi.getAllOrders()
+        brandApi.getAllProducts(), // Fetch products from backend
+        brandApi.getAllOrders()     // Fetch orders from backend
       ]);
       setProducts(productsRes.data || []);
       setOrders(ordersRes.data || []);
@@ -70,13 +62,12 @@ function BrandDashboard() {
       setLoading(false);
     }
   };
-
+  
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      //await mockApiService.createProduct(productForm);
-      await brandApi.createProduct(productForm);
+      await brandApi.createProduct(productForm); // Create product in backend
       setShowAddProduct(false);
       setProductForm({
         productname: '',
@@ -96,16 +87,14 @@ function BrandDashboard() {
       setLoading(false);
     }
   };
-
+  
   const handleEditProduct = async (e) => {
     e.preventDefault();
     if (!showEditProduct || !showEditProduct._id) return;
     
     try {
       setLoading(true);
-      //await apiService.updateProduct(showEditProduct._id, productForm); <------ ?
-      //await mockApiService.updateProduct(showEditProduct._id, productForm);
-      await brandApi.updateProduct(showEditProduct._id, productForm)
+      await brandApi.updateProduct(showEditProduct._id, productForm); // Update product in backend
       setShowEditProduct(null);
       setProductForm({
         productname: '',
@@ -125,8 +114,19 @@ function BrandDashboard() {
       setLoading(false);
     }
   };
-
-  const handleDeleteProduct = async (productId) => {
+  
+  const handleUpdateOrderStatus = async (orderId, status) => {
+    try {
+      await brandApi.updateOrderStatus(orderId, status); // Update order status in backend
+      await loadDashboardData();
+      toast.success(`Order status updated to ${status}!`);
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      toast.error('Failed to update order status');
+    }
+  };
+  
+const handleDeleteProduct = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         //await apiService.deleteProduct(productId);
@@ -136,19 +136,6 @@ function BrandDashboard() {
       } catch (error) {
         console.error('Failed to delete product:', error);
       }
-    }
-  };
-
-  const handleUpdateOrderStatus = async (orderId, status) => {
-    try {
-      //await apiService.updateOrderStatus(orderId, status);
-      //await mockApiService.updateOrderStatus(orderId, status);
-      await brandApi.updateOrderStatus(orderId, status);
-      await loadDashboardData();
-      toast.success(`Order status updated to ${status}!`);
-    } catch (error) {
-      console.error('Failed to update order status:', error);
-      toast.error('Failed to update order status');
     }
   };
 

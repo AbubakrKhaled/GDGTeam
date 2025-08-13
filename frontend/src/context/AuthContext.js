@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockApiService, mockCustomer, mockBrand } from '../services/mockData';
 //import apiService from '../services/api';
+import React, {createContext, useContext, useState, useEffect, useCallback} from 'react';
 import { brandApi } from '../api/brand';
 import { adminApi } from '../api/admin';
 import { customerApi } from '../api/customer';
@@ -20,50 +19,63 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [userType, setUserType] = useState(null); // 'customer', 'brand', 'admin'
 
+  // Logout function memoized so it doesn't change every render
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('currentUserId');
+    setUser(null);
+    setUserType(null);
+    setLoading(false);
+  }, []);
+
+  // Fetch profile memoized with stable logout
+  const fetchUserProfile = useCallback(
+    async (type) => {
+      try {
+        let profile;
+        switch (type) {
+          case 'customer':
+            profile = await customerApi.getCustomerProfile();
+            break;
+          case 'brand':
+            profile = await brandApi.getBrandProfile();
+            break;
+          case 'admin':
+            profile = await adminApi.getAdminDashboard();
+            break;
+          default:
+            throw new Error('Invalid user type');
+        }
+        setUser(profile.data || profile);
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [logout]
+  );
+
+  // On mount, check if logged in and fetch profile
   useEffect(() => {
-    // Check if user is logged in on app start
     const token = localStorage.getItem('token');
     const storedUserType = localStorage.getItem('userType');
-    
+
     if (token && storedUserType) {
       setUserType(storedUserType);
-      
-      // Fetch user profile
       fetchUserProfile(storedUserType);
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [fetchUserProfile]);
 
-  const fetchUserProfile = async (type) => {
-    try {
-      let profile;
-      switch (type) {
-        case 'customer':
-          profile = await customerApi.getCustomerProfile();
-          break;
-        case 'brand':
-          profile = await brandApi.getBrandProfile();
-          break;
-        case 'admin':
-          profile = await adminApi.getAdminDashboard();
-          break;
-        default:
-          throw new Error('Invalid user type');
-      }
-      setUser(profile.data || profile);
-    } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = async (email,password ,userType) => {
+  // Login method
+  const login = async (email, password, type) => {
     try {
       let response;
-      switch (userType) {
+      switch (type) {
         case 'customer':
           response = await customerApi.loginCustomer(email, password);
           break;
@@ -80,23 +92,23 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data || response;
 
       localStorage.setItem('token', token);
-      localStorage.setItem('userType', userType);
+      localStorage.setItem('userType', type);
       localStorage.setItem('currentUserId', user.id);
 
-      setUserType(userType);
+      setUserType(type);
       setUser(user);
 
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }
+  };
 
-
-  const signup = async (data , userType)=>{
+  // Signup method
+  const signup = async (data, type) => {
     try {
       let response;
-      switch (userType) {
+      switch (type) {
         case 'customer':
           response = await customerApi.signupCustomer(data);
           break;
@@ -110,14 +122,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userType');
-    localStorage.removeItem('currentUserId');
-    setUser(null);
-    setUserType(null);
   };
 
   const value = {
@@ -127,12 +131,9 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     logout,
-    isAuthenticated: !!user,
+    fetchUserProfile,
+    isAuthenticated: !!user
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}; 
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

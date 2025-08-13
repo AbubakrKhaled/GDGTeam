@@ -2,22 +2,13 @@ import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-//import apiService from '../services/api';
 import { FaTrash, FaHeart, FaShoppingBag, FaArrowLeft } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { cartApi } from '../api/cart';
-import { orderApi } from '../api/order';
 
 function Cart() {
- 
- // return (
-  //  <div>
-  //      <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
-  //      <p className="text-gray-600">Your cart is currently empty.</p>
-  //
-  //
-  const { cart, updateCartItem, removeFromCart, getCartTotal, clearCart, getCartCount } = useCart();
-  const { isAuthenticated, user } = useAuth();
+  const { cart, getCartTotal, clearCart, getCartCount } = useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [checkoutData, setCheckoutData] = useState({
@@ -29,29 +20,30 @@ function Cart() {
   const handleQuantityChange = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
     try {
-      //await updateCartItem(productId, newQuantity); <------------------------
-      await cartApi.updateCartProductAmount(productId, newQuantity)
+      await cartApi.updateCartProductAmount(productId, newQuantity);
     } catch (error) {
       console.error('Failed to update quantity:', error);
+      toast.error('Failed to update quantity');
     }
   };
 
   const handleRemoveItem = async (productId) => {
     try {
-      //await removeFromCart(productId);
-      await cartApi.deleteCartProduct(productId)
+      await cartApi.deleteCartProduct(productId);
+      toast.success('Item removed from cart');
     } catch (error) {
       console.error('Failed to remove item:', error);
+      toast.error('Failed to remove item');
     }
   };
 
   const addToWishlist = async (productId) => {
     try {
-      //await apiService.addToWishlist(product._id);
-      //await mockApiService.addToWishlist(product._id);
-      await cartApi.addToWishlist(productId)   // <----------------- not sure i changed id
+      await cartApi.addToWishlist(productId);
+      toast.success('Added to wishlist');
     } catch (error) {
       console.error('Failed to add to wishlist:', error);
+      toast.error('Failed to add to wishlist');
     }
   };
 
@@ -70,14 +62,24 @@ function Cart() {
 
     try {
       setLoading(true);
-      console.log('cart', cart);
+      
+      // Create the order with backend
+      const orderData = {
+        items: cart.map(item => ({
+          product: item.product._id,
+          quantity: item.quantity,
+          price: item.product.price
+        })),
+        total: getCartTotal(),
+        shippingAddress: checkoutData.shippingAddress,
+        paymentMethod: checkoutData.paymentMethod,
+        notes: checkoutData.notes
+      };
 
-      // Normally we'd create an order with the backend here.
-      // To avoid referencing an undefined 'response', proceed optimistically for now.
+      await cartApi.createOrder(orderData);
       clearCart();
       toast.success('Order placed successfully!');
       navigate('/profile');
-
     } catch (error) {
       console.error('Checkout failed:', error);
       toast.error('Failed to place order. Please try again.');
