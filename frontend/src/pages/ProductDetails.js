@@ -32,31 +32,29 @@ function ProductDetails() {
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
-    loadProduct();
-    if (isAuthenticated) {
-      checkWishlistStatus();
-    }
-  }, [id, isAuthenticated, loadProduct, checkWishlistStatus]);
+  loadProduct();
+  if (isAuthenticated) {
+    checkWishlistStatus();
+  }
+}, [id, isAuthenticated, loadProduct, checkWishlistStatus]);
 
 
-  const loadProduct = async () => {
-    try {
-      setLoading(true);
-      //const response = await apiService.getProductById(id);
-      const response = await productApi.getProductById(id);
-      setProduct(response.data);
-      
-      // Load related products
-      if (response.data?.category) {
-        loadRelatedProducts(response.data.category);
-      }
-    } catch (error) {
-      console.error('Failed to load product:', error);
-      toast.error('Failed to load product');
-    } finally {
-      setLoading(false);
+  const loadProduct = useCallback(async () => {
+  try {
+    setLoading(true);
+    const response = await productApi.getProductById(id);
+    setProduct(response.data);
+    if (response.data?.category) {
+      await loadRelatedProducts(response.data.category);
     }
-  };
+  } catch (error) {
+    console.error('Failed to load product:', error);
+    toast.error('Failed to load product');
+  } finally {
+    setLoading(false);
+  }
+}, [id, loadRelatedProducts]);
+
 
   const loadRelatedProducts = async (category) => {
     try {
@@ -72,16 +70,16 @@ function ProductDetails() {
     }
   };
 
-  const checkWishlistStatus = async () => {
-    try {
-      //const response = await apiService.getCustomerWishlist();
-      const response = await cartApi.getWishlist();
-      const wishlistIds = response.data.map(item => item._id);
-      setIsInWishlist(wishlistIds.includes(id));
-    } catch (error) {
-      console.error('Failed to check wishlist status:', error);
-    }
-  };
+ const checkWishlistStatus = useCallback(async () => {
+  try {
+    const response = await cartApi.getWishlist();
+    const wishlistIds = response.data.map(item => item._id);
+    setIsInWishlist(wishlistIds.includes(id));
+  } catch (error) {
+    console.error('Failed to check wishlist status:', error);
+  }
+}, [id]);
+
 
   const handleAddToCart = async () => {
     if (!product) return;
