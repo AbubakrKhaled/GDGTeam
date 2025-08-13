@@ -45,7 +45,7 @@ function AdminDashboard() {
         adminApi.getAllBrands(),
         //mockApiService.getAllOrders()
         adminApi.getAllOrders(),
-        adminApi.getAllCustomers(), //<----------- added this need frontend code for it
+        //adminApi.getAllCustomers(), //<----------- added this need frontend code for it
       ]);
       
       setDashboardData(dashboardRes.data);

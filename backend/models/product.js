@@ -37,16 +37,22 @@ const productSchema = new Schema({
         required: true
     },
     color: {
-
+        type: String,
+        required: true,
     },
     size: {
         type: Types.ObjectId,
         ref: 'size',
         required: false
     },// dont refrence (amount ,is valid)
-    discount: {
-
-
+    discountAmount: { 
+        type: Number, 
+        default: 0, 
+        min: 0 
+    },
+    isDiscountValid: { 
+        type: Boolean, 
+        default: false 
     },
     reviews: {
         type: Types.ObjectId,

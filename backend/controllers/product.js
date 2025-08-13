@@ -9,7 +9,7 @@ exports.createProduct = async (req, res,next) => {
     }
     try{
         const {
-            productname, price, quantity, imageURL, description, category, color, size, discount
+            productname, price, quantity, imageURL, description, category, color, size, discountAmount, isDiscountValid
         } = req.body;
         const reviews = 0;
 
@@ -18,11 +18,10 @@ exports.createProduct = async (req, res,next) => {
         if (existingProduct) {return next(new ErrorResponse('Product already exists', 400));}
 
         const product = await Product.create({
-            productname, price, quantity, imageURL, description, reviews: 0,
+            productname, price, quantity, imageURL, description, reviews: 0, discountAmount, isDiscountValid,
             category: Types.ObjectId(category),
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
-            discount: Types.ObjectId(discount),
             brand: req.brand.id
         });
 
@@ -41,15 +40,14 @@ exports.updateProduct = async (req, res, next) => {
         return next(new ErrorResponse('Invalid ID', 400));
     
     const {
-            productname, price, quantity, imageURL, description, category, color, size, discount
+            productname, price, quantity, imageURL, description, category, color, size, discountAmount, isDiscountValid
         } = req.body;
     try{
         const product = await Product.findByIdAndUpdate(id, {
-            productname, price, quantity, imageURL, description,
+            productname, price, quantity, imageURL, description, discountAmount, isDiscountValid,
             category: Types.ObjectId(category),
             color: Types.ObjectId(color),
             size: Types.ObjectId(size),
-            discount: Types.ObjectId(discount),       
         }, {new: true});
 
         if (!product) {
@@ -164,11 +162,15 @@ exports.getProductById = async (req, res, next) => {
             return next(new ErrorResponse('Product not found', 404));
         }
 
+        const finalPrice = product.isDiscountValid
+      ? product.price - product.discountAmount
+      : product.price;
+
         // Transform the data to match frontend expectations
         const transformedProduct = {
             _id: product._id,
             productname: product.productname,
-            price: product.price,
+            price: finalPrice,
             quantity: product.quantity,
             imageURL: Array.isArray(product.imageURL) ? product.imageURL : [product.imageURL],
             description: product.description,

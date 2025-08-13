@@ -134,7 +134,7 @@ exports.checkoutOrder = async (req,res,next) => {
 
         let totalPrice = 0;
         const products = [];
-
+        
         for (const cartItem of user.cart) { 
             const product = cartItem.product; 
  
@@ -151,8 +151,15 @@ exports.checkoutOrder = async (req,res,next) => {
                 quantity: cartItem.quantity, 
                 price: product.price 
             }); 
-            totalPrice += cartItem.quantity * product.price; 
+
+            const finalPrice = product.isDiscountValid
+            ? product.price - product.discountAmount
+            : product.price;
+
+            
+            totalPrice += cartItem.quantity * finalPrice; 
         } 
+        
 
         const newOrder = new Order({ 
             customer: id, 

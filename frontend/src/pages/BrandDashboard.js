@@ -37,7 +37,9 @@ function BrandDashboard() {
     imageURL: '',
     category: '',
     color: '',
-    size: ''
+    size: '',
+    discountAmount: '',
+    reviews: ''
   });
 
   useEffect(() => {
@@ -84,7 +86,8 @@ function BrandDashboard() {
         imageURL: '',
         category: '',
         color: '',
-        size: ''
+        size: '',
+        discountAmount: '',
       });
       await loadDashboardData();
     } catch (error) {
@@ -113,7 +116,7 @@ function BrandDashboard() {
         category: '',
         color: '',
         size: '',
-        discount: ''
+        discountAmount: ''
       });
       await loadDashboardData();
     } catch (error) {
