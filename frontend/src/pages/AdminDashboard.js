@@ -1,20 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { mockApiService } from '../services/mockData';
-import { 
-  FaUsers, 
-  FaStore, 
-  FaBox, 
-  FaShoppingCart, 
-  FaCheck, 
-  FaTimes, 
-  FaEye,
-  FaChartBar,
-  FaDollarSign,
-  FaClock,
-  FaStar
-} from 'react-icons/fa';
+import { FaUsers, FaStore, FaBox, FaCheck, FaTimes, FaDollarSign } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { adminApi } from '../api/admin';
 
@@ -39,13 +26,9 @@ function AdminDashboard() {
     try {
       setLoading(true);
       const [dashboardRes, brandsRes, ordersRes] = await Promise.all([
-        //mockApiService.getAdminDashboard(),
-        adminApi.getAdminDashboard(),
-        //mockApiService.getAllBrands(),
-        adminApi.getAllBrands(),
-        //mockApiService.getAllOrders()
-        adminApi.getAllOrders(),
-        //adminApi.getAllCustomers(), //<----------- added this need frontend code for it
+        adminApi.getAdminDashboard(), // Fetch admin dashboard data
+        adminApi.getAllBrands(),       // Fetch all brands
+        adminApi.getAllOrders(),       // Fetch all orders
       ]);
       
       setDashboardData(dashboardRes.data);
@@ -60,9 +43,8 @@ function AdminDashboard() {
 
   const handleApproveBrand = async (brandId) => {
     try {
-      //await mockApiService.approveBrand(brandId);
-      await adminApi.brandApprove(brandId)
-      await loadDashboardData();
+      await adminApi.brandApprove(brandId); // Approve brand
+      await loadDashboardData(); // Reload dashboard data
       toast.success('Brand approved successfully!');
     } catch (error) {
       console.error('Failed to approve brand:', error);
@@ -73,9 +55,8 @@ function AdminDashboard() {
   const handleRejectBrand = async (brandId) => {
     if (window.confirm('Are you sure you want to reject this brand? This action cannot be undone.')) {
       try {
-        //await mockApiService.rejectBrand(brandId); //will do rejectbrand controller and change this
-        await adminApi.brandDisapprove(brandId);
-        await loadDashboardData();
+        await adminApi.brandDisapprove(brandId); // Reject brand
+        await loadDashboardData(); // Reload dashboard data
         toast.success('Brand rejected successfully!');
       } catch (error) {
         console.error('Failed to reject brand:', error);
@@ -432,7 +413,7 @@ function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {orders.map((order) => (
+                {orders.map((order) => (
                     <tr key={order._id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {order._id}

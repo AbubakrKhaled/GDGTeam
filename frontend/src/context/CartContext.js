@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 //import apiService from '../services/api';
-import { mockApiService, mockCart } from '../services/mockData';
 import { cartApi } from '../api/cart';
 
 const CartContext = createContext();
@@ -20,31 +19,26 @@ export const CartProvider = ({ children }) => {
   const { isAuthenticated, userType } = useAuth();
 
   // Load cart from backend when user is authenticated
-  useEffect(() => {
-    if (isAuthenticated && userType === 'customer') {
-      loadCart();
-    }
-  }, [isAuthenticated, userType]);
-
-  const loadCart = async () => {
+  const loadCart = useCallback(async () => {
     try {
       setLoading(true);
       if (isAuthenticated) {
-        //const response = await mockApiService.getCustomerCart();
         const response = await cartApi.getCart();
         setCart(response.data || []);
-      } /*else {
-        // Load from localStorage for non-authenticated users
-        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        setCart(localCart);
-      }*/
+      }
     } catch (error) {
       console.error('Failed to load cart:', error);
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [isAuthenticated]);
+  
+  useEffect(() => {
+    if (isAuthenticated && userType === 'customer') {
+      loadCart();
+    }
+  }, [isAuthenticated, userType, loadCart]);
+  
   /*const addToCart = async (productId) => {
     try {
       if (isAuthenticated) {

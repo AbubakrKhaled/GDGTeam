@@ -200,4 +200,8 @@ class ApiService {
   }
 }
 
-export default new ApiService(); 
+// Create an instance of ApiService
+const apiService = new ApiService();
+
+// Export the instance as default
+export default apiService;

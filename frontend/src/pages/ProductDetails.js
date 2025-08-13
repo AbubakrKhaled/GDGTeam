@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import apiService from '../services/api';
 import { 
   FaHeart, 
   FaShoppingCart, 
@@ -12,8 +11,7 @@ import {
   FaShare, 
   FaTruck, 
   FaShieldAlt,
-  FaUndo,
-  FaCheckCircle
+  FaUndo
 } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { productApi } from '../api/product';
@@ -38,7 +36,8 @@ function ProductDetails() {
     if (isAuthenticated) {
       checkWishlistStatus();
     }
-  }, [id, isAuthenticated]);
+  }, [id, isAuthenticated, loadProduct, checkWishlistStatus]);
+
 
   const loadProduct = async () => {
     try {
