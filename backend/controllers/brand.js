@@ -56,7 +56,8 @@ exports.brandLogin = async (req, res, next) => {
                 id: brand._id,
                 name: brand.name,
                 email: brand.email,
-                role: 'brand'
+                role: 'brand' ,
+                isApproved : brand.isApproved,
             }
         });
     } catch (err) {

@@ -618,7 +618,7 @@ class MockDataService {
     this.setData('mockOrders', orders);
     
     // Clear cart
-    localStorage.removeItem('cart');
+    // localStorage.removeItem('cart');
     
     return { success: true, orderId: newOrder._id };
   }
