@@ -75,7 +75,7 @@ exports.createBrand = async (req, res, next) => {
         // Create brand with hashed password
         const brand = await Brand.create({
             name, email, categories, phonenumber, page, brandlocation, logoURL,
-            deliveryTime, description, isApproved: false, ratings: 0, products,
+            deliveryTime, description, ratings: 0, products,
             role: 'brand', password: await hashPassword(password)
         });
 

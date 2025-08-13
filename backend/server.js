@@ -1,12 +1,34 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser'); // Add this line
 const errorHandler = require('./middlewares/errorhandle.js');
+//--------------------- admin hardcoded
+const User = require('./models/User');
 
+async function createAdmin() {
+    const existingAdmin = await User.findOne({ role: 'admin', email: 'admin@example.com' });
+    if (!existingAdmin) {
+        const hashedPassword = await bcrypt.hash('supersecurepassword', 10);
+        await User.create({
+            name: 'admin',
+            email: 'admin@example.com',
+            password: hashedPassword,
+            phonenumber: 1234567890,
+            role: 'admin'
+        });
+        console.log('Admin account created.');
+    } else {
+        console.log('ℹAdmin already exists.');
+    }
+}
+//-------------------------------------------
 dotenv.config();
 
 connectDB();
+
+createAdmin(); //asdasdasdaa
 
 const adminRoutes = require('./routes/admin');
 const brandRoutes = require('./routes/brand'); 

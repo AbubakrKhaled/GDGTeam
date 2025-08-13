@@ -32,8 +32,7 @@ export const brandLogout = async () => {
 export const createBrand = async (brandData) => {
   return await axios.post(
     `${API_BASE_URL}/brand/signup`,
-    brandData,
-    authHeader()
+    brandData
   );
 };
 // ------------------------------- Brands --------------------------

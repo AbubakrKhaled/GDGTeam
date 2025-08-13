@@ -32,8 +32,7 @@ const brandSchema = new Schema({
     },
     isApproved:{
         type: Boolean,
-        default: false,
-        select: false
+        default: true,
     },
     reviews: [{
         type: Types.ObjectId,
