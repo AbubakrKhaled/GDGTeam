@@ -54,7 +54,9 @@ function BrandDashboard() {
         brandApi.getAllProducts(), // Fetch products from backend
         brandApi.getAllOrders()     // Fetch orders from backend
       ]);
-      setProducts(productsRes.data || []);
+      console.log('Products:', productsRes.data);
+        console.log('Orders:', ordersRes.data);
+      setProducts(productsRes.data.data || []);
       setOrders(ordersRes.data || []);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
@@ -208,6 +210,7 @@ const handleDeleteProduct = async (productId) => {
                   </span>
                   <span className="flex items-center">
                     <FaChartLine className="mr-2" />
+                    {/*{console.log("res",user)}*/}
                     {user.isApproved ? 'Approved' : 'Pending Approval'}
                   </span>
                 </div>
