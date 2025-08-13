@@ -9,7 +9,7 @@ POST/PUT need data. GET/DELETE do not.
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 
 const authHeader = () => {
-  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+  const token = localStorage.getItem('token');
   return token
     ? {
         headers: {

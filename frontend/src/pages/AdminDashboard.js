@@ -30,9 +30,10 @@ function AdminDashboard() {
         adminApi.getAllBrands(),       // Fetch all brands
         adminApi.getAllOrders(),       // Fetch all orders
       ]);
-      
+      console.log("res",dashboardRes.data)
       setDashboardData(dashboardRes.data);
-      setBrands(brandsRes.data);
+      console.log("res",brandsRes.data.data)
+      setBrands(brandsRes.data.data);
       setOrders(ordersRes.data);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
@@ -315,7 +316,9 @@ function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {brands.map((brand) => (
+                  {
+                    // console.log("in",brands)
+                    brands?.map((brand) => (
                     <tr key={brand._id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -377,7 +380,8 @@ function AdminDashboard() {
                         )}
                       </td>
                     </tr>
-                  ))}
+                  ))
+                  }
                 </tbody>
               </table>
             </div>
