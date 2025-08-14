@@ -19,6 +19,8 @@ import { brandApi } from '../api/brand';
 
 function BrandDashboard() {
   const { user, userType } = useAuth();
+  const [categories, setCategories] = useState([]);
+  const [sizes, setSizes] = useState([]);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [products, setProducts] = useState([]);
@@ -45,8 +47,8 @@ function BrandDashboard() {
 
     const fetchData = async () => {
       try {
-        const { data: categories } = brandApi.productcategories;
-        const { data: sizes } = brandApi.productsizes;
+        const { data: categories } = await brandApi.productcategories();
+        const { data: sizes } = await brandApi.productsizes();
         setCategories(categories);
         setSizes(sizes);
       } catch (err) {
