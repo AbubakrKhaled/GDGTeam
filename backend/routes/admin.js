@@ -18,6 +18,7 @@ const {
     deactivateCustomer,
     getAdminDashboard,
     addCategory,
+    addSize
 
 } = require('../controllers/admin.js');
 const { adminAuth } = require('../middlewares/auth.js');
