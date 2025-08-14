@@ -40,6 +40,17 @@ router.get('/orders/:id', brandAuth, orderController.getOrderById);
 router.put('/orders/:id/status', brandAuth, orderController.updateOrderStatus);
 router.put('/orders/:id/deactivate', brandAuth, orderController.deactivateOrder);
 
+
+router.get('/productcategories', brandAuth, async (req, res) => {
+    const categories = await Category.find();
+    res.json(categories);
+});
+
+router.get('/productsizes', brandAuth, async (req, res) => {
+    const sizes = await Size.find();
+    res.json(sizes);
+});
+
 router.get('/:id', getBrandById);
 
 

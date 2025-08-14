@@ -102,6 +102,15 @@ export const deactivateProduct = async (id) => {
   );
 };
 
+
+export const productcategories = async () => {
+  return await axios.get(`${API_BASE_URL}/brand/productcategories/`, authHeader());
+}
+
+export const productsizes = async () => {
+  return await axios.get(`${API_BASE_URL}/brand/productsizes/`, authHeader());
+}
+
 // ------------------------------ Orders -------------------------
 export const getAllOrders = async () => {
   return await axios.get(`${API_BASE_URL}/brand/orders/`, authHeader());
@@ -146,6 +155,9 @@ const brandApi = {
   getOrderById,
   updateOrderStatus,
   deactivateOrder,
+
+  productcategories,
+  productsizes
 };
 
 export { brandApi };

@@ -33,11 +33,28 @@ function BrandDashboard() {
     description: '',
     imageURL: '',
     category: '',
-    color: '',
+    color: '#000000',
     size: '',
     discountAmount: '',
+    isDiscountValid: '',
     reviews: ''
   });
+
+  useEffect(() => {
+    if (!showAddProduct && !showEditProduct) return;
+
+    const fetchData = async () => {
+      try {
+        const { data: categories } = brandApi.productcategories;
+        const { data: sizes } = brandApi.productsizes;
+        setCategories(categories);
+        setSizes(sizes);
+      } catch (err) {
+        console.error('Error fetching categories/sizes:', err);
+      }
+    };
+    fetchData();
+  }, [showAddProduct, showEditProduct]);
 
   useEffect(() => {
     if (userType !== 'brand') {
@@ -78,9 +95,11 @@ function BrandDashboard() {
         description: '',
         imageURL: '',
         category: '',
-        color: '',
+        color: '#000000',
         size: '',
         discountAmount: '',
+        isDiscountValid: '',
+        reviews: ''
       });
       await loadDashboardData();
     } catch (error) {
@@ -105,9 +124,11 @@ function BrandDashboard() {
         description: '',
         imageURL: '',
         category: '',
-        color: '',
+        color: '#000000',
         size: '',
-        discountAmount: ''
+        discountAmount: '',
+        isDiscountValid: '',
+        reviews: ''
       });
       await loadDashboardData();
     } catch (error) {
@@ -151,7 +172,9 @@ const handleDeleteProduct = async (productId) => {
       imageURL: product.imageURL || '',
       category: product.category || '',
       color: product.color || '',
-      size: product.size || ''
+      size: product.size || '',
+      discountAmount: product.discountAmount || '',
+      isDiscountValid: product.isDiscountValid || '',
     });
   };
 

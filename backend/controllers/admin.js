@@ -10,6 +10,8 @@ const Product = require('../models/product');
 const Token = require('../models/token');
 const ErrorResponse = require('../middlewares/errorresponse');
 const mongoose = require('mongoose');
+const Category = require('../models/productoptions')
+const Size = require('../models/productoptions')
 
 // Helper function to set cookie
 const setTokenCookie = (res, token) => {
@@ -309,3 +311,14 @@ exports.deactivateCustomer = async (req, res, next) => {
 
 /* ---------------------------- Orders ----------------------------- */
 
+exports.addCategory = async (req, res, next) => {
+    const { name } = req.body;
+    const category = await Category.create({ name });
+    res.status(201).json(category);
+}
+
+exports.addSize = async (req, res) => {
+    const { name } = req.body;
+    const size = await Size.create({ name });
+    res.status(201).json(size);
+}

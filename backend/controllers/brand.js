@@ -45,6 +45,10 @@ exports.brandLogin = async (req, res, next) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
+        if (!brand.isApproved) {
+            return res.status(403).json({ message: 'Brand not approved yet' });
+        }
+
         // Generate and save token
         const token = await generateToken(brand._id);
         setTokenCookie(res, token);

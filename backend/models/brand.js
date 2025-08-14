@@ -32,7 +32,7 @@ const brandSchema = new Schema({
     },
     isApproved:{
         type: Boolean,
-        default: true,
+        default: false,
     },
     reviews: [{
         type: Types.ObjectId,

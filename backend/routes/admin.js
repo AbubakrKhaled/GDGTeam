@@ -17,6 +17,7 @@ const {
     activateCustomer,
     deactivateCustomer,
     getAdminDashboard,
+    addCategory,
 
 } = require('../controllers/admin.js');
 const { adminAuth } = require('../middlewares/auth.js');
@@ -56,5 +57,9 @@ router.get('/products', adminAuth, productController.getAllProducts);
 router.get('/products/:id', adminAuth, productController.getProductById);
 router.put('/products/:id/activate', adminAuth, productController.activateProduct);
 router.put('/products/:id/deactivate', adminAuth, productController.deactivateProduct);
+
+router.post('/addCategory', adminAuth, addCategory);
+
+router.post('/addSize', adminAuth, addSize );
 
 module.exports = router;

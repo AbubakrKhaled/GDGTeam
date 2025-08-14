@@ -66,6 +66,20 @@ function AdminDashboard() {
     }
   };
 
+  const handleDeactivateBrand = async (brandId) => {
+    if (window.confirm('Are you sure you want to reject this brand? This action cannot be undone.')) {
+      try {
+        //await adminApi.brandDisapprove(brandId); // Reject brand
+        await adminApi.deactivateBrand(brandId);
+        await loadDashboardData(); // Reload dashboard data
+        toast.success('Brand deleted successfully!');
+      } catch (error) {
+        console.error('Failed to delete brand:', error);
+        toast.error('Failed to delete brand');
+      }
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'text-yellow-600 bg-yellow-100';
@@ -364,7 +378,7 @@ function AdminDashboard() {
                               <FaCheck className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleRejectBrand(brand._id)}
+                              onClick={() => handleDeactivateBrand(brand._id)}
                               className="text-red-600 hover:text-red-900"
                             >
                               <FaTimes className="w-4 h-4" />
@@ -372,7 +386,7 @@ function AdminDashboard() {
                           </div>
                         ) : (
                           <button
-                            onClick={() => handleRejectBrand(brand._id)}
+                            onClick={() => handleDeactivateBrand(brand._id)}
                             className="text-red-600 hover:text-red-900"
                           >
                             <FaTimes className="w-4 h-4" />
