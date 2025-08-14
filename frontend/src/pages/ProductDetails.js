@@ -1,5 +1,5 @@
 //import { useParams } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -31,34 +31,8 @@ function ProductDetails() {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
-  useEffect(() => {
-  loadProduct();
-  if (isAuthenticated) {
-    checkWishlistStatus();
-  }
-}, [id, isAuthenticated, loadProduct, checkWishlistStatus]);
-
-
-  const loadProduct = useCallback(async () => {
-  try {
-    setLoading(true);
-    const response = await productApi.getProductById(id);
-    setProduct(response.data);
-    if (response.data?.category) {
-      await loadRelatedProducts(response.data.category);
-    }
-  } catch (error) {
-    console.error('Failed to load product:', error);
-    toast.error('Failed to load product');
-  } finally {
-    setLoading(false);
-  }
-}, [id, loadRelatedProducts]);
-
-
-  const loadRelatedProducts = async (category) => {
+  const loadRelatedProducts = useCallback(async (category) => {
     try {
-      //const response = await apiService.getAllProducts({ category });
       const response = await productApi.getAllProducts({ category });
       // Filter out current product and limit to 4
       const filtered = response.data
@@ -68,18 +42,40 @@ function ProductDetails() {
     } catch (error) {
       console.error('Failed to load related products:', error);
     }
-  };
+  }, [id]);
 
- const checkWishlistStatus = useCallback(async () => {
-  try {
-    const response = await cartApi.getWishlist();
-    const wishlistIds = response.data.map(item => item._id);
-    setIsInWishlist(wishlistIds.includes(id));
-  } catch (error) {
-    console.error('Failed to check wishlist status:', error);
-  }
-}, [id]);
+  const checkWishlistStatus = useCallback(async () => {
+    try {
+      const response = await cartApi.getWishlist();
+      const wishlistIds = response.data.map(item => item._id);
+      setIsInWishlist(wishlistIds.includes(id));
+    } catch (error) {
+      console.error('Failed to check wishlist status:', error);
+    }
+  }, [id]);
 
+  const loadProduct = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await productApi.getProductById(id);
+      setProduct(response.data);
+      if (response.data?.category) {
+        await loadRelatedProducts(response.data.category);
+      }
+    } catch (error) {
+      console.error('Failed to load product:', error);
+      toast.error('Failed to load product');
+    } finally {
+      setLoading(false);
+    }
+  }, [id, loadRelatedProducts]);
+
+  useEffect(() => {
+    loadProduct();
+    if (isAuthenticated) {
+      checkWishlistStatus();
+    }
+  }, [id, isAuthenticated, loadProduct, checkWishlistStatus]);
 
   const handleAddToCart = async () => {
     if (!product) return;

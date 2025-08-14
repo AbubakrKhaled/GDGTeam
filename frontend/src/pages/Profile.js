@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-//import apiService from '../services/api';
-import { mockApiService } from '../services/mockData';
-import {getWishlist} from '../api/cart'
+//import apiService from '../services/api'; 
+import{updateCustomer} from '../api/customer'
+import{updateBrand} from '../api/brand'
+import {getWishlist, deleteWishlistProduct} from '../api/cart'
 import { FaHeart, FaShoppingBag, FaUser, FaMapMarkerAlt, FaEdit, FaTrash } from 'react-icons/fa';
+import { getOrders } from '../api/order';
 
 function Profile() {
   const { user, userType } = useAuth();
@@ -44,8 +46,6 @@ function Profile() {
   const loadWishlist = async () => {
     try {
       setLoading(true);
-      //const response = await apiService.getCustomerWishlist();
-      // const response = await mockApiService.getCustomerWishlist();
         const response = await getWishlist();
       setWishlist(response.data || []);
 
@@ -59,8 +59,7 @@ function Profile() {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      //const response = await apiService.getCustomerOrders();
-      const response = await mockApiService.getCustomerOrders();
+      const response = await getOrders();
       setOrders(response.data || []);
     } catch (error) {
       console.error('Failed to load orders:', error);
@@ -72,8 +71,7 @@ function Profile() {
   const removeFromWishlist = async (productId) => {
     try {
         //await apiService.removeFromWishlist(productId);
-      await mockApiService.removeFromWishlist(productId);
-      await loadWishlist();
+        await deleteWishlistProduct(productId);
     } catch (error) {
       console.error('Failed to remove from wishlist:', error);
     }
@@ -83,8 +81,8 @@ function Profile() {
     e.preventDefault();
     try {
       setLoading(true);
-      //await apiService.updateCustomerProfile(profileData);
-      await mockApiService.updateCustomerProfile(profileData);
+      await updateCustomer(e);
+      await updateBrand(e)
       setEditMode(false);
       // Reload user data
       window.location.reload();
