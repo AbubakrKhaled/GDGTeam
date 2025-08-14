@@ -146,6 +146,15 @@ export const deactivateProduct = async (id) => {
   );
 };
 
+export const addCategory = async (name) => {
+  return await axios.post(`${API_BASE_URL}/addCategory`, { name }, authHeader());
+};
+
+export const addSize = async (name) => {
+  return await axios.post(`${API_BASE_URL}/addSize`, { name }, authHeader());
+};
+
+
 const adminApi = {
   adminLogin,
   adminLogout,
@@ -168,6 +177,9 @@ const adminApi = {
   getProductById,
   activateProduct,
   deactivateProduct,
+
+  addCategory,
+  addSize
 };
 
 export {adminApi};
