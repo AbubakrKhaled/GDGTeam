@@ -50,7 +50,8 @@ function Products() {
   const loadWishlist = async () => {
     try {
       const response = await cartApi.getWishlist();
-      setWishlistIds((response.data || []).map(item => item._id));
+      console.log("fdf",response)
+      setWishlistIds((response.data.data || []).map(item => item._id));
     } catch (error) {
       console.error('Failed to load wishlist:', error);
     }

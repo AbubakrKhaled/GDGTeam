@@ -20,8 +20,8 @@ export const loginCustomer = async (email, password) => {
   return await axios.post(`${API_BASE_URL}/customer/login`, { email, password });
 };
 
-export const signupCustomer = async (email, password) => {
-  return await axios.post(`${API_BASE_URL}/customer/signup`, { email, password });
+export const signupCustomer = async (data) => {
+  return await axios.post(`${API_BASE_URL}/customer/signup`, data);
 };
 
 export const customerLogout = async () => {

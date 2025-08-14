@@ -7,6 +7,7 @@ const ErrorResponse = require('../middlewares/errorresponse');
 
 // Input validation helper
 function validateCustomerInput(email, password) {
+
     if (!email || !password) return 'Email and password are required';
     if (!/\S+@\S+\.\S+/.test(email)) return 'Invalid email format';
     if (password.length < 6) return 'Password must be at least 6 characters';
@@ -102,6 +103,12 @@ exports.customerLogin = async (req, res, next) => {
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
+        await Token.create({
+            token,
+            userId: customer._id,
+            userType: 'customer'
+        });
+
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -115,7 +122,8 @@ exports.customerLogin = async (req, res, next) => {
             user: {
                 id: customer._id,
                 email: customer.email,
-                role: 'customer'
+                role: 'customer' ,
+                address : customer.address
             }
         });
     } catch (err) {
@@ -125,7 +133,8 @@ exports.customerLogin = async (req, res, next) => {
 
 // Signup
 exports.customerSignup = async (req, res, next) => {
-    const { email, password } = req.body;
+    const data = req.body;
+    const { email, password, address ,phonenumber ,name ,gender} = data;
     const validationError = validateCustomerInput(email, password);
     if (validationError) return res.status(400).json({ message: validationError });
 
@@ -133,7 +142,10 @@ exports.customerSignup = async (req, res, next) => {
         const existing = await Customer.findOne({ email });
         if (existing) return res.status(409).json({ message: 'Email already registered' });
 
-        const customer = new Customer({ email, password, role: 'customer' });
+        const hashedPassword = await bcrypt.hash(password, 8);
+        console.log(hashedPassword)
+
+        const customer = new Customer({ email   ,password :hashedPassword , address,phonenumber,name,gender ,role: 'customer' });
         await customer.save();
 
         const token = jwt.sign(
@@ -155,7 +167,8 @@ exports.customerSignup = async (req, res, next) => {
             customer: {
                 id: customer._id,
                 email: customer.email,
-                role: 'customer'
+                role: 'customer' ,
+                address : customer.address
             }
         });
     } catch (err) {

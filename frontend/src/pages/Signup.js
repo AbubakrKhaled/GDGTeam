@@ -15,6 +15,7 @@ function Signup() {
     confirmPassword: '',
     phonenumber: '',
     gender: '',
+    address: '',
     // Brand specific fields
     categories: [],
     page: [],
@@ -54,7 +55,7 @@ function Signup() {
         email: formData.email,
         password: formData.password,
         phonenumber: formData.phonenumber,
-        ...(formData.userType === 'customer' && { gender: formData.gender }),
+        ...(formData.userType === 'customer' && { gender: formData.gender , address : formData.address }),
         ...(formData.userType === 'brand' && {
           categories: formData.categories,
           page: formData.page,
@@ -287,23 +288,39 @@ function Signup() {
               </div>
 
               {formData.userType === 'customer' && (
-                <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
-                    Gender
-                  </label>
-                  <select
-                    id="gender"
-                    name="gender"
-                    required
-                    value={formData.gender}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                </div>
+                  <>
+                    <div>
+                      <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
+                        Gender
+                      </label>
+                      <select
+                          id="gender"
+                          name="gender"
+                          required
+                          value={formData.gender}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                        Address
+                      </label>
+                      <textarea
+                          id="address"
+                          name="address"
+                          rows={2}
+                          value={formData.address}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                          placeholder="Enter your address"
+                      />
+                    </div>
+                  </>
               )}
             </div>
 

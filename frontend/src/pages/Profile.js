@@ -21,7 +21,7 @@ function Profile() {
     email: '',
     phonenumber: '',
     gender: '',
-    addresses: []
+    address: ''
   });
 
   useEffect(() => {
@@ -31,13 +31,14 @@ function Profile() {
         email: user.email || '',
         phonenumber: user.phonenumber || '',
         gender: user.gender || '',
-        addresses: user.addresses || []
+        address: user.address || ''
       });
     }
   }, [user]);
 
   useEffect(() => {
     if (userType === 'customer') {
+      console.log(user)
       loadWishlist();
       loadOrders();
     }
@@ -47,7 +48,7 @@ function Profile() {
     try {
       setLoading(true);
         const response = await getWishlist();
-      setWishlist(response.data || []);
+      setWishlist(response.data.data || []);
 
     } catch (error) {
       console.error('Failed to load wishlist:', error);
@@ -91,36 +92,6 @@ function Profile() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const addAddress = () => {
-    setProfileData(prev => ({
-      ...prev,
-      addresses: [...prev.addresses, {
-        label: '',
-        line1: '',
-        city: '',
-        governorate: '',
-        zip: '',
-        isDefault: false
-      }]
-    }));
-  };
-
-  const updateAddress = (index, field, value) => {
-    setProfileData(prev => ({
-      ...prev,
-      addresses: prev.addresses.map((addr, i) =>
-        i === index ? { ...addr, [field]: value } : addr
-      )
-    }));
-  };
-
-  const removeAddress = (index) => {
-    setProfileData(prev => ({
-      ...prev,
-      addresses: prev.addresses.filter((_, i) => i !== index)
-    }));
   };
 
   const getOrderStatusColor = (status) => {
@@ -382,111 +353,34 @@ function Profile() {
             </div>
           )}
 
-          {/* Addresses Tab */}
+          {/* Address Tab */}
           {activeTab === 'addresses' && (
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">My Addresses</h2>
+                <h2 className="text-xl font-semibold">My Address</h2>
                 <button
-                  onClick={addAddress}
-                  className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700"
+                  onClick={updateProfile}
+                  disabled={loading}
+                  className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 disabled:opacity-50"
                 >
-                  Add Address
+                  {loading ? 'Saving...' : 'Save Address'}
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {profileData.addresses.map((address, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Label (e.g., Home, Work)
-                        </label>
-                        <input
-                          type="text"
-                          value={address.label}
-                          onChange={(e) => updateAddress(index, 'label', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Address Line 1
-                        </label>
-                        <input
-                          type="text"
-                          value={address.line1}
-                          onChange={(e) => updateAddress(index, 'line1', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          City
-                        </label>
-                        <input
-                          type="text"
-                          value={address.city}
-                          onChange={(e) => updateAddress(index, 'city', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Governorate
-                        </label>
-                        <input
-                          type="text"
-                          value={address.governorate}
-                          onChange={(e) => updateAddress(index, 'governorate', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          ZIP Code
-                        </label>
-                        <input
-                          type="text"
-                          value={address.zip}
-                          onChange={(e) => updateAddress(index, 'zip', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        />
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={address.isDefault}
-                            onChange={(e) => updateAddress(index, 'isDefault', e.target.checked)}
-                            className="mr-2"
-                          />
-                          <span className="text-sm">Default Address</span>
-                        </label>
-                        <button
-                          onClick={() => removeAddress(index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {profileData.addresses.length > 0 && (
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={updateProfile}
-                    disabled={loading}
-                    className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 disabled:opacity-50"
-                  >
-                    {loading ? 'Saving...' : 'Save Addresses'}
-                  </button>
+              <div className="border border-gray-200 rounded-lg p-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Address
+                  </label>
+                  <textarea
+                    value={profileData.address}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="Enter your complete address..."
+                  />
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>
