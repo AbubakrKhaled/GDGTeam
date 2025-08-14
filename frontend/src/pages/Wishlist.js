@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { mockApiService } from '../services/mockData';
 import { 
   FaHeart, 
   FaShoppingCart, 

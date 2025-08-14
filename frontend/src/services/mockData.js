@@ -479,7 +479,6 @@ class MockDataService {
     if (!customer) throw new Error('Customer not found');
     
     // Get wishlist products
-    const products = this.getData('mockProducts');
     const wishlistProducts = customer.wishlist ? customer.wishlist.map(id => this.getPopulatedProduct(id)).filter(Boolean) : [];
     
     // Get customer orders
@@ -512,7 +511,6 @@ class MockDataService {
     await new Promise(resolve => setTimeout(resolve, 500));
     const users = this.getData('mockUsers');
     const customer = users.find(c => c._id === localStorage.getItem('currentUserId'));
-    const products = this.getData('mockProducts');
     
     const wishlistProducts = customer.wishlist ? customer.wishlist.map(id => this.getPopulatedProduct(id)).filter(Boolean) : [];
     return { data: wishlistProducts };
