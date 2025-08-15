@@ -10,8 +10,7 @@ const Product = require('../models/product');
 const Token = require('../models/token');
 const ErrorResponse = require('../middlewares/errorresponse');
 const mongoose = require('mongoose');
-const Category = require('../models/productoptions')
-const Size = require('../models/productoptions')
+const { Category, Size } = require('../models/productoptions')
 
 // Helper function to set cookie
 const setTokenCookie = (res, token) => {
@@ -44,14 +43,21 @@ const generateToken = async (adminId) => {
 exports.adminLogin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        console.log('Admin login attempt:', { email });
 
-        // 1. Fetch admin user
-        const admin = await Admin.findOne({ email }).select('+password');
-        if (!admin) return next(new ErrorResponse('Invalid credentials', 401));
+        // 1. Fetch admin user from User model (since admin is created there)
+        const admin = await User.findOne({ email, role: 'admin' }).select('+password');
+        if (!admin) {
+            console.log('Admin not found');
+            return next(new ErrorResponse('Invalid credentials', 401));
+        }
 
         // 2. Validate password
         const isMatch = await bcrypt.compare(password, admin.password);
-        if (!isMatch) return next(new ErrorResponse('Invalid credentials', 401));
+        if (!isMatch) {
+            console.log('Password mismatch');
+            return next(new ErrorResponse('Invalid credentials', 401));
+        }
 
         // 3. Generate and save token
         const token = await generateToken(admin._id);
@@ -59,16 +65,19 @@ exports.adminLogin = async (req, res, next) => {
         // 4. Set cookie
         setTokenCookie(res, token);
 
+        console.log('Admin login successful:', admin._id);
         res.status(200).json({
             success: true,
             token,
             user: {
                 id: admin._id,
                 email: admin.email,
-                role: admin.role
+                role: admin.role,
+                name: admin.name
             }
         });
     } catch (err) {
+        console.error('Admin login error:', err);
         next(err);
     }
 };
@@ -312,13 +321,75 @@ exports.deactivateCustomer = async (req, res, next) => {
 /* ---------------------------- Orders ----------------------------- */
 
 exports.addCategory = async (req, res, next) => {
-    const { name } = req.body;
-    const category = await Category.create({ name });
-    res.status(201).json(category);
+    try {
+        const { name } = req.body;
+        console.log('Adding category request:', { name, body: req.body, admin: req.admin });
+        
+        if (!name || !name.trim()) {
+            return next(new ErrorResponse('Category name is required', 400));
+        }
+        
+        const category = await Category.create({ category: name.trim() });
+        console.log('Category created successfully:', category);
+        
+        res.status(201).json({
+            success: true,
+            data: category,
+            message: 'Category added successfully'
+        });
+    } catch (error) {
+        console.error('Error adding category:', error);
+        next(error);
+    }
 }
 
-exports.addSize = async (req, res) => {
-    const { name } = req.body;
-    const size = await Size.create({ name });
-    res.status(201).json(size);
+exports.addSize = async (req, res, next) => {
+    try {
+        const { name } = req.body;
+        console.log('Adding size request:', { name, body: req.body, admin: req.admin });
+        
+        if (!name || !name.trim()) {
+            return next(new ErrorResponse('Size name is required', 400));
+        }
+        
+        const size = await Size.create({ size: name.trim() });
+        console.log('Size created successfully:', size);
+        
+        res.status(201).json({
+            success: true,
+            data: size,
+            message: 'Size added successfully'
+        });
+    } catch (error) {
+        console.error('Error adding size:', error);
+        next(error);
+    }
 }
+
+// Get all categories
+exports.getAllCategories = async (req, res, next) => {
+    try {
+        const categories = await Category.find().sort({ category: 1 });
+        res.status(200).json({
+            success: true,
+            data: categories
+        });
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        next(error);
+    }
+};
+
+// Get all sizes
+exports.getAllSizes = async (req, res, next) => {
+    try {
+        const sizes = await Size.find().sort({ size: 1 });
+        res.status(200).json({
+            success: true,
+            data: sizes
+        });
+    } catch (error) {
+        console.error('Error fetching sizes:', error);
+        next(error);
+    }
+};

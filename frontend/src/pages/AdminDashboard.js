@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { FaUsers, FaStore, FaBox, FaCheck, FaTimes, FaDollarSign } from 'react-icons/fa';
+import { FaUsers, FaStore, FaBox, FaCheck, FaTimes, FaDollarSign, FaPlus } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { adminApi } from '../api/admin';
 
@@ -13,6 +13,16 @@ function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // New state for category and size management
+  const [newCategory, setNewCategory] = useState('');
+  const [newSize, setNewSize] = useState('');
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showSizeModal, setShowSizeModal] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingSizes, setLoadingSizes] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated || userType !== 'admin') {
@@ -21,6 +31,14 @@ function AdminDashboard() {
     }
     loadDashboardData();
   }, [isAuthenticated, userType, navigate]);
+
+  // Fetch categories and sizes when Product Management tab is active
+  useEffect(() => {
+    if (activeTab === 'productManagement') {
+      loadCategories();
+      loadSizes();
+    }
+  }, [activeTab]);
 
   const loadDashboardData = async () => {
     try {
@@ -77,6 +95,87 @@ function AdminDashboard() {
         console.error('Failed to delete brand:', error);
         toast.error('Failed to delete brand');
       }
+    }
+  };
+
+  // New functions for category and size management
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) {
+      toast.error('Please enter a category name');
+      return;
+    }
+    
+    try {
+      console.log('Adding category:', newCategory.trim());
+      const response = await adminApi.addCategory(newCategory.trim());
+      console.log('Category response:', response);
+      setNewCategory('');
+      setShowCategoryModal(false);
+      toast.success('Category added successfully!');
+      // Reload categories after adding
+      loadCategories();
+    } catch (error) {
+      console.error('Failed to add category:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        toast.error(`Failed to add category: ${error.response.data.message || 'Unknown error'}`);
+      } else {
+        toast.error('Failed to add category');
+      }
+    }
+  };
+
+  const handleAddSize = async () => {
+    if (!newSize.trim()) {
+      toast.error('Please enter a size name');
+      return;
+    }
+    
+    try {
+      console.log('Adding size:', newSize.trim());
+      const response = await adminApi.addSize(newSize.trim());
+      console.log('Size response:', response);
+      setNewSize('');
+      setShowSizeModal(false);
+      toast.success('Size added successfully!');
+      // Reload sizes after adding
+      loadSizes();
+    } catch (error) {
+      console.error('Failed to add size:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        toast.error(`Failed to add size: ${error.response.data.message || 'Unknown error'}`);
+      } else {
+        toast.error('Failed to add size');
+      }
+    }
+  };
+
+  // Load categories from database
+  const loadCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const response = await adminApi.getAllCategories();
+      setCategories(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+      toast.error('Failed to load categories');
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  // Load sizes from database
+  const loadSizes = async () => {
+    try {
+      setLoadingSizes(true);
+      const response = await adminApi.getAllSizes();
+      setSizes(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to load sizes:', error);
+      toast.error('Failed to load sizes');
+    } finally {
+      setLoadingSizes(false);
     }
   };
 
@@ -157,6 +256,16 @@ function AdminDashboard() {
               }`}
             >
               Orders
+            </button>
+            <button
+              onClick={() => setActiveTab('productManagement')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'productManagement'
+                  ? 'border-pink-500 text-pink-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Product Management
             </button>
           </nav>
         </div>
@@ -457,6 +566,207 @@ function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* Product Management Tab */}
+        {activeTab === 'productManagement' && (
+          <div className="space-y-6">
+            {/* Category Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Category Management</h3>
+                <button
+                  onClick={() => setShowCategoryModal(true)}
+                  className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 flex items-center space-x-2"
+                >
+                  <FaPlus className="w-4 h-4" />
+                  <span>Add Category</span>
+                </button>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Add new product categories that brands can use when creating products.
+              </p>
+              {loadingCategories ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading categories...</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Category
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                                         <tbody className="bg-white divide-y divide-gray-200">
+                       {categories.length === 0 ? (
+                         <tr>
+                           <td colSpan="2" className="px-6 py-4 text-center text-sm text-gray-500">
+                             No categories found
+                           </td>
+                         </tr>
+                       ) : (
+                         categories.map((category) => (
+                           <tr key={category._id}>
+                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{category.category}</td>
+                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                               <button
+                                 onClick={() => {
+                                   // Implement delete category logic here
+                                   toast.error('Delete category functionality not yet implemented.');
+                                 }}
+                                 className="text-red-600 hover:text-red-900"
+                               >
+                                 <FaTimes className="w-4 h-4" />
+                               </button>
+                             </td>
+                           </tr>
+                         ))
+                       )}
+                     </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Size Management */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Size Management</h3>
+                <button
+                  onClick={() => setShowSizeModal(true)}
+                  className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 flex items-center space-x-2"
+                >
+                  <FaPlus className="w-4 h-4" />
+                  <span>Add Size</span>
+                </button>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Add new product sizes that brands can use when creating products.
+              </p>
+              {loadingSizes ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading sizes...</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Size
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                                         <tbody className="bg-white divide-y divide-gray-200">
+                       {sizes.length === 0 ? (
+                         <tr>
+                           <td colSpan="2" className="px-6 py-4 text-center text-sm text-gray-500">
+                             No sizes found
+                           </td>
+                         </tr>
+                       ) : (
+                         sizes.map((size) => (
+                           <tr key={size._id}>
+                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{size.size}</td>
+                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                               <button
+                                 onClick={() => {
+                                   // Implement delete size logic here
+                                   toast.error('Delete size functionality not yet implemented.');
+                                 }}
+                                 className="text-red-600 hover:text-red-900"
+                               >
+                                 <FaTimes className="w-4 h-4" />
+                               </button>
+                             </td>
+                           </tr>
+                         ))
+                       )}
+                     </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Category Modal */}
+        {showCategoryModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-96">
+              <h3 className="text-lg font-semibold mb-4">Add New Category</h3>
+              <input
+                type="text"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                placeholder="Enter category name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 mb-4"
+                onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()}
+              />
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleAddCategory}
+                  className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+                >
+                  Add Category
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCategoryModal(false);
+                    setNewCategory('');
+                  }}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Size Modal */}
+        {showSizeModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-96">
+              <h3 className="text-lg font-semibold mb-4">Add New Size</h3>
+              <input
+                type="text"
+                value={newSize}
+                onChange={(e) => setNewSize(e.target.value)}
+                placeholder="Enter size name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 mb-4"
+                onKeyPress={(e) => e.key === 'Enter' && handleAddSize()}
+              />
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleAddSize}
+                  className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+                >
+                  Add Size
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSizeModal(false);
+                    setNewSize('');
+                  }}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         )}

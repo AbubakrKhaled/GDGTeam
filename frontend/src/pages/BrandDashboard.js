@@ -26,6 +26,8 @@ function BrandDashboard() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingSizes, setLoadingSizes] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showEditProduct, setShowEditProduct] = useState(null);
   const [productForm, setProductForm] = useState({
@@ -47,12 +49,34 @@ function BrandDashboard() {
 
     const fetchData = async () => {
       try {
-        const { data: categories } = await brandApi.productcategories();
-        const { data: sizes } = await brandApi.productsizes();
-        setCategories(categories);
-        setSizes(sizes);
+        setLoadingCategories(true);
+        setLoadingSizes(true);
+        
+        console.log('Fetching categories and sizes...');
+        
+        const [categoriesRes, sizesRes] = await Promise.all([
+          brandApi.productcategories(),
+          brandApi.productsizes()
+        ]);
+        
+        console.log('Categories response:', categoriesRes);
+        console.log('Sizes response:', sizesRes);
+        
+        // Extract the data array from the response
+        const categoriesData = categoriesRes.data?.data || categoriesRes.data || [];
+        const sizesData = sizesRes.data?.data || sizesRes.data || [];
+        
+        setCategories(categoriesData);
+        setSizes(sizesData);
+        
+        console.log('Categories set:', categoriesData);
+        console.log('Sizes set:', sizesData);
       } catch (err) {
         console.error('Error fetching categories/sizes:', err);
+        toast.error('Failed to load categories and sizes');
+      } finally {
+        setLoadingCategories(false);
+        setLoadingSizes(false);
       }
     };
     fetchData();
@@ -73,10 +97,17 @@ function BrandDashboard() {
         brandApi.getAllProducts(), // Fetch products from backend
         brandApi.getAllOrders()     // Fetch orders from backend
       ]);
-      console.log('Products:', productsRes.data);
-        console.log('Orders:', ordersRes.data);
-      setProducts(productsRes.data.data || []);
-      setOrders(ordersRes.data || []);
+      console.log('Products response:', productsRes);
+      console.log('Orders response:', ordersRes);
+      
+      const productsData = productsRes.data?.data || productsRes.data || [];
+      const ordersData = ordersRes.data || [];
+      
+      console.log('Products data to set:', productsData);
+      console.log('Orders data to set:', ordersData);
+      
+      setProducts(productsData);
+      setOrders(ordersData);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
@@ -88,8 +119,12 @@ function BrandDashboard() {
     e.preventDefault();
     try {
       setLoading(true);
-      await brandApi.createProduct(productForm); // Create product in backend
-      setShowAddProduct(false);
+      const response = await brandApi.createProduct(productForm);
+      console.log('Product created successfully:', response);
+      
+      toast.success('Product added successfully!');
+      
+      // Reset form
       setProductForm({
         productname: '',
         price: '',
@@ -103,9 +138,15 @@ function BrandDashboard() {
         isDiscountValid: '',
         reviews: ''
       });
+      
+      // Close modal
+      setShowAddProduct(false);
+      
+      // Refresh data
       await loadDashboardData();
     } catch (error) {
       console.error('Failed to add product:', error);
+      toast.error(error.response?.data?.message || 'Failed to add product');
     } finally {
       setLoading(false);
     }
@@ -375,10 +416,42 @@ const handleDeleteProduct = async (productId) => {
                         />
                         <h3 className="font-semibold text-lg mb-2">{product.productname}</h3>
                         <p className="text-gray-600 text-sm mb-2">{product.description}</p>
-                        <div className="flex justify-between items-center mb-3">
-                          <span className="text-pink-600 font-bold">${product.price}</span>
-                          <span className="text-gray-500">Qty: {product.quantity}</span>
+                        
+                        {/* Product Details */}
+                        <div className="space-y-2 mb-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-pink-600 font-bold">${product.price}</span>
+                            <span className="text-gray-500">Qty: {product.quantity}</span>
+                          </div>
+                          
+                          {/* Category and Size */}
+                          <div className="flex flex-wrap gap-2">
+                            {product.category && (
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                                {product.category}
+                              </span>
+                            )}
+                            {product.size && (
+                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                                {product.size}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Color Display */}
+                          {product.color && (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-gray-600">Color:</span>
+                              <div 
+                                className="w-4 h-4 rounded-full border border-gray-300"
+                                style={{ backgroundColor: product.color }}
+                                title={product.color}
+                              ></div>
+                              <span className="text-xs text-gray-500">{product.color}</span>
+                            </div>
+                          )}
                         </div>
+                        
                         <div className="flex space-x-2">
                           <button
                             onClick={() => openEditProduct(product)}
@@ -568,7 +641,7 @@ const handleDeleteProduct = async (productId) => {
         {/* Add Product Modal */}
         {showAddProduct && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold mb-4">Add New Product</h3>
               <form onSubmit={handleAddProduct} className="space-y-4">
                 <div>
@@ -606,6 +679,75 @@ const handleDeleteProduct = async (productId) => {
                     />
                   </div>
                 </div>
+                
+                {/* Category Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <select
+                    value={productForm.category}
+                    onChange={(e) => setProductForm(prev => ({ ...prev, category: e.target.value }))}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="">Select a category</option>
+                    {loadingCategories ? (
+                      <option value="">Loading categories...</option>
+                    ) : (!Array.isArray(categories) || categories.length === 0) ? (
+                      <option value="">No categories available</option>
+                    ) : (
+                      categories.map((category) => (
+                        <option key={category._id} value={category.category}>
+                          {category.category}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Size Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Size</label>
+                  <select
+                    value={productForm.size}
+                    onChange={(e) => setProductForm(prev => ({ ...prev, size: e.target.value }))}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="">Select a size</option>
+                    {loadingSizes ? (
+                      <option value="">Loading sizes...</option>
+                    ) : (!Array.isArray(sizes) || sizes.length === 0) ? (
+                      <option value="">No sizes available</option>
+                    ) : (
+                      sizes.map((size) => (
+                        <option key={size._id} value={size.size}>
+                          {size.size}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Color Picker */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="color"
+                      value={productForm.color}
+                      onChange={(e) => setProductForm(prev => ({ ...prev, color: e.target.value }))}
+                      className="w-12 h-10 border border-gray-300 rounded-md cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={productForm.color}
+                      onChange={(e) => setProductForm(prev => ({ ...prev, color: e.target.value }))}
+                      placeholder="#000000"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                   <textarea
@@ -648,7 +790,7 @@ const handleDeleteProduct = async (productId) => {
         {/* Edit Product Modal */}
         {showEditProduct && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold mb-4">Edit Product</h3>
               <form onSubmit={handleEditProduct} className="space-y-4">
                 <div>
@@ -686,6 +828,75 @@ const handleDeleteProduct = async (productId) => {
                     />
                   </div>
                 </div>
+                
+                {/* Category Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <select
+                    value={productForm.category}
+                    onChange={(e) => setProductForm(prev => ({ ...prev, category: e.target.value }))}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="">Select a category</option>
+                    {loadingCategories ? (
+                      <option value="">Loading categories...</option>
+                    ) : (!Array.isArray(categories) || categories.length === 0) ? (
+                      <option value="">No categories available</option>
+                    ) : (
+                      categories.map((category) => (
+                        <option key={category._id} value={category.category}>
+                          {category.category}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Size Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Size</label>
+                  <select
+                    value={productForm.size}
+                    onChange={(e) => setProductForm(prev => ({ ...prev, size: e.target.value }))}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="">Select a size</option>
+                    {loadingSizes ? (
+                      <option value="">Loading sizes...</option>
+                    ) : (!Array.isArray(sizes) || sizes.length === 0) ? (
+                      <option value="">No sizes available</option>
+                    ) : (
+                      sizes.map((size) => (
+                        <option key={size._id} value={size.size}>
+                          {size.size}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Color Picker */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="color"
+                      value={productForm.color}
+                      onChange={(e) => setProductForm(prev => ({ ...prev, color: e.target.value }))}
+                      className="w-12 h-10 border border-gray-300 rounded-md cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={productForm.color}
+                      onChange={(e) => setProductForm(prev => ({ ...prev, color: e.target.value }))}
+                      placeholder="#000000"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                   <textarea

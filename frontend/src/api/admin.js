@@ -147,11 +147,19 @@ export const deactivateProduct = async (id) => {
 };
 
 export const addCategory = async (name) => {
-  return await axios.post(`${API_BASE_URL}/addCategory`, { name }, authHeader());
+  return await axios.post(`${API_BASE_URL}/admin/addCategory`, { name }, authHeader());
 };
 
 export const addSize = async (name) => {
-  return await axios.post(`${API_BASE_URL}/addSize`, { name }, authHeader());
+  return await axios.post(`${API_BASE_URL}/admin/addSize`, { name }, authHeader());
+};
+
+export const getAllCategories = async () => {
+  return await axios.get(`${API_BASE_URL}/admin/categories`, authHeader());
+};
+
+export const getAllSizes = async () => {
+  return await axios.get(`${API_BASE_URL}/admin/sizes`, authHeader());
 };
 
 
@@ -179,7 +187,9 @@ const adminApi = {
   deactivateProduct,
 
   addCategory,
-  addSize
+  addSize,
+  getAllCategories,
+  getAllSizes
 };
 
 export {adminApi};

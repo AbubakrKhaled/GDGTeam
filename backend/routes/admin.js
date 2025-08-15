@@ -18,7 +18,9 @@ const {
     deactivateCustomer,
     getAdminDashboard,
     addCategory,
-    addSize
+    addSize,
+    getAllCategories,
+    getAllSizes
 
 } = require('../controllers/admin.js');
 const { adminAuth } = require('../middlewares/auth.js');
@@ -62,5 +64,9 @@ router.put('/products/:id/deactivate', adminAuth, productController.deactivatePr
 router.post('/addCategory', adminAuth, addCategory);
 
 router.post('/addSize', adminAuth, addSize );
+
+router.get('/categories', adminAuth, getAllCategories);
+
+router.get('/sizes', adminAuth, getAllSizes);
 
 module.exports = router;

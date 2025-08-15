@@ -32,8 +32,7 @@ const productSchema = new Schema({
         default: ''
     },
     category: {
-        type: Types.ObjectId,
-        ref: 'category',
+        type: String,
         required: true
     },
     color: {
@@ -41,8 +40,7 @@ const productSchema = new Schema({
         required: true,
     },
     size: {
-        type: Types.ObjectId,
-        ref: 'size',
+        type: String,
         required: false
     },// dont refrence (amount ,is valid)
     discountAmount: { 

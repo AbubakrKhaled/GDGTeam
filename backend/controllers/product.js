@@ -19,9 +19,9 @@ exports.createProduct = async (req, res,next) => {
 
         const product = await Product.create({
             productname, price, quantity, imageURL, description, reviews: 0, discountAmount, isDiscountValid,
-            category: Types.ObjectId(category),
-            color: Types.ObjectId(color),
-            size: Types.ObjectId(size),
+            category,
+            color,
+            size,
             brand: req.brand.id
         });
 
@@ -45,9 +45,9 @@ exports.updateProduct = async (req, res, next) => {
     try{
         const product = await Product.findByIdAndUpdate(id, {
             productname, price, quantity, imageURL, description, discountAmount, isDiscountValid,
-            category: Types.ObjectId(category),
-            color: Types.ObjectId(color),
-            size: Types.ObjectId(size),
+            category,
+            color,
+            size,
         }, {new: true});
 
         if (!product) {
@@ -68,6 +68,11 @@ exports.getAllProducts = async (req, res, next) => {
         
         let filter = { isActive: true };
         
+        // Filter by brand if the request is from a brand
+        if (req.brand) {
+            filter.brand = req.brand.id;
+        }
+        
         // Apply category filter
         if (category) {
             filter.category = category;
@@ -83,9 +88,6 @@ exports.getAllProducts = async (req, res, next) => {
 
         const products = await Product.find(filter)
             .populate('brand', 'name')
-            .populate('category', 'category')
-            .populate('color', 'color')
-            .populate('size', 'size')
             .populate('reviews', 'rating count')
             .lean();
 
@@ -116,9 +118,9 @@ exports.getAllProducts = async (req, res, next) => {
             quantity: product.quantity,
             imageURL: Array.isArray(product.imageURL) ? product.imageURL[0] : product.imageURL,
             description: product.description,
-            category: product.category?.category || 'Unknown',
-            color: product.color?.color || 'Unknown',
-            size: product.size?.size || 'Unknown',
+            category: product.category || 'Unknown',
+            color: product.color || 'Unknown',
+            size: product.size || 'Unknown',
             brand: product.brand,
             reviews: {
                 rating: product.reviews?.rating || 0,
@@ -144,9 +146,6 @@ exports.getProductById = async (req, res, next) => {
     try {
         const product = await Product.findById(id)
             .populate('brand', 'name')
-            .populate('category', 'category')
-            .populate('color', 'color')
-            .populate('size', 'size')
             .populate('reviews', 'rating count')
             .lean();
 
