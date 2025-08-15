@@ -20,6 +20,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
 import ErrorBoundary from './components/ErrorBoundary';
+import Orders from './pages/Orders';
 import { useEffect } from 'react';
 
 function AppContent() {
@@ -46,6 +47,7 @@ function AppContent() {
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<BrandDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
