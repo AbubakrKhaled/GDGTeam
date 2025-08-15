@@ -41,7 +41,7 @@ const app = express();
 
 // CORS middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // url of frontend env file
+  res.header('Access-Control-Allow-Origin', '*'); // url of frontend env file
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', true);
@@ -55,7 +55,12 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(cookieParser()); // Add this line AFTER express.json()
-
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  next();
+});
 app.use('/api/admin', adminRoutes);
 app.use('/api/brand', brandRoutes); 
 app.use('/api/customer', customerRoutes);
