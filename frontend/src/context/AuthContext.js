@@ -1,5 +1,4 @@
-//import apiService from '../services/api';
-import React, {createContext, useContext, useState, useEffect, useCallback} from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { brandApi } from '../api/brand';
 import { adminApi } from '../api/admin';
 import { customerApi } from '../api/customer';
@@ -17,17 +16,30 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userType, setUserType] = useState(null); // 'customer', 'brand', 'admin'
+  const [userType, setUserType] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Logout function memoized so it doesn't change every render
-  const logout = useCallback(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userType');
-    localStorage.removeItem('currentUserId');
-    setUser(null);
-    setUserType(null);
-    setLoading(false);
-  }, []);
+  const logout = useCallback(async () => {
+    try {
+      // Call appropriate logout API based on user type
+      if (userType === 'admin') {
+        await adminApi.adminLogout();
+      } else if (userType === 'brand') {
+        await brandApi.brandLogout();
+      } else if (userType === 'customer') {
+        await customerApi.customerLogout();
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userType');
+      localStorage.removeItem('currentUserId');
+      setUser(null);
+      setUserType(null);
+      setLoading(false);
+    }
+  }, [userType]);
 
   // Fetch profile memoized with stable logout
   const fetchUserProfile = useCallback(
@@ -75,7 +87,6 @@ export const AuthProvider = ({ children }) => {
     [logout]
   );
 
-  // On mount, check if logged in and fetch profile
   useEffect(() => {
     const token = localStorage.getItem('token');
     const currentUserId = localStorage.getItem('currentUserId');
@@ -90,9 +101,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, [fetchUserProfile]);
 
-  // Login method
   const login = async (email, password, type) => {
     try {
+      setLoading(true);
+      setError(null);
+      
       let response;
       switch (type) {
         case 'customer':
@@ -108,12 +121,13 @@ export const AuthProvider = ({ children }) => {
           throw new Error('Invalid user type');
       }
 
-      const { token, user } = response.data || response;
+      const { token, user: userData } = response.data;
 
       localStorage.setItem('token', token);
       localStorage.setItem('userType', type);
-      localStorage.setItem('currentUserId', user.id);
+      localStorage.setItem('currentUserId', userData.id);
 
+      setUser(userData);
       setUserType(type);
       //setUser(user);
       // Only setUser once, and if you want full profile, fetch it after login
@@ -125,18 +139,23 @@ export const AuthProvider = ({ children }) => {
           setUser(user); // fallback to minimal user if profile fetch fails
         }
       } else {
-        setUser(user);
-      }
-
+        }
+      
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      const errorMsg = error.response?.data?.message || 'Login failed';
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Signup method
   const signup = async (data, type) => {
     try {
+      setLoading(true);
+      setError(null);
+      
       let response;
       switch (type) {
         case 'customer':
@@ -148,9 +167,23 @@ export const AuthProvider = ({ children }) => {
         default:
           throw new Error('Invalid user type');
       }
+
+      // Auto-login after signup
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userType', type);
+        localStorage.setItem('currentUserId', response.data.user.id);
+        setUser(response.data.user);
+        setUserType(type);
+      }
+      
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, error: error.message };
+      const errorMsg = error.response?.data?.message || 'Signup failed';
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -158,11 +191,12 @@ export const AuthProvider = ({ children }) => {
     user,
     userType,
     loading,
+    error,
     login,
     signup,
     logout,
     fetchUserProfile,
-    isAuthenticated: !!user
+    isAuthenticated: !!user && !!userType
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

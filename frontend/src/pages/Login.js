@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaUser, FaStore, FaShieldAlt } from 'react-icons/fa';
 
 function Login() {
-  const { login } = useAuth();
+  const { login, userType, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -15,6 +15,25 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const redirectBasedOnUserType = useCallback(() => {
+    switch (userType) {
+      case 'brand':
+        navigate('/dashboard');
+        break;
+      case 'admin':
+        navigate('/admin/dashboard');
+        break;
+      default:
+        navigate('/');
+    }
+  }, [userType, navigate]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      redirectBasedOnUserType();
+    }
+  }, [isAuthenticated, userType, redirectBasedOnUserType]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -24,22 +43,13 @@ function Login() {
       const result = await login(formData.email, formData.password, formData.userType);
       
       if (result.success) {
-        // Redirect based on user type
-        switch (formData.userType) {
-          case 'brand':
-            navigate('/dashboard');
-            break;
-          case 'admin':
-            navigate('/admin');
-            break;
-          default:
-            navigate('/');
-        }
+        redirectBasedOnUserType();
       } else {
-        setError(result.error || 'Login failed');
+        setError(result.error || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
-      setError('An error occurred during login');
+      console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -58,6 +68,17 @@ function Login() {
     { value: 'admin', label: 'Admin', icon: FaShieldAlt, description: 'Platform management' }
   ];
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      setFormData(prev => ({
+        ...prev,
+        email: 'admin@example.com',
+        password: 'supersecurepassword',
+        userType: 'admin'
+      }));
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -69,7 +90,6 @@ function Login() {
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
-          {/* User Type Selection */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">
               I am a:
@@ -115,7 +135,6 @@ function Login() {
             </div>
           </div>
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
@@ -177,15 +196,14 @@ function Login() {
                 </label>
               </div>
               <div className="text-sm">
-                <a
-                  href="/forgot-password"
+                <Link
+                  to="/forgot-password"
                   className="font-medium text-pink-600 hover:text-pink-500"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
-
 
             <button
               type="submit"
@@ -209,7 +227,7 @@ function Login() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">New to BrandHub?</span>
+                <span className="px-2 bg-white text-gray-500">New to our platform?</span>
               </div>
             </div>
 
@@ -224,13 +242,12 @@ function Login() {
           </div>
         </div>
 
-        {/* Security Notice */}
         <div className="text-center">
           <p className="text-xs text-gray-500">
             By signing in, you agree to our{' '}
-            <a href="/terms" className="text-pink-600 hover:text-pink-500">Terms of Service</a>
+            <Link to="/terms" className="text-pink-600 hover:text-pink-500">Terms of Service</Link>
             {' '}and{' '}
-            <a href="/privacy" className="text-pink-600 hover:text-pink-500">Privacy Policy</a>
+            <Link to="/privacy" className="text-pink-600 hover:text-pink-500">Privacy Policy</Link>
           </p>
         </div>
       </div>
