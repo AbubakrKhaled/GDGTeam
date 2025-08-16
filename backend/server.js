@@ -8,19 +8,19 @@ const errorHandler = require('./middlewares/errorhandle.js');
 const User = require('./models/User');
 
 async function createAdmin() {
-    const existingAdmin = await User.findOne({ role: 'admin', email: 'admin@example.com' });
+    const existingAdmin = await User.findOne({ role: 'admin', email: 'admin2@example.com' });
     if (!existingAdmin) {
-        const hashedPassword = await bcrypt.hash('supersecurepassword', 10);
+        const hashedPassword = await bcrypt.hash('admin2pass', 10);
         await User.create({
             name: 'admin',
-            email: 'admin@example.com',
+            email: 'admin2@example.com',
             password: hashedPassword,
-            phonenumber: 1234567890,
+            phonenumber: 10203040,
             role: 'admin'
         });
         console.log('Admin account created.');
     } else {
-        console.log('ℹAdmin already exists.');
+        console.log('Admin already exists.');
     }
 }
 //-------------------------------------------

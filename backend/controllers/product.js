@@ -8,8 +8,10 @@ exports.createProduct = async (req, res,next) => {
     return next(new ErrorResponse('Not authorized as customer', 403));
     }
     try{
+        // console.log('Product create request body:', req.body);
+        // console.log('Brand in request:', req.brand);
         const {
-            productname, price, quantity, imageURL, description, category, color, size, discountAmount, isDiscountValid
+            productname, price, quantity, imageURL, description, category, color, size, /*discountAmount, isDiscountValid*/
         } = req.body;
         const reviews = 0;
 
@@ -18,7 +20,7 @@ exports.createProduct = async (req, res,next) => {
         if (existingProduct) {return next(new ErrorResponse('Product already exists', 400));}
 
         const product = await Product.create({
-            productname, price, quantity, imageURL, description, reviews: 0, discountAmount, isDiscountValid,
+            productname, price, quantity, imageURL, description, /*reviews: 0, discountAmount, isDiscountValid,*/
             category,
             color,
             size,
@@ -27,6 +29,7 @@ exports.createProduct = async (req, res,next) => {
 
         res.status(201).json({success: true, data: product});
     }catch(err){
+        console.error('Product creation error:', err);
         next(err);
     }
 }
@@ -40,11 +43,11 @@ exports.updateProduct = async (req, res, next) => {
         return next(new ErrorResponse('Invalid ID', 400));
     
     const {
-            productname, price, quantity, imageURL, description, category, color, size, discountAmount, isDiscountValid
+            productname, price, quantity, imageURL, description, category, color, size, /*discountAmount, isDiscountValid*/
         } = req.body;
     try{
         const product = await Product.findByIdAndUpdate(id, {
-            productname, price, quantity, imageURL, description, discountAmount, isDiscountValid,
+            productname, price, quantity, imageURL, description, /*discountAmount, isDiscountValid,*/
             category,
             color,
             size,

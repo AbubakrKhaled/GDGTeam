@@ -20,11 +20,9 @@ const productSchema = new Schema({
         required: true,
         default: 0
     },
-    // Handle both single image and multiple images
     imageURL: {
-        type: [String],
-        required: false,
-        default: []
+        type: String,
+        required: true
     },
     description: {
         type: String,
@@ -46,11 +44,13 @@ const productSchema = new Schema({
     discountAmount: { 
         type: Number, 
         default: 0, 
-        min: 0 
+        min: 0,
+        required: false
     },
     isDiscountValid: { 
         type: Boolean, 
-        default: false 
+        default: false,
+        required: false
     },
     reviews: {
         type: Types.ObjectId,

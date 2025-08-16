@@ -39,9 +39,9 @@ function BrandDashboard() {
     category: '',
     color: '#000000',
     size: '',
-    discountAmount: '',
-    isDiscountValid: '',
-    reviews: ''
+    //discountAmount: '',
+    //isDiscountValid: '',
+    //reviews: ''
   });
 
   useEffect(() => {
@@ -83,12 +83,19 @@ function BrandDashboard() {
   }, [showAddProduct, showEditProduct]);
 
   useEffect(() => {
-    if (userType !== 'brand') {
+    // Only redirect if user is truly unauthenticated (no token or userType)
+    const token = localStorage.getItem('token');
+    const userType = localStorage.getItem('userType');
+    if (!token || !userType) {
       navigate('/login');
       return;
     }
+    if (!user) {
+      // Show loading spinner or nothing, but don't redirect
+      return;
+    }
     loadDashboardData();
-  }, [userType, navigate]);
+  }, [userType, user, navigate]);
 
   const loadDashboardData = async () => {
     try {
@@ -119,11 +126,28 @@ function BrandDashboard() {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await brandApi.createProduct(productForm);
+      // Build payload with only required fields
+      const payload = {
+        productname: productForm.productname,
+        price: productForm.price,
+        quantity: productForm.quantity,
+        imageURL: productForm.imageURL, // send as string
+        description: productForm.description,
+        category: productForm.category,
+        color: productForm.color,
+        size: productForm.size
+      };
+      // Validate required fields
+      for (const key in payload) {
+        if (!payload[key]) {
+          toast.error(`Missing required field: ${key}`);
+          setLoading(false);
+          return;
+        }
+      }
+      const response = await brandApi.createProduct(payload);
       console.log('Product created successfully:', response);
-      
       toast.success('Product added successfully!');
-      
       // Reset form
       setProductForm({
         productname: '',
@@ -133,15 +157,10 @@ function BrandDashboard() {
         imageURL: '',
         category: '',
         color: '#000000',
-        size: '',
-        discountAmount: '',
-        isDiscountValid: '',
-        reviews: ''
+        size: ''
       });
-      
       // Close modal
       setShowAddProduct(false);
-      
       // Refresh data
       await loadDashboardData();
     } catch (error) {
@@ -155,10 +174,28 @@ function BrandDashboard() {
   const handleEditProduct = async (e) => {
     e.preventDefault();
     if (!showEditProduct || !showEditProduct._id) return;
-    
     try {
       setLoading(true);
-      await brandApi.updateProduct(showEditProduct._id, productForm); // Update product in backend
+      // Build payload with only required fields
+      const payload = {
+        productname: productForm.productname,
+        price: productForm.price,
+        quantity: productForm.quantity,
+        imageURL: productForm.imageURL,
+        description: productForm.description,
+        category: productForm.category,
+        color: productForm.color,
+        size: productForm.size
+      };
+      // Validate required fields
+      for (const key in payload) {
+        if (!payload[key]) {
+          toast.error(`Missing required field: ${key}`);
+          setLoading(false);
+          return;
+        }
+      }
+      await brandApi.updateProduct(showEditProduct._id, payload);
       setShowEditProduct(null);
       setProductForm({
         productname: '',
@@ -169,13 +206,14 @@ function BrandDashboard() {
         category: '',
         color: '#000000',
         size: '',
-        discountAmount: '',
-        isDiscountValid: '',
-        reviews: ''
+        //discountAmount: '',
+        //isDiscountValid: '',
+        //reviews: ''
       });
       await loadDashboardData();
     } catch (error) {
       console.error('Failed to update product:', error);
+      toast.error(error.response?.data?.message || 'Failed to update product');
     } finally {
       setLoading(false);
     }
@@ -939,10 +977,5 @@ const handleDeleteProduct = async (productId) => {
     </>
   );
 }
-
-// export default BrandDashboard;
-//     </div>
-//   );
-// }
 
 export default BrandDashboard;

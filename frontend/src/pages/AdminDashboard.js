@@ -25,12 +25,19 @@ function AdminDashboard() {
   const [loadingSizes, setLoadingSizes] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated || userType !== 'admin') {
+    // Only redirect if user is truly unauthenticated (no token or userType)
+    const token = localStorage.getItem('token');
+    const userType = localStorage.getItem('userType');
+    if (!token || !userType) {
       navigate('/login');
       return;
     }
+    if (!user) {
+      // Show loading spinner or nothing, but don't redirect
+      return;
+    }
     loadDashboardData();
-  }, [isAuthenticated, userType, navigate]);
+  }, [userType, user, navigate]);
 
   // Fetch categories and sizes when Product Management tab is active
   useEffect(() => {

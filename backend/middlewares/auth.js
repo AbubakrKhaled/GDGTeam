@@ -5,7 +5,7 @@ const authByRole = (role) => {
     return async (req, res, next) => {
         // Check for token in cookies first, then headers
         const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-        console.log("token",token)
+        //console.log("token",token)
         if (!token) return res.status(401).json({ message: 'No token provided' });
 
         try {

@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
 
   // Fetch profile memoized with stable logout
   const fetchUserProfile = useCallback(
-    async (type) => {
+    async (type, userId) => {
       try {
         let profile;
         switch (type) {
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
             profile = await customerApi.getCustomerProfile();
             break;
           case 'brand':
-            profile = await brandApi.getBrandProfile();
+            profile = await brandApi.getBrandProfile(userId);
             break;
           case 'admin':
             profile = await adminApi.getAdminDashboard();
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
           default:
             throw new Error('Invalid user type');
         }
-        setUser(profile.data.data || profile);
+        setUser(profile.data.data.brand || profile.data.data || profile);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch user profile:', error);
@@ -78,12 +78,14 @@ export const AuthProvider = ({ children }) => {
   // On mount, check if logged in and fetch profile
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const currentUserId = localStorage.getItem('currentUserId');
     const storedUserType = localStorage.getItem('userType');
-
-    if (token && storedUserType) {
+    if (token && storedUserType && currentUserId) {
       setUserType(storedUserType);
-      fetchUserProfile(storedUserType);
+      fetchUserProfile(storedUserType, currentUserId);
     } else {
+      setUser(null); //added
+      setUserType(null); //added
       setLoading(false);
     }
   }, [fetchUserProfile]);
@@ -113,7 +115,18 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('currentUserId', user.id);
 
       setUserType(type);
-      setUser(user);
+      //setUser(user);
+      // Only setUser once, and if you want full profile, fetch it after login
+      if (type === 'brand' && user.id) {
+        try {
+          const profileRes = await brandApi.getBrandProfile(user.id);
+          setUser(profileRes.data.data.brand || profileRes.data.data || user);
+        } catch (err) {
+          setUser(user); // fallback to minimal user if profile fetch fails
+        }
+      } else {
+        setUser(user);
+      }
 
       return { success: true };
     } catch (error) {

@@ -42,7 +42,7 @@ function Profile() {
       loadWishlist();
       loadOrders();
     }
-  }, [userType]);
+  }, [userType, user]);
 
   const loadWishlist = async () => {
     try {
