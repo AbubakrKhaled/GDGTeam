@@ -71,10 +71,11 @@ function Cart() {
           price: item.product.price
         })),
         total: getCartTotal(),
-        shippingAddress: checkoutData.shippingAddress,
+        deliveryAddress: checkoutData.shippingAddress,
         paymentMethod: checkoutData.paymentMethod,
         notes: checkoutData.notes
       };
+
 
       await cartApi.createOrder(orderData);
       clearCart();

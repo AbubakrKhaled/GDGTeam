@@ -152,14 +152,8 @@ exports.getProductById = async (req, res, next) => {
             .populate('reviews', 'rating count')
             .lean();
 
-        if (req.admin) {
-            return res.status(200).json({ success: true, data: product });
-        }else if (req.brand && product.brand._id.toString() !== req.brand.id && product.isActive === false) {
-            return next(new ErrorResponse('Not your product', 403));
-        }else if (req.brand && product.brand._id.toString() === req.brand.id) {
-            return res.status(200).json({ success: true, data: product });
-        }
-              
+
+
         if (!product || !product.isActive) {
             return next(new ErrorResponse('Product not found', 404));
         }

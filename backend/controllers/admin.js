@@ -25,7 +25,7 @@ const setTokenCookie = (res, token) => {
 // Helper function to generate and save token
 const generateToken = async (adminId) => {
     const token = jwt.sign(
-        { id: adminId, role: 'admin' },
+        { id: adminId, role: 'admin'},
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
     );

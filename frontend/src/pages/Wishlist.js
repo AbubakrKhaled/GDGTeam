@@ -33,8 +33,8 @@ function Wishlist() {
       setLoading(true);
       //const response = await mockApiService.getCustomerWishlist();
       const response = await cartApi.getWishlist();
-      console.log(response)
-      setWishlist(response.data.data || []);
+      console.log(response.data)
+      setWishlist(response.data.wishlist || []);
     } catch (error) {
       console.error('Failed to load wishlist:', error);
     } finally {

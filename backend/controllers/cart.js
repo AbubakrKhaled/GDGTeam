@@ -14,7 +14,7 @@ exports.getWishlist = async (req, res, next) => {
             return res.status(404).json({ message: 'Wishlist not found.' });
         }
         if(user.wishlist.length === 0){
-            return res.status(200).json({ message: 'Wishlist is empty.' });
+            return res.status(200).json({ message: 'Wishlist is empty.',wishlist:[] });
         }
         res.status(200).json({ wishlist: user.wishlist });
     } catch (err) {
@@ -75,7 +75,7 @@ exports.getCart = async (req, res) => {
         });
 
         if (!user || !user.cart || user.cart.length === 0) {
-            return res.status(400).json({
+            return res.status(200).json({
                 message: 'No products in the cart.',
                 cart: [],
                 totalPrice: 0

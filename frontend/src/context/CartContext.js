@@ -24,7 +24,8 @@ export const CartProvider = ({ children }) => {
       setLoading(true);
       if (isAuthenticated) {
         const response = await cartApi.getCart();
-        setCart(response.data || []);
+        console.log(response);
+        setCart(response.data.cart || []);
       }
     } catch (error) {
       console.error('Failed to load cart:', error);
@@ -67,6 +68,7 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product) => {
     try {
+
       if (isAuthenticated && userType === 'customer') {
         await cartApi.addToCart(product.id);
         await loadCart();

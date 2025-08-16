@@ -124,9 +124,10 @@ exports.deactivateOrder = async (req, res, next) => {
 exports.checkoutOrder = async (req,res,next) => {
     try{
         const id = req.customer.id;
-        const deliveryAddress = req.customer.address
         const user = await Customer.findById(id).populate('cart.product');
         const brand = user.cart[0].product.brand;
+        const deliveryAddress = user.address ;
+        console.log(user)
 
         if (!user || !user.cart || user.cart.length === 0) {
             return res.status(400).json({ message: 'No products in the cart to create an order.' });

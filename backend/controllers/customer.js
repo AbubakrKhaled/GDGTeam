@@ -123,7 +123,8 @@ exports.customerLogin = async (req, res, next) => {
                 id: customer._id,
                 email: customer.email,
                 role: 'customer' ,
-                address : customer.address
+                address : customer.address ,
+                gender : customer.gender,
             }
         });
     } catch (err) {
@@ -139,7 +140,7 @@ exports.customerSignup = async (req, res, next) => {
     if (validationError) return res.status(400).json({ message: validationError });
 
     try {
-        const existing = await Customer.findOne({ email });
+        const existing = await Customer.findOne(    { email });
         if (existing) return res.status(409).json({ message: 'Email already registered' });
 
         const hashedPassword = await bcrypt.hash(password, 8);

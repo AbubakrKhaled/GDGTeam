@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const Token = require('../models/token');
-
 const authByRole = (role) => {
     return async (req, res, next) => {
         // Check for token in cookies first, then headers

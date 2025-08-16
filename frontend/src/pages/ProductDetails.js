@@ -35,7 +35,7 @@ function ProductDetails() {
     try {
       const response = await productApi.getAllProducts({ category });
       // Filter out current product and limit to 4
-      const filtered = response.data
+      const filtered = response.data.data
         .filter(p => p._id !== id)
         .slice(0, 4);
       setRelatedProducts(filtered);
@@ -47,7 +47,8 @@ function ProductDetails() {
   const checkWishlistStatus = useCallback(async () => {
     try {
       const response = await cartApi.getWishlist();
-      const wishlistIds = response.data.map(item => item._id);
+      console.log(response)
+      const wishlistIds = response.data.wishlist.map(item => item._id);
       setIsInWishlist(wishlistIds.includes(id));
     } catch (error) {
       console.error('Failed to check wishlist status:', error);
@@ -58,9 +59,9 @@ function ProductDetails() {
     try {
       setLoading(true);
       const response = await productApi.getProductById(id);
-      setProduct(response.data);
-      if (response.data?.category) {
-        await loadRelatedProducts(response.data.category);
+      setProduct(response.data.data);
+      if (response.data.data.category) {
+        await loadRelatedProducts(response.data.data.category);
       }
     } catch (error) {
       console.error('Failed to load product:', error);
@@ -81,8 +82,8 @@ function ProductDetails() {
     if (!product) return;
     
     try {
-      await addToCart(product, selectedQuantity); //<-------- check this bc product and quantity input we want product only
-      await cartApi.addToCart(product);
+      console.log('Adding to cart:', product);
+      await cartApi.addToCart(product._id)
       toast.success('Product added to cart!');
     } catch (error) {
       console.error('Failed to add to cart:', error);
@@ -126,10 +127,7 @@ function ProductDetails() {
     : (product?.imageURL ? [product.imageURL] : []);
 
   const productImages = [
-    ...primaryImages,
-    'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400',
-    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
-    'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400'
+    ...primaryImages
   ].filter(Boolean);
 
   if (loading) {

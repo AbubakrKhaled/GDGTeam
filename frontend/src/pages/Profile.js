@@ -82,8 +82,11 @@ function Profile() {
     e.preventDefault();
     try {
       setLoading(true);
-      await updateCustomer(e);
-      await updateBrand(e)
+      if(userType === 'customer') {
+        await updateCustomer(profileData);
+      }else{
+        await updateBrand(profileData);
+      }
       setEditMode(false);
       // Reload user data
       window.location.reload();

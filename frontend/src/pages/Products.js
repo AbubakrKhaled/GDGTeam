@@ -59,6 +59,7 @@ function Products() {
 
   const handleAddToCart = async (product) => { 
     try {
+      console.log(product);
       await cartApi.addToCart(product._id)
       toast.success('Product added to cart!');
     } catch (error) {

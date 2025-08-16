@@ -59,8 +59,7 @@ const productSchema = new Schema({
     },
     isActive:{
         type: Boolean,
-        default: true,
-        select: false
+        default: true
     }
 }, { timestamps: true }
 )

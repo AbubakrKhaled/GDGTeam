@@ -88,7 +88,7 @@ export const deleteCartProduct = async (productId) => {
 export const createOrder = async (orderData) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/order`,
+      `${API_BASE_URL}/order/checkout`,
       orderData,
       authHeader()
     );
