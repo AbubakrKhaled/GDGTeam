@@ -135,9 +135,21 @@ exports.customerLogin = async (req, res, next) => {
 // Signup
 exports.customerSignup = async (req, res, next) => {
     const data = req.body;
-    const { email, password, address ,phonenumber ,name ,gender} = data;
+    const { email, password, address, phonenumber, name, gender } = data;
+    
+    // Enhanced validation
     const validationError = validateCustomerInput(email, password);
     if (validationError) return res.status(400).json({ message: validationError });
+    
+    // Validate required fields
+    if (!name || !address || !gender || !phonenumber) {
+        return res.status(400).json({ message: 'Name, address, gender, and phone number are required' });
+    }
+    
+    // Validate phone number format
+    if (isNaN(parseInt(phonenumber))) {
+        return res.status(400).json({ message: 'Phone number must be a valid number' });
+    }
 
     try {
         const existing = await Customer.findOne(    { email });
@@ -146,7 +158,18 @@ exports.customerSignup = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 8);
         console.log(hashedPassword)
 
-        const customer = new Customer({ email   ,password :hashedPassword , address,phonenumber,name,gender ,role: 'customer' });
+        // Convert phonenumber to number if it's a string
+        const phoneNumber = typeof phonenumber === 'string' ? parseInt(phonenumber) : phonenumber;
+
+        const customer = new Customer({ 
+            email, 
+            password: hashedPassword, 
+            address, 
+            phonenumber: phoneNumber, 
+            name, 
+            gender, 
+            role: 'customer' 
+        });
         await customer.save();
 
         const token = jwt.sign(
@@ -173,6 +196,18 @@ exports.customerSignup = async (req, res, next) => {
             }
         });
     } catch (err) {
+        console.error('Customer signup error:', err);
+        
+        // Handle specific MongoDB errors
+        if (err.code === 11000) {
+            return res.status(409).json({ message: 'Email already registered' });
+        }
+        
+        if (err.name === 'ValidationError') {
+            const validationErrors = Object.values(err.errors).map(e => e.message);
+            return res.status(400).json({ message: validationErrors.join(', ') });
+        }
+        
         next(err);
     }
 };
