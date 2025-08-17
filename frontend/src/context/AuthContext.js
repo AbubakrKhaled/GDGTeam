@@ -168,17 +168,26 @@ export const AuthProvider = ({ children }) => {
           throw new Error('Invalid user type');
       }
 
-      // Auto-login after signup
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userType', type);
-        localStorage.setItem('currentUserId', response.data.user.id);
-        setUser(response.data.user);
-        setUserType(type);
+      // Check if signup was successful
+      if (response.data && response.data.success !== false) {
+        // Auto-login after signup if token is provided
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('userType', type);
+          localStorage.setItem('currentUserId', response.data.user?.id || response.data.data?.id);
+          setUser(response.data.user || response.data.data);
+          setUserType(type);
+        }
+        
+        return { success: true, data: response.data };
+      } else {
+        // Handle case where backend returns success: false
+        const errorMsg = response.data?.message || 'Signup failed';
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
       }
-      
-      return { success: true, data: response.data };
     } catch (error) {
+      console.error('Signup error:', error);
       const errorMsg = error.response?.data?.message || 'Signup failed';
       setError(errorMsg);
       return { success: false, error: errorMsg };

@@ -69,12 +69,17 @@ function Signup() {
       const result = await signup(signupData, formData.userType);
       
       if (result.success) {
-        toast.success('Account created successfully! Please wait for approval if you registered as a brand.');
+        if (formData.userType === 'brand') {
+          toast.success('Brand account created successfully! Please wait for admin approval before you can login.');
+        } else {
+          toast.success('Account created successfully! You can now login.');
+        }
         navigate('/login');
       } else {
         setError(result.error || 'Registration failed');
       }
     } catch (error) {
+      console.error('Signup error:', error);
       setError('An error occurred during registration');
     } finally {
       setLoading(false);

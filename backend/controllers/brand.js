@@ -144,7 +144,7 @@ exports.getBrandById = async (req, res, next) => {
 };
 
 exports.updateBrand = async (req, res, next) => {
-    const id = req.brand._id;
+    const id = req.brand.id; // Changed from req.brand._id to req.brand.id
 
     if (!mongoose.isValidObjectId(id.toString())) {
         return next(new ErrorResponse('Invalid ID', 400));

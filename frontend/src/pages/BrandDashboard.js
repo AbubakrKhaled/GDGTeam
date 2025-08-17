@@ -43,6 +43,13 @@ function BrandDashboard() {
     //isDiscountValid: '',
     //reviews: ''
   });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    email: '',
+    phonenumber: '',
+    description: ''
+  });
 
   useEffect(() => {
     if (!showAddProduct && !showEditProduct) return;
@@ -256,6 +263,95 @@ const handleDeleteProduct = async (productId) => {
       size: product.size || '',
       discountAmount: product.discountAmount || '',
       isDiscountValid: product.isDiscountValid || '',
+    });
+  };
+
+  const handleEditProfile = () => {
+    setProfileForm({
+      name: user.name || '',
+      email: user.email || '',
+      phonenumber: user.phonenumber || '',
+      description: user.description || ''
+    });
+    setIsEditingProfile(true);
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      
+      // Validate phone number
+      if (profileForm.phonenumber && isNaN(parseInt(profileForm.phonenumber))) {
+        toast.error('Phone number must be a valid number');
+        setLoading(false);
+        return;
+      }
+      
+      // Convert phonenumber to number if it's not empty
+      const phonenumber = profileForm.phonenumber ? parseInt(profileForm.phonenumber) : user.phonenumber;
+      
+      // Validate required fields
+      if (!profileForm.name || !profileForm.email) {
+        toast.error('Name and email are required');
+        setLoading(false);
+        return;
+      }
+      
+      // Build the complete payload with all required fields
+      const payload = {
+        name: profileForm.name,
+        email: profileForm.email,
+        phonenumber: phonenumber,
+        description: profileForm.description || '',
+        // Include existing user data for required fields that we're not editing
+        categories: user.categories && user.categories.length > 0 ? user.categories : ['Clothes'], // Default to a valid category if none exists
+        page: user.page || [],
+        brandlocation: user.brandlocation || [],
+        logoURL: user.logoURL || [],
+        deliveryTime: user.deliveryTime || '',
+        products: user.products || []
+      };
+      
+      console.log('Sending payload:', payload);
+      
+      const response = await brandApi.updateBrand(payload);
+      console.log('Profile updated successfully:', response);
+      toast.success('Profile updated successfully!');
+      setIsEditingProfile(false);
+      
+      // Refresh the user data by fetching the updated profile
+      try {
+        const profileResponse = await brandApi.getBrandProfile(user.id);
+        const updatedUserData = profileResponse.data.data.brand;
+        
+        // Update localStorage with new user data
+        localStorage.setItem('currentUser', JSON.stringify(updatedUserData));
+        
+        // Force a page reload to refresh the user context
+        window.location.reload();
+      } catch (profileError) {
+        console.error('Failed to refresh user data:', profileError);
+        // If refresh fails, still reload to get fresh data
+        window.location.reload();
+      }
+      
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      console.error('Error response:', error.response?.data);
+      toast.error(error.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingProfile(false);
+    setProfileForm({
+      name: '',
+      email: '',
+      phonenumber: '',
+      description: ''
     });
   };
 
@@ -615,62 +711,158 @@ const handleDeleteProduct = async (productId) => {
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div>
-                <h2 className="text-xl font-semibold mb-6">Brand Profile</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Brand Name</label>
-                      <input
-                        type="text"
-                        value={user.name || ''}
-                        disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                      <input
-                        type="email"
-                        value={user.email || ''}
-                        disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                      <input
-                        type="tel"
-                        value={user.phonenumber || ''}
-                        disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Categories</label>
-                      <div className="flex flex-wrap gap-2">
-                        {user.categories?.map((category, index) => (
-                          <span key={index} className="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm">
-                            {category}
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold">Brand Profile</h2>
+                  {!isEditingProfile && (
+                    <button
+                      onClick={handleEditProfile}
+                      className="flex items-center space-x-2 px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+                    >
+                      <FaEdit />
+                      <span>Edit Profile</span>
+                    </button>
+                  )}
+                </div>
+                
+                {isEditingProfile ? (
+                  <form onSubmit={handleSaveProfile} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Brand Name</label>
+                          <input
+                            type="text"
+                            value={profileForm.name}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                          <input
+                            type="email"
+                            value={profileForm.email}
+                            disabled
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                          <input
+                            type="tel"
+                            value={profileForm.phonenumber}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, phonenumber: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Categories</label>
+                          <div className="flex flex-wrap gap-2">
+                            {user.categories?.map((category, index) => (
+                              <span key={index} className="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm">
+                                {category}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Approval Status</label>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            user.isApproved ? 'text-green-600 bg-green-100' : 'text-yellow-600 bg-yellow-100'
+                          }`}>
+                            {user.isApproved ? 'Approved' : 'Pending Approval'}
                           </span>
-                        ))}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                          <textarea
+                            value={profileForm.description}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, description: e.target.value }))}
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            placeholder="Enter your brand description..."
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Approval Status</label>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        user.isApproved ? 'text-green-600 bg-green-100' : 'text-yellow-600 bg-yellow-100'
-                      }`}>
-                        {user.isApproved ? 'Approved' : 'Pending Approval'}
-                      </span>
+                    <div className="flex space-x-4">
+                      <button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 disabled:opacity-50"
+                      >
+                        {loading ? 'Saving...' : 'Save Changes'}
+                      </button>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                      <p className="text-gray-600">{user.description || 'No description provided'}</p>
+                  </form>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Brand Name</label>
+                        <input
+                          type="text"
+                          value={user.name || ''}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input
+                          type="email"
+                          value={user.email || ''}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input
+                          type="tel"
+                          value={user.phonenumber || ''}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Categories</label>
+                        <div className="flex flex-wrap gap-2">
+                          {user.categories?.map((category, index) => (
+                            <span key={index} className="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm">
+                              {category}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Approval Status</label>
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          user.isApproved ? 'text-green-600 bg-green-100' : 'text-yellow-600 bg-yellow-100'
+                        }`}>
+                          {user.isApproved ? 'Approved' : 'Pending Approval'}
+                        </span>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <p className="text-gray-600">{user.description || 'No description provided'}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
