@@ -11,6 +11,7 @@ function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [brands, setBrands] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   
@@ -50,15 +51,17 @@ function AdminDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [dashboardRes, brandsRes, ordersRes] = await Promise.all([
+      const [dashboardRes, brandsRes, customersRes, ordersRes] = await Promise.all([
         adminApi.getAdminDashboard(), // Fetch admin dashboard data
         adminApi.getAllBrands(),       // Fetch all brands
+        adminApi.getAllCustomers(),    // Fetch all customers
         adminApi.getAllOrders(),       // Fetch all orders
       ]);
       console.log("res",dashboardRes.data)
       setDashboardData(dashboardRes.data);
       console.log("res",brandsRes.data.data)
       setBrands(brandsRes.data.data);
+      setCustomers(customersRes.data.data);
       setOrders(ordersRes.data);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
@@ -381,6 +384,12 @@ function AdminDashboard() {
                         Customer
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Brand
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Items
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Total
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -392,27 +401,37 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {dashboardData.recentOrders.map((order) => (
-                      <tr key={order._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {order._id}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {order.customer?.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ${order.total}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOrderStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(order.createdAt).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))}
+                    {dashboardData.recentOrders.map((order) => {
+                      const customerObj = customers.find(c => c._id === order.customer);
+                      const brandObj = brands.find(b => b._id === order.brand);
+                      return (
+                        <tr key={order._id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {order._id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {customerObj ? customerObj.name : order.customer}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {brandObj ? brandObj.name : order.brand}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {order.products.length} items
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${order.totalPrice}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOrderStatusColor(order.status)}`}>
+                              {order.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -533,6 +552,9 @@ function AdminDashboard() {
                       Customer
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Brand
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Items
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -547,30 +569,23 @@ function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                {orders.map((order) => (
-                    <tr key={order._id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {order._id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.customer?.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.items.length} items
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${order.total}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOrderStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
+                {orders.map((order) => {
+                    const customerObj = customers.find(c => c._id === order.customer);
+                    const brandObj = brands.find(b => b._id === order.brand);
+                    return (
+                      <tr key={order._id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order._id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{customerObj ? customerObj.name : order.customer}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{brandObj ? brandObj.name : order.brand}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.products.length} items</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${order.totalPrice}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOrderStatusColor(order.status)}`}>{order.status}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

@@ -66,22 +66,22 @@ export const AuthProvider = ({ children }) => {
 
         // // Only logout if it's an authentication error (401 or 403)
         // // Don't logout for network errors or server issues
-        // if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        //   console.log('Authentication error - logging out');
-        //   logout();
-        // } else {
-        //   // For other errors (network, server issues), try to maintain session
-        //   // Set user from localStorage if available, or keep existing state
-        //   const storedUserType = localStorage.getItem('userType');
-        //   const currentUserId = localStorage.getItem('currentUserId');
-        //
-        //   if (storedUserType && currentUserId) {
-        //     // Create a minimal user object to maintain session
-        //     setUser({ id: currentUserId, userType: storedUserType });
-        //     console.log('Network error, maintaining session with stored data');
-        //   }
-        //   setLoading(false);
-        // }
+         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+           console.log('Authentication error - logging out');
+           logout();
+         } else {
+           // For other errors (network, server issues), try to maintain session
+           // Set user from localStorage if available, or keep existing state
+           const storedUserType = localStorage.getItem('userType');
+           const currentUserId = localStorage.getItem('currentUserId');
+        
+           if (storedUserType && currentUserId) {
+             // Create a minimal user object to maintain session
+             setUser({ id: currentUserId, userType: storedUserType });
+             console.log('Network error, maintaining session with stored data');
+           }
+           setLoading(false);
+         }
       }
     },
     [logout]

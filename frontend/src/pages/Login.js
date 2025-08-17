@@ -21,7 +21,7 @@ function Login() {
         navigate('/dashboard');
         break;
       case 'admin':
-        navigate('/admin/dashboard');
+        navigate('/admin');
         break;
       default:
         navigate('/');

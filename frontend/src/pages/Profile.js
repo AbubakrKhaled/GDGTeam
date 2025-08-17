@@ -84,7 +84,7 @@ function Profile() {
       setLoading(true);
       if(userType === 'customer') {
         await updateCustomer(profileData);
-      }else{
+      }else if (userType === 'brand') {
         await updateBrand(profileData);
       }
       setEditMode(false);
