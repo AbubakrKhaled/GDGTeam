@@ -25,6 +25,7 @@ function BrandDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [loadingSizes, setLoadingSizes] = useState(false);
@@ -237,16 +238,27 @@ function BrandDashboard() {
     }
   };
   
-const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        //await apiService.deleteProduct(productId);
-        //await mockApiService.deleteProduct(productId);
         await brandApi.deactivateProduct(productId);
         await loadDashboardData();
       } catch (error) {
         console.error('Failed to delete product:', error);
       }
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      await brandApi.deactivateOrder(orderId);
+      await loadDashboardData();
+      toast.success('Order cancelled/deleted successfully!');
+    } catch (error) {
+      // Show more specific error message if available
+      const msg = error.response?.data?.message || error.response?.data?.error || 'Failed to delete/cancel order';
+      toast.error(msg);
+      console.error('Failed to delete/cancel order:', error);
     }
   };
 
@@ -377,6 +389,18 @@ const handleDeleteProduct = async (productId) => {
     }
   };
 
+  function getCustomerName(customer) {
+    // If customer is populated object, use its name
+    if (customer && typeof customer === 'object' && customer.name) {
+      return customer.name;
+    }
+    // Otherwise, fallback to ID lookup
+    const found = customers.find(c => c._id === customer);
+    return found ? found.name : 'Unknown';
+  }
+
+  const totalRevenue = orders.reduce((sum, order) => sum + (Number(order.totalPrice) || 0), 0);
+
   if (!user || userType !== 'brand') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -416,7 +440,7 @@ const handleDeleteProduct = async (productId) => {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold">${orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}</div>
+                <div className="text-2xl font-bold text-gray-900">${totalRevenue.toFixed(2)}</div>
                 <div className="text-purple-100">Total Revenue</div>
               </div>
             </div>
@@ -478,7 +502,7 @@ const handleDeleteProduct = async (productId) => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-purple-100">Total Revenue</p>
-                      <p className="text-3xl font-bold">${orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}</p>
+                      <p className="text-3xl font-bold">${totalRevenue.toFixed(2)}</p>
                     </div>
                     <FaChartLine className="text-4xl opacity-50" />
                   </div>
@@ -498,7 +522,7 @@ const handleDeleteProduct = async (productId) => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold">${order.total}</p>
+                          <p className="font-bold">${order.totalPrice}</p>
                           <span className={`px-2 py-1 rounded-full text-xs ${getOrderStatusColor(order.status)}`}>
                             {order.status}
                           </span>
@@ -631,13 +655,13 @@ const handleDeleteProduct = async (productId) => {
                             <p className="text-gray-600 text-sm">
                               {new Date(order.createdAt).toLocaleDateString()}
                             </p>
-                            <p className="text-gray-600 text-sm">Customer: {order.customer?.name || 'Unknown'}</p>
+                            <p className="text-gray-600 text-sm">Customer: {getCustomerName(order.customer)}</p>
                           </div>
                           <div className="text-right">
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getOrderStatusColor(order.status)}`}>
                               {order.status}
                             </span>
-                            <p className="font-bold text-lg mt-2">${order.total}</p>
+                            <p className="font-bold text-lg mt-2">${order.totalPrice}</p>
                           </div>
                         </div>
 
@@ -665,7 +689,27 @@ const handleDeleteProduct = async (productId) => {
                                 </p>
                               )}
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-2 items-center">
+                              {/* Status dropdown for editing order status */}
+                              <select
+                                value={order.status}
+                                onChange={e => handleUpdateOrderStatus(order._id, e.target.value)}
+                                className="px-2 py-1 border rounded-md text-sm"
+                                style={{ minWidth: 120 }}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                              </select>
+                              {/* Delete order button */}
+                              <button
+                                onClick={() => handleDeleteOrder(order._id)}
+                                className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                                title="Delete Order"
+                              >
+                                Delete
+                              </button>
                               {order.status === 'pending' && (
                                 <>
                                   <button

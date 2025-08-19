@@ -12,10 +12,13 @@ exports.getOrders = async (req, res, next) => {
         orders = await Order.find().populate('products.product');
     } 
     else if (req.brand) {
-        orders = await Order.find({brand: req.brand.id}).populate('products.product');
+        // Populate customer details for brand orders
+        orders = await Order.find({ brand: req.brand.id, status: { $ne: 'Cancelled' } })
+            .populate('products.product')
+            .populate('customer', 'name email'); // <-- add this line
     } 
     else if (req.customer) {
-      orders = await Order.find({ customer: req.customer.id }).populate('products.product');
+      orders = await Order.find({ customer: req.customer.id, status: { $ne: 'Cancelled' } }).populate('products.product');
     } 
     else {
       return res.status(403).json({ message: 'Unauthorized' });
@@ -99,15 +102,18 @@ exports.deactivateOrder = async (req, res, next) => {
         const order = await Order.findById(id).populate('products.product');
 
         if (!order) {
-        return next(new ErrorResponse('Order not found', 404));
+            return next(new ErrorResponse('Order not found', 404));
         }
-        if (req.customer.id === order.customer.toString() && order.status.toString() === "Pending") {
+        if (req.customer && req.customer.id === order.customer.toString() && order.status.toString() === "Pending") {
             order.status = 'Cancelled';
             await order.save();
             return res.status(200).json({success: true, data: order});
         }
-   
-        if (req.brand.id === order.products[0].product.brand.toString() && order.status.toString() === "Pending") {
+        // Defensive check for req.brand
+        if (!req.brand || !req.brand.id) {
+            return next(new ErrorResponse('Brand authentication failed', 401));
+        }
+        if (order.products && order.products[0] && order.products[0].product && req.brand.id === order.products[0].product.brand.toString() && order.status.toString() === "Pending") {
             order.status = 'Cancelled';
             await order.save();
             return res.status(200).json({success: true, data: order});
