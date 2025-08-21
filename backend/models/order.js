@@ -1,50 +1,55 @@
-const mongoose = require('mongoose');
-const { Schema, model, Types } = mongoose;
+const mongoose = require("mongoose");
 
-const orderSchema = new Schema({
+const orderSchema = new mongoose.Schema(
+  {
     customer: {
-        type: Types.ObjectId,
-        ref: 'customer',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customer",
+      required: true,
     },
     brand: {
-        type: Types.ObjectId,
-        ref: 'brand',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
+      required: true,
     },
-    products: [{
+    products: [
+      {
         product: {
-            type: Types.ObjectId,
-            ref: 'product'
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
         },
-        quantity: {
-            type: Number,
-            required: true
-        },
-        price: {
-            type: Number,
-            required: true
-        }
-    }],
-    totalPrice: {
-        type: Number,
-        required: true
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+      },
+    ],
+    shippingAddress: {
+      fullName: { type: String, required: true },
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
     },
     deliveryAddress: {
-        type: String,
-        required: true
+      type: String,
+    },
+    totalPrice: {
+      type: Number,
+      required: true,
     },
     status: {
-        type: String,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
-        //pending=while we send order to business. processing=business making order. shipped=business shipping.
-        default: 'Pending'
+      type: String,
+      enum: ["Pending", "Shipped", "Delivered", "Cancelled"],
+      default: "Pending",
     },
-    isActive:{
-        type: Boolean,
-        default: true
-    }
-}, { timestamps: true }
-)
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model('order', orderSchema);
+module.exports = mongoose.model("Order", orderSchema);
