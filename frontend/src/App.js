@@ -23,6 +23,9 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Orders from './pages/Orders';
 import { useEffect } from 'react';
 
+import CheckoutPage from "./pages/CheckoutPage";
+
+
 function AppContent() {
   const location = useLocation();
   const showSearchBar = ["/", "/products", "/cart"].includes(location.pathname);
