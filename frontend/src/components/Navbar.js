@@ -36,15 +36,17 @@ function Navbar() {
             Products
           </Link>
           
-          {/* Cart Icon with Badge */}
-          <Link to="/cart" className="text-gray-700 hover:text-pink-600 transition text-xl relative">
-            <FaShoppingCart />
-            {getCartCount() > 0 && (
-              <span className="absolute -top-2 -right-2 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {getCartCount()}
-              </span>
-            )}
-          </Link>
+          {/* Cart Icon with Badge - Only show for customers */}
+          {userType === 'customer' && (
+            <Link to="/cart" className="text-gray-700 hover:text-pink-600 transition text-xl relative">
+              <FaShoppingCart />
+              {getCartCount() > 0 && (
+                <span className="absolute -top-2 -right-2 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {getCartCount()}
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* User Menu */}
           {isAuthenticated ? (
@@ -74,12 +76,6 @@ function Navbar() {
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         Wishlist
-                      </Link>
-                      <Link
-                        to="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        My Orders
                       </Link>
                     </>
                   )}
