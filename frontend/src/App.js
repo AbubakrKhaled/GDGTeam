@@ -22,8 +22,6 @@ import SearchBar from './components/SearchBar';
 import ErrorBoundary from './components/ErrorBoundary';
 import Orders from './pages/Orders';
 import { useEffect } from 'react';
-import CheckoutPage from "./pages/CheckoutPage";
-
 
 function AppContent() {
   const location = useLocation();
@@ -54,7 +52,6 @@ function AppContent() {
           <Route path="/dashboard" element={<BrandDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </main>
       <Footer />
