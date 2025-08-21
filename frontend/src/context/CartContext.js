@@ -66,11 +66,10 @@ export const CartProvider = ({ children }) => {
   };*/
 
 
-  const addToCart = async (product) => {
+  const addToCart = async (productId) => {
     try {
-
       if (isAuthenticated && userType === 'customer') {
-        await cartApi.addToCart(product.id);
+        await cartApi.addToCart(productId);
         await loadCart();
       } else {
         console.warn("Only logged in customers can add to cart.");

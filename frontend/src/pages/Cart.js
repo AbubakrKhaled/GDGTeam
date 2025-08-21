@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -8,14 +8,21 @@ import { cartApi } from '../api/cart';
 
 function Cart() {
   const { cart, getCartTotal, clearCart, getCartCount } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [useManualAddress, setUseManualAddress] = useState(false);
   const [checkoutData, setCheckoutData] = useState({
-    shippingAddress: '',
+    shippingAddress: user?.address || '',
     paymentMethod: 'cash',
     notes: ''
   });
+
+  useEffect(() => {
+    if (user && !useManualAddress) {
+      setCheckoutData(prev => ({ ...prev, shippingAddress: user.address || '' }));
+    }
+  }, [user, useManualAddress]);
 
   const handleQuantityChange = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
@@ -217,13 +224,26 @@ function Cart() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Shipping Address
                   </label>
+                  <div className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      checked={useManualAddress}
+                      onChange={e => setUseManualAddress(e.target.checked)}
+                      id="manual-address-toggle"
+                      className="mr-2"
+                    />
+                    <label htmlFor="manual-address-toggle" className="text-sm text-gray-600">
+                      Use a different address
+                    </label>
+                  </div>
                   <textarea
                     value={checkoutData.shippingAddress}
-                    onChange={(e) => setCheckoutData(prev => ({ ...prev, shippingAddress: e.target.value }))}
+                    onChange={e => setCheckoutData(prev => ({ ...prev, shippingAddress: e.target.value }))}
                     required
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    placeholder="Enter your shipping address..."
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 ${!useManualAddress ? 'bg-gray-100' : ''}`}
+                    placeholder={useManualAddress ? 'Enter your shipping address...' : 'Using your saved address'}
+                    disabled={!useManualAddress}
                   />
                 </div>
 

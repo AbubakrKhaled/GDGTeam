@@ -37,9 +37,12 @@ export const addToWishlist = async (productId) => {
       );
       return response.data;
     } catch (err) {
-      console.error("Error adding product to wishlist:", err);
-      throw err;
+      // Only log unexpected errors, not 403 forbidden
+      if (!(err.response && err.response.status === 403)) {
+        console.error("Error adding product to wishlist:", err);
       }
+      throw err;
+    }
 };
 
 export const deleteWishlistProduct = async (productId) => {
@@ -56,9 +59,11 @@ export const addToCartFromWishlist = async (productId) => {
       );
       return response.data;
     } catch (err) {
-      console.error("Error adding product to cart from wishlist:", err);
-      throw err;
+      if (!(err.response && err.response.status === 403)) {
+        console.error("Error adding product to cart from wishlist:", err);
       }
+      throw err;
+    }
 };
 
 export const addToCart = async (productId) => {
@@ -70,7 +75,10 @@ export const addToCart = async (productId) => {
       );
       return response.data;
     } catch (err) {
-      console.error("Error adding product to cart:", err);
+      // Only log unexpected errors, not 403 forbidden
+      if (!(err.response && err.response.status === 403)) {
+        console.error("Error adding product to cart:", err);
+      }
       throw err;
     }
   };

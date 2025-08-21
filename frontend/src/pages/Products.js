@@ -5,10 +5,12 @@ import { FaHeart, FaShoppingCart, FaSearch, FaStar } from 'react-icons/fa';
 import { Toaster, toast } from 'react-hot-toast';
 import { productApi } from '../api/product';
 import { cartApi } from '../api/cart';
+import { useCart } from '../context/CartContext';
 
 function Products() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { addToCart, loadCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,12 +61,16 @@ function Products() {
 
   const handleAddToCart = async (product) => { 
     try {
-      console.log(product);
-      await cartApi.addToCart(product._id)
+      await cartApi.addToCart(product._id);
+      await loadCart();
       toast.success('Product added to cart!');
     } catch (error) {
-      console.error('Failed to add to cart:', error);
-      toast.error('Failed to add product to cart');
+      // Only show toast, do not log error to console for forbidden/unauthorized
+      if (error.response && error.response.status === 403) {
+        toast.error('You are not allowed to add products to cart.');
+      } else {
+        toast.error('Failed to add product to cart');
+      }
     }
   };
 
@@ -78,8 +84,12 @@ function Products() {
       setWishlistIds(prev => [...prev, product._id]);
       toast.success('Product added to wishlist!');
     } catch (error) {
-      console.error('Failed to add to wishlist:', error);
-      toast.error('Failed to add product to wishlist');
+      // Only show toast, do not log error to console for forbidden/unauthorized
+      if (error.response && error.response.status === 403) {
+        toast.error('You are not allowed to add products to wishlist.');
+      } else {
+        toast.error('Failed to add product to wishlist');
+      }
     }
   };
 

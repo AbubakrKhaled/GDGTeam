@@ -703,15 +703,16 @@ function BrandDashboard() {
                                 <option value="Delivered">Delivered</option>
                               </select>
                               {/* Delete order button */}
-                              <button
+                              
+                              {order.status === 'Pending' && (
+                                <button
                                 onClick={() => handleDeleteOrder(order._id)}
                                 className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
                                 title="Delete Order"
                               >
                                 Delete
                               </button>
-                              {order.status === 'pending' && (
-                                <>
+                                /*<>
                                   <button
                                     onClick={() => handleUpdateOrderStatus(order._id, 'confirmed')}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
@@ -724,9 +725,9 @@ function BrandDashboard() {
                                   >
                                     Cancel
                                   </button>
-                                </>
+                                </>*/
                               )}
-                              {order.status === 'confirmed' && (
+                              {/*order.status === 'confirmed' && (
                                 <button
                                   onClick={() => handleUpdateOrderStatus(order._id, 'shipped')}
                                   className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
@@ -741,7 +742,7 @@ function BrandDashboard() {
                                 >
                                   Mark Delivered
                                 </button>
-                              )}
+                              )*/}
                             </div>
                           </div>
                         </div>

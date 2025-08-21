@@ -1,4 +1,5 @@
 // Dynamic mock data service with localStorage persistence - matches backend schema
+/*
 class MockDataService {
   constructor() {
     this.initializeData();
@@ -859,3 +860,4 @@ export const mockBrand = mockApiService.getInitialUsers().find(u => u.role === '
 export const mockCart = [];
 
 export { mockApiService }; 
+*/

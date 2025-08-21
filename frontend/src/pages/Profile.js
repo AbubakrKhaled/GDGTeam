@@ -6,7 +6,7 @@ import{updateCustomer} from '../api/customer'
 import{updateBrand} from '../api/brand'
 import {getWishlist, deleteWishlistProduct} from '../api/cart'
 import { FaHeart, FaShoppingBag, FaUser, FaMapMarkerAlt, FaEdit, FaTrash } from 'react-icons/fa';
-import { getOrders } from '../api/order';
+import { getOrders, deactivateOrder } from '../api/order';
 
 function Profile() {
   const { user, userType } = useAuth();
@@ -150,7 +150,7 @@ function Profile() {
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'profile', label: 'Profile', icon: FaUser },
-              { id: 'wishlist', label: 'Wishlist', icon: FaHeart },
+              /*{ id: 'wishlist', label: 'Wishlist', icon: FaHeart },*/
               { id: 'orders', label: 'Orders', icon: FaShoppingBag },
               { id: 'addresses', label: 'Addresses', icon: FaMapMarkerAlt }
             ].map(tab => (
@@ -158,9 +158,12 @@ function Profile() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                  activeTab === tab.id
+                  /*activeTab === tab.id
                     ? 'border-pink-500 text-pink-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    */
+                  activeTab === tab.id ? 'border-pink-500 text-pink-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+
                 }`}
               >
                 <tab.icon />
@@ -264,8 +267,8 @@ function Profile() {
               </form>
             </div>
           )}
-
-          {/* Wishlist Tab */}
+{/*
+          {Wishlist Tab }
           {activeTab === 'wishlist' && (
             <div>
               <h2 className="text-xl font-semibold mb-6">My Wishlist</h2>
@@ -306,7 +309,7 @@ function Profile() {
               )}
             </div>
           )}
-
+*/}
           {/* Orders Tab */}
           {activeTab === 'orders' && (
             <div>
@@ -343,11 +346,28 @@ function Profile() {
                           </div>
                         ))}
                       </div>
-                      <div className="border-t pt-4 mt-4">
-                        <div className="flex justify-between items-center">
+                      <div className="border-t pt-4 mt-4 flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
                           <span className="font-semibold">Total:</span>
                           <span className="font-bold text-lg">{order.totalPrice} $</span>
                         </div>
+                        {order.status === 'Pending' && (
+                          <button
+                            onClick={async () => {
+                              if (window.confirm('Are you sure you want to cancel this order?')) {
+                                try {
+                                  await deactivateOrder(order._id);
+                                  await loadOrders();
+                                } catch (error) {
+                                  alert('Failed to cancel order');
+                                }
+                              }
+                            }}
+                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                          >
+                            Cancel Order
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
