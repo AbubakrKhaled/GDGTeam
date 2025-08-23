@@ -328,7 +328,19 @@ function AdminDashboard() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">${dashboardData.revenue.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-gray-900">${dashboardData.revenue}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <FaBox className="w-6 h-6" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                    <p className="text-2xl font-bold text-gray-900">{dashboardData.totalNonCancelledOrders}</p>
                   </div>
                 </div>
               </div>
@@ -513,7 +525,7 @@ function AdminDashboard() {
                               <FaCheck className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleDeactivateBrand(brand._id)}
+                              onClick={() => handleRejectBrand(brand._id)}
                               className="text-red-600 hover:text-red-900"
                             >
                               <FaTimes className="w-4 h-4" />
@@ -521,7 +533,7 @@ function AdminDashboard() {
                           </div>
                         ) : (
                           <button
-                            onClick={() => handleDeactivateBrand(brand._id)}
+                            onClick={() => handleRejectBrand(brand._id)}
                             className="text-red-600 hover:text-red-900"
                           >
                             <FaTimes className="w-4 h-4" />

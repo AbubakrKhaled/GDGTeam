@@ -181,13 +181,17 @@ exports.getAdminDashboard = async (req, res, next) => {
 
     const pendingBrands = brands.filter(b => !b.isApproved);
     const recentOrders = orders.slice(-5);
-    const revenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+    // Only include non-cancelled orders in revenue (case-insensitive)
+    const revenue = orders.filter(order => String(order.status).toLowerCase() !== 'cancelled').reduce((sum, order) => sum + order.totalPrice, 0);
+    // Add total non-cancelled orders
+    const totalNonCancelledOrders = orders.filter(order => String(order.status).toLowerCase() !== 'cancelled').length;
 
     res.status(200).json({
       totalCustomers: customers.length,
       totalBrands: brands.length,
       totalProducts: products.length,
       totalOrders: orders.length,
+      totalNonCancelledOrders,
       pendingBrands,
       recentOrders,
       revenue
