@@ -115,27 +115,52 @@ The application will open at `http://localhost:3000`
 ```
 frontend/
 ├── src/
-│   ├── components/          # Reusable UI components
-│   │   ├── Navbar.js       # Navigation with user menu
-│   │   ├── Footer.js       # Site footer
-│   │   └── SearchBar.js    # Product search component
-│   ├── context/            # React context providers
-│   │   ├── AuthContext.js  # Authentication state
-│   │   └── CartContext.js  # Shopping cart state
-│   ├── pages/              # Main application pages
-│   │   ├── Home.js         # Landing page
-│   │   ├── Products.js     # Product catalog
-│   │   ├── ProductDetails.js # Individual product page
-│   │   ├── Cart.js         # Shopping cart
-│   │   ├── Wishlist.js     # Saved products
-│   │   ├── Profile.js      # Customer profile
-│   │   ├── BrandDashboard.js # Brand management
-│   │   ├── AdminDashboard.js # Admin panel
-│   │   ├── Login.js        # Authentication
-│   │   └── Signup.js       # Account creation
-│   ├── services/           # Data and API services
-│   │   └── mockData.js     # Dynamic mock data service
-│   └── App.js              # Main application component
+│   ├── api/                    # API endpoints 
+│   │   ├── admin.js            # Admin API
+│   │   ├── brand.js            # Brand API
+│   │   ├── cart.js             # Cart API
+│   │   ├── customer.js         # Customer API
+│   │   ├── order.js            # Order API
+│   │   └── product.js          # Product API
+│   ├── components/              # Reusable UI components
+│   │   ├── BrandCard.js        # Brand card UI
+│   │   ├── CartDrawer.js       # Cart drawer component
+│   │   ├── ErrorBoundary.js     # Error handling component
+│   │   ├── FilterSidebar.js     # Filter sidebar UI
+│   │   ├── Footer.js           # Site footer
+│   │   ├── Navbar.js           # Navigation bar
+│   │   ├── ProductCard.js      # Product card UI
+│   │   └── SearchBar.js        # Search bar component
+│   ├── context/                 # Context providers
+│   │   ├── AuthContext.js      # Authentication context
+│   │   └── CartContext.js      # Cart context
+│   ├── pages/                   # Main application pages
+│   │   ├── About.js            # About page
+│   │   ├── AdminDashboard.js    # Admin dashboard
+│   │   ├── BrandDashboard.js    # Brand management dashboard
+│   │   ├── Cart.js              # Cart page
+│   │   ├── CheckoutPage.jsx    # Checkout page
+│   │   ├── Contact.js          # Contact page
+│   │   ├── Home.js             # Landing page
+│   │   ├── Login.js            # Login page
+│   │   ├── NotFound.js         # 404 page
+│   │   ├── OrderDetails.js     # Order details page
+│   │   ├── Orders.js           # Orders page
+│   │   ├── Privacy.js          # Privacy policy
+│   │   ├── ProductDetails.js    # Individual product page
+│   │   ├── Products.js         # Product catalog
+│   │   ├── Profile.js          # Customer profile
+│   │   ├── Signup.js           # Sign up page
+│   │   └── Wishlist.js         # Saved products page
+│   ├── services/                # Data and API services
+│   │   └── mockData.js         # Mock data service
+│   ├── types/                   # Type definitions
+│   │   ├── admin.js             # Admin types
+│   │   ├── brand.js             # Brand types
+│   │   ├── customer.js          # Customer types
+│   │   └── product.js           # Product types
+│   └── App.js                  # Main application component
+
 ```
 
 ## 🔧 Technical Features
