@@ -189,6 +189,29 @@ function AdminDashboard() {
     }
   };
 
+  const handleDeleteCategory = async (id) => {
+  try {
+    await adminApi.deleteCategory(id);
+    setCategories((prev) => prev.filter((c) => c._id !== id));
+    toast.success("Category deleted successfully");
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    toast.error("Failed to delete category");
+  }
+};
+
+  const handleDeleteSize = async (id) => {
+  try {
+    await adminApi.deleteSize(id);
+    setSizes((prev) => prev.filter((s) => s._id !== id));
+    toast.success("Size deleted successfully");
+  } catch (error) {
+    console.error("Error deleting size:", error);
+    toast.error("Failed to delete size");
+  }
+};
+
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'text-yellow-600 bg-yellow-100';
@@ -653,10 +676,7 @@ function AdminDashboard() {
                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{category.category}</td>
                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                <button
-                                 onClick={() => {
-                                   // Implement delete category logic here
-                                   toast.error('Delete category functionality not yet implemented.');
-                                 }}
+                                 onClick={ async () => { handleDeleteCategory(category._id)} }
                                  className="text-red-600 hover:text-red-900"
                                >
                                  <FaTimes className="w-4 h-4" />
@@ -717,10 +737,7 @@ function AdminDashboard() {
                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{size.size}</td>
                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                <button
-                                 onClick={() => {
-                                   // Implement delete size logic here
-                                   toast.error('Delete size functionality not yet implemented.');
-                                 }}
+                                 onClick={() => handleDeleteSize(size._id)}
                                  className="text-red-600 hover:text-red-900"
                                >
                                  <FaTimes className="w-4 h-4" />

@@ -397,3 +397,35 @@ exports.getAllSizes = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.deleteCategory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const category = await Category.findByIdAndDelete(id);
+    if (!category) return next(new ErrorResponse('Category not found', 404));
+
+    res.status(200).json({
+      success: true,
+      message: 'Category deleted successfully',
+      data: category
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteSize = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const size = await Size.findByIdAndDelete(id);
+    if (!size) return next(new ErrorResponse('Size not found', 404));
+
+    res.status(200).json({
+      success: true,
+      message: 'Size deleted successfully',
+      data: size
+    });
+  } catch (err) {
+    next(err);
+  }
+};

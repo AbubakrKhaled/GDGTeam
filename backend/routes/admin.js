@@ -20,7 +20,9 @@ const {
     addCategory,
     addSize,
     getAllCategories,
-    getAllSizes
+    getAllSizes,
+    deleteCategory,
+    deleteSize
 
 } = require('../controllers/admin.js');
 const { adminAuth } = require('../middlewares/auth.js');
@@ -68,5 +70,9 @@ router.post('/addSize', adminAuth, addSize );
 router.get('/categories', adminAuth, getAllCategories);
 
 router.get('/sizes', adminAuth, getAllSizes);
+
+router.delete('/categories/delete/:id', adminAuth, deleteCategory);
+
+router.delete('/sizes/delete/:id', adminAuth, deleteSize);
 
 module.exports = router;

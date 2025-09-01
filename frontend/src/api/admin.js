@@ -162,6 +162,20 @@ export const getAllSizes = async () => {
   return await axios.get(`${API_BASE_URL}/admin/sizes`, authHeader());
 };
 
+export const deleteCategory = async (id) => {
+  return await axios.delete(
+    `${API_BASE_URL}/admin/categories/delete/${id}`,
+    authHeader()
+  );
+};
+
+export const deleteSize = async (id) => {
+  return await axios.delete(
+    `${API_BASE_URL}/admin/sizes/delete/${id}`,
+    authHeader()
+  );
+};
+
 
 const adminApi = {
   adminLogin,
@@ -189,7 +203,9 @@ const adminApi = {
   addCategory,
   addSize,
   getAllCategories,
-  getAllSizes
+  getAllSizes,
+  deleteCategory,
+  deleteSize
 };
 
 export {adminApi};
